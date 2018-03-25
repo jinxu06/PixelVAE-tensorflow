@@ -16,7 +16,7 @@ flatten = tf.contrib.layers.flatten
 parser = argparse.ArgumentParser()
 
 parser.add_argument('-is', '--image_size', type=int, default=64, help="size of input image")
-parser.add_argument('-zd', '--z_dim', type=int, default=100, help="dimension of the latent variable z")
+parser.add_argument('-zd', '--z_dim', type=int, default=32, help="dimension of the latent variable z")
 parser.add_argument('-l', '--lam', type=float, default=1., help="threshold under which the KL divergence will not be punished")
 parser.add_argument('-b', '--beta', type=float, default=1., help="strength of the KL divergence penalty")
 
@@ -100,7 +100,7 @@ def sample_z(loc, log_var):
         scale = tf.sqrt(tf.exp(log_var))
         dist = tf.distributions.Normal()
         z = dist.sample(sample_shape=(args.batch_size, args.z_dim), seed=None)
-        z = loc + z * scale
+        z = loc + tf.multiply(z, scale)
         return z
 
 def vae_model(x):
@@ -115,7 +115,7 @@ model = tf.make_template('vae', vae_model)
 
 xs = [tf.placeholder(tf.float32, shape=(None, args.image_size, args.image_size, 3)) for i in range(args.nr_gpu)]
 ms = [tf.placeholder_with_default(np.ones((args.batch_size, args.image_size, args.image_size), dtype=np.float32), shape=(None, args.image_size, args.image_size)) for i in range(args.nr_gpu)]
-mxs = [tf.multiple(xs[i], tf.stack([ms for k in range(3)], axis=-1)) for i in range(args.nr_gpu)]
+mxs = [tf.multiply(xs[i], tf.stack([ms for k in range(3)], axis=-1)) for i in range(args.nr_gpu)]
 
 
 locs = [None for i in range(args.nr_gpu)]
