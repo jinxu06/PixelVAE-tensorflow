@@ -15,7 +15,7 @@ default_config = {
     'init_batch_size': 64,
     'dropout_p': 0.5,
     'max_epochs': 1000,
-    'nr_gpu': 1
+    'nr_gpu': 1,
     'polyak_decay': 0.9995,
     'num_samples': 1,
     'seed': 1,
