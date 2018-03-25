@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument('', 'image_size', type=int, default_value=64, help="size of input image")
 parser.add_argument('', 'z_dim', type=int, default_value=100, help="dimension of the latent variable z")
-parser.add_argument('', 'lambda', type=float, default_value=1., help="threshold under which the KL divergence will not be punished")
+parser.add_argument('', 'lam', type=float, default_value=1., help="threshold under which the KL divergence will not be punished")
 parser.add_argument('', 'beta', type=float, default_value=1., help="strength of the KL divergence penalty")
 
 parser.add_argument('', 'batch_size', type=int, default_value=100, help="batch size")
@@ -136,7 +136,7 @@ for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         MSEs[i] = tf.reduce_sum(tf.square(flatten(xs[i])-flatten(x_hats[i])), 1)
         KLDs[i] = - 0.5 * tf.reduce_mean(1 + log_vars[i] - tf.square(locs[i]) - tf.exp(log_vars[i]), axis=-1)
-        losses[i] = tf.reduce_mean(MSEs[i] + args.beta * tf.maximum(args.lambda, KLDs[i]))
+        losses[i] = tf.reduce_mean(MSEs[i] + args.beta * tf.maximum(args.lam, KLDs[i]))
         grads[i] = tf.gradients(losses[i], all_params, colocate_gradients_with_ops=True)
 
 with tf.device('/gpu:0'):
