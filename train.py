@@ -16,13 +16,10 @@ import time
 import numpy as np
 import tensorflow as tf
 
-from pixel_cnn_pp import nn
-# from pixel_cnn_pp.model import model_spec
-from pixel_cnn_pp.mini_model import model_spec
+from pixelcnn import nn
+from pixelcnn.mini_model import model_spec
 from utils import plotting
-import utils.mask as um
 import utils.mfunc as uf
-import utils.grid as grid
 
 # self define modules
 from config import get_config
