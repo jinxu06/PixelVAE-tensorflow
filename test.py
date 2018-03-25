@@ -224,6 +224,8 @@ def sample_from_model(sess, data=None, **params):
 
         spatial_lv = np.concatenate(spatial_lv, axis=-1)
 
+    feed_dict = {}
+
     if args.global_conditional:
         global_lv = np.split(global_lv, args.nr_gpu)
         feed_dict.update({ghs[i]: global_lv[i] for i in range(args.nr_gpu)})
