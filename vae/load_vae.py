@@ -15,7 +15,7 @@ flatten = tf.contrib.layers.flatten
 parser = argparse.ArgumentParser()
 
 parser.add_argument('-is', '--image_size', type=int, default=64, help="size of input image")
-parser.add_argument('-zd', '--z_dim', type=int, default=100, help="dimension of the latent variable z")
+parser.add_argument('-zd', '--z_dim', type=int, default=32, help="dimension of the latent variable z")
 parser.add_argument('-l', '--lam', type=float, default=1., help="threshold under which the KL divergence will not be punished")
 parser.add_argument('-b', '--beta', type=float, default=1., help="strength of the KL divergence penalty")
 
