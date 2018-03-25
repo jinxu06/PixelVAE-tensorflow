@@ -115,7 +115,7 @@ model = tf.make_template('vae', vae_model)
 
 xs = [tf.placeholder(tf.float32, shape=(None, args.image_size, args.image_size, 3)) for i in range(args.nr_gpu)]
 ms = [tf.placeholder_with_default(np.ones((args.batch_size, args.image_size, args.image_size), dtype=np.float32), shape=(None, args.image_size, args.image_size)) for i in range(args.nr_gpu)]
-mxs = [tf.multiply(xs[i], tf.stack([ms for k in range(3)], axis=-1)) for i in range(args.nr_gpu)]
+mxs = [tf.multiply(xs[i], tf.stack([ms[i] for k in range(3)], axis=-1)) for i in range(args.nr_gpu)]
 
 
 locs = [None for i in range(args.nr_gpu)]
