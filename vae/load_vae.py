@@ -131,6 +131,6 @@ def make_feed_dict(data, mgen=None):
 
 def load_vae(sess, saver):
 
-    ckpt_file = FLAGS.save_dir + '/params_' + 'celeba' + '.ckpt'
+    ckpt_file = args.save_dir + '/params_' + 'celeba' + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
