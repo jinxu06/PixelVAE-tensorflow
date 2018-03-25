@@ -20,7 +20,7 @@ from pixelcnn import nn
 from pixelcnn.mini_model import model_spec
 from utils import plotting
 import utils.mfunc as uf
-
+import utils.mask as um
 # self define modules
 from config import get_config
 
