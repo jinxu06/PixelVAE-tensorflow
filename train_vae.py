@@ -98,7 +98,7 @@ def inference_network(x):
 def sample_z(loc, log_var):
     with tf.variable_scope("sample_z"):
         scale = tf.sqrt(tf.exp(log_var))
-        dist = tf.distributions.Normal()
+        dist = tf.distributions.Normal(loc=0., scale=1.)
         z = dist.sample(sample_shape=(args.batch_size, args.z_dim), seed=None)
         z = loc + tf.multiply(z, scale)
         return z
