@@ -39,9 +39,9 @@ configs['imagenet'] = {
     "data_set": "imagenet",
     "batch_size": 8,
     "init_batch_size": 8,
-    "spatial_conditional": True,
+    'global_conditional': False,
+    "spatial_conditional": False,
     "save_interval": 10,
-    "map_sampling": True,
     "nr_gpu": 2,
 }
 
