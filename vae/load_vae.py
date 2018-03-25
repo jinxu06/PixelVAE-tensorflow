@@ -106,7 +106,6 @@ zs = [tf.placeholder(tf.float32, shape=(None, args.z_dim)) for i in range(args.n
 
 locs = [None for i in range(args.nr_gpu)]
 log_vars = [None for i in range(args.nr_gpu)]
-zs = [None for i in range(args.nr_gpu)]
 x_hats = [None for i in range(args.nr_gpu)]
 
 with tf.variable_scope("vae"):
