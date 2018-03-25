@@ -24,7 +24,7 @@ import utils.mask as um
 # self define modules
 from config import get_config
 
-cfg = get_config('imagenet')
+cfg = get_config('cifar')
 
 # -----------------------------------------------------------------------------
 parser = argparse.ArgumentParser()
@@ -68,6 +68,7 @@ args.load_params = args.load_params or cfg['load_params']
 args.spatial_conditional = args.spatial_conditional or cfg['spatial_conditional']
 args.global_conditional = args.global_conditional or cfg['global_conditional']
 args.context_conditioning = args.context_conditioning or cfg['context_conditioning']
+args.debug = args.debug or cfg['debug']
 
 print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
 

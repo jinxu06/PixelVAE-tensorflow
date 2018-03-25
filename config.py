@@ -31,18 +31,19 @@ default_config = {
 
 configs = {}
 
-configs['imagenet'] = {
-    "data_dir": "/data/ziz/not-backed-up/jxu/imagenet",
-    "save_dir": "/data/ziz/jxu/models/imagenet-test",
-    "nr_filters": 160,
-    "nr_resnet": 5,
-    "data_set": "imagenet",
+configs['cifar'] = {
+    "data_dir": "/data/ziz/not-backed-up/jxu/cifar",
+    "save_dir": "/data/ziz/jxu/models/cifar-test",
+    "nr_filters": 80,
+    "nr_resnet": 6,
+    "data_set": "cifar",
     "batch_size": 8,
     "init_batch_size": 8,
-    'global_conditional': False,
     "spatial_conditional": False,
+    "global_conditional": False,
+    "context_conditioning": False,
     "save_interval": 10,
-    "nr_gpu": 2,
+    "nr_gpu": 4,
 }
 
 def get_config(config_name):
