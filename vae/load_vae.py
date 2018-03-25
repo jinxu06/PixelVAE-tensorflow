@@ -104,6 +104,11 @@ ms = [tf.placeholder_with_default(np.ones((args.batch_size, args.image_size, arg
 mxs = [tf.multiply(xs[i], tf.stack([ms for k in range(3)], axis=-1)) for i in range(args.nr_gpu)]
 zs = [tf.placeholder(tf.float32, shape=(None, args.z_dim)) for i in range(args.nr_gpu)]
 
+locs = [None for i in range(args.nr_gpu)]
+log_vars = [None for i in range(args.nr_gpu)]
+zs = [None for i in range(args.nr_gpu)]
+x_hats = [None for i in range(args.nr_gpu)]
+
 with tf.variable_scope("vae"):
     for i in range(args.nr_gpu):
         with tf.device('/gpu:%d' % i):
