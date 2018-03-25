@@ -2,6 +2,7 @@ import numpy as np
 import os
 import tensorflow as tf
 import argparse
+import json
 import time
 import data.celeba_data as celeba_data
 from tensorflow.contrib.framework.python.ops import arg_scope
@@ -31,6 +32,8 @@ parser.add_argument('-lp', '--load_params', dest='load_params', action='store_tr
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
 
 args = parser.parse_args()
+
+print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
 
 # Data IO
 if args.debug:

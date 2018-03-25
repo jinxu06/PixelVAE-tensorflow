@@ -2,35 +2,38 @@ import numpy as np
 import os
 import tensorflow as tf
 import argparse
+import json
 import time
 import data.celeba_data as celeba_data
 from tensorflow.contrib.framework.python.ops import arg_scope
-import pixel_cnn_pp.nn as nn
+import pixelcnn.nn as nn
 from utils import plotting
-from pixel_cnn_pp.nn import adam_updates
+from pixelcnn.nn import adam_updates
 import utils.mask as m
 flatten = tf.contrib.layers.flatten
 
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('', 'image_size', type=int, default_value=64, help="size of input image")
-parser.add_argument('', 'z_dim', type=int, default_value=100, help="dimension of the latent variable z")
-parser.add_argument('', 'lam', type=float, default_value=1., help="threshold under which the KL divergence will not be punished")
-parser.add_argument('', 'beta', type=float, default_value=1., help="strength of the KL divergence penalty")
+parser.add_argument('-is', '--image_size', type=int, default=64, help="size of input image")
+parser.add_argument('-zd', '--z_dim', type=int, default=100, help="dimension of the latent variable z")
+parser.add_argument('-l', '--lam', type=float, default=1., help="threshold under which the KL divergence will not be punished")
+parser.add_argument('-b', '--beta', type=float, default=1., help="strength of the KL divergence penalty")
 
-parser.add_argument('', 'batch_size', type=int, default_value=100, help="batch size")
-parser.add_argument('', 'save_interval', type=int, default_value=10, help="epoch interval for checkpointing")
+parser.add_argument('-bs', '--batch_size', type=int, default=100, help="batch size")
+parser.add_argument('-si', '--save_interval', type=int, default=10, help="epoch interval for checkpointing")
 
-parser.add_argument('', 'data_dir', type=str, default_value="/data/ziz/not-backed-up/jxu/CelebA", help="data storage location")
-parser.add_argument('', 'save_dir', type=str, default_value="/data/ziz/jxu/models/vae-test", help="checkpoints storage location")
-parser.add_argument('', 'nr_gpu', type=int, default_value=1, help="number of GPUs used")
-parser.add_argument('', 'data_set', type=str, default_value="celeba64", help="dataset used")
+parser.add_argument('-dd', '--data_dir', type=str, default="/data/ziz/not-backed-up/jxu/CelebA", help="data storage location")
+parser.add_argument('-sd', '--save_dir', type=str, default="/data/ziz/jxu/models/vae-test", help="checkpoints storage location")
+parser.add_argument('-ng', '--nr_gpu', type=int, default=1, help="number of GPUs used")
+parser.add_argument('-ds', '--data_set', type=str, default="celeba64", help="dataset used")
 
-parser.add_argument('', '--load_params', dest='load_params', action='store_true', help='whether to load previous checkpoint?')
-parser.add_argument('', '--debug', dest='debug', action='store_true', help='Under debug mode?')
+parser.add_argument('-lp', '--load_params', dest='load_params', action='store_true', help='whether to load previous checkpoint?')
+parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
 
 args = parser.parse_args()
+
+print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
 
 # Data IO
 if args.debug:
