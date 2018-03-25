@@ -14,21 +14,21 @@ flatten = tf.contrib.layers.flatten
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument('', 'image_size', type=int, default_value=64, help="size of input image")
-parser.add_argument('', 'z_dim', type=int, default_value=100, help="dimension of the latent variable z")
-parser.add_argument('', 'lam', type=float, default_value=1., help="threshold under which the KL divergence will not be punished")
-parser.add_argument('', 'beta', type=float, default_value=1., help="strength of the KL divergence penalty")
+parser.add_argument('-', '--image_size', type=int, default_value=64, help="size of input image")
+parser.add_argument('-', '--z_dim', type=int, default_value=100, help="dimension of the latent variable z")
+parser.add_argument('-', '--lam', type=float, default_value=1., help="threshold under which the KL divergence will not be punished")
+parser.add_argument('-', '--beta', type=float, default_value=1., help="strength of the KL divergence penalty")
 
-parser.add_argument('', 'batch_size', type=int, default_value=100, help="batch size")
-parser.add_argument('', 'save_interval', type=int, default_value=10, help="epoch interval for checkpointing")
+parser.add_argument('-', '--batch_size', type=int, default_value=100, help="batch size")
+parser.add_argument('-', '--save_interval', type=int, default_value=10, help="epoch interval for checkpointing")
 
-parser.add_argument('', 'data_dir', type=str, default_value="/data/ziz/not-backed-up/jxu/CelebA", help="data storage location")
-parser.add_argument('', 'save_dir', type=str, default_value="/data/ziz/jxu/models/vae-test", help="checkpoints storage location")
-parser.add_argument('', 'nr_gpu', type=int, default_value=1, help="number of GPUs used")
-parser.add_argument('', 'data_set', type=str, default_value="celeba64", help="dataset used")
+parser.add_argument('-', '--data_dir', type=str, default_value="/data/ziz/not-backed-up/jxu/CelebA", help="data storage location")
+parser.add_argument('-', '--save_dir', type=str, default_value="/data/ziz/jxu/models/vae-test", help="checkpoints storage location")
+parser.add_argument('-', '--nr_gpu', type=int, default_value=1, help="number of GPUs used")
+parser.add_argument('-', '--data_set', type=str, default_value="celeba64", help="dataset used")
 
-parser.add_argument('', '--load_params', dest='load_params', action='store_true', help='whether to load previous checkpoint?')
-parser.add_argument('', '--debug', dest='debug', action='store_true', help='Under debug mode?')
+parser.add_argument('-', '--load_params', dest='load_params', action='store_true', help='whether to load previous checkpoint?')
+parser.add_argument('-', '--debug', dest='debug', action='store_true', help='Under debug mode?')
 
 args = parser.parse_args()
 
