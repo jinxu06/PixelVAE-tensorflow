@@ -23,7 +23,7 @@ default_config = {
     'global_conditional': False,
     'spatial_latent_num_channel': 4,
     'global_latent_dim': 10,
-    'context_conditioning': True,
+    'context_conditioning': False,
     'debug': False,
 }
 
