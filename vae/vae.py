@@ -52,7 +52,7 @@ def sample_z(loc, log_var, z_dim, seed=None):
     with tf.variable_scope("sample_z"):
         scale = tf.sqrt(tf.exp(log_var))
         dist = tf.distributions.Normal(loc=0., scale=1.)
-        z = dist.sample(sample_shape=int_shape(loc), seed=None)
+        z = dist.sample(sample_shape=(None, z_dim), seed=None)
         z = loc + tf.multiply(z, scale)
         return z
 
