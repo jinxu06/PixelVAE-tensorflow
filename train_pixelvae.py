@@ -111,7 +111,7 @@ for i in range(args.nr_gpu):
         locs[i], log_vars[i], out = model(mxs[i], **model_opt)
         nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out)
         klds[i] = - 0.5 * tf.reduce_mean(1 + log_vars[i] - tf.square(locs[i]) - tf.exp(log_vars[i]), axis=-1)
-        losses[i] = nlls[i] + klds[i]
+        losses[i] = tf.reduce_mean(nlls[i] + args.beta * tf.maximum(args.lam, klds[i]))
 
 all_params = tf.trainable_variables()
 for i in range(args.nr_gpu):
@@ -122,9 +122,9 @@ with tf.device('/gpu:0'):
     for i in range(1, args.nr_gpu):
         for j in range(len(grads[0])):
             grads[0][j] += grads[i][j]
-    nll = tf.reduce_mean(nlls)
-    kld = tf.reduce_mean(klds)
-    loss = tf.reduce_mean(losses)
+    nll = tf.concat(nlls, axis=0)
+    kld = tf.concat(klds, axis=0)
+    loss = tf.concat(losses, axis=0)
 
     train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
