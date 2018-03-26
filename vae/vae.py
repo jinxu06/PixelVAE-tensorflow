@@ -15,7 +15,7 @@ def generative_network(z, z_dim, img_size=64, output_feature_maps=False, nr_fina
         net = tf.layers.conv2d_transpose(net, 2**4*nr_final_feature_maps, 4, strides=1, padding='VALID', kernel_initializer=kernel_initializer)
         net = tf.layers.batch_normalization(net)
         net = nonlinearity(net)
-        for i in range(np.rint(np.log2(img_size))-2):
+        for i in range(np.rint(np.log2(img_size)).astype(np.int32)-2):
             net = tf.layers.conv2d_transpose(net, 2**3*nr_final_feature_maps, 5, strides=2, padding='SAME', kernel_initializer=kernel_initializer)
             net = tf.layers.batch_normalization(net)
             net = nonlinearity(net)
@@ -32,7 +32,7 @@ def inference_network(x, z_dim, img_size=64, nr_final_feature_maps=32):
     kernel_initializer = None
     with tf.variable_scope("inference_network"):
         net = tf.reshape(x, [-1, img_size, img_size, 3]) # 64x64
-        for i in range(np.rint(np.log2(img_size))-2):
+        for i in range(np.rint(np.log2(img_size)).astype(np.int32)-2):
             net = tf.layers.conv2d(net, nr_final_feature_maps, 5, strides=2, padding='SAME', kernel_initializer=kernel_initializer)
             net = tf.layers.batch_normalization(net)
             net = nonlinearity(net)
