@@ -83,8 +83,23 @@ for i in range(args.nr_gpu):
         nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(mxs[i]), out)
         klds[i] = - 0.5 * tf.reduce_mean(1 + log_vars[i] - tf.square(locs[i]) - tf.exp(log_vars[i]), axis=-1)
         losses[i] = nlls[i] + klds[i]
-        print(losses)
 
+all_params = tf.trainable_variables()
+for i in range(args.nr_gpu):
+    with tf.device('/gpu:%d' % i):
+        grads[i] = tf.gradients(losses[i], all_params, colocate_gradients_with_ops=True)
+
+with tf.device('/gpu:0'):
+    for i in range(1, args.nr_gpu):
+        losses[0] += losses[i]
+        for j in range(len(grads[0])):
+            grads[0][j] += grads[i][j]
+
+    train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
+
+print(losses)
+initializer = tf.global_variables_initializer()
+saver = tf.train.Saver()
 
 quit()
 # gradients
