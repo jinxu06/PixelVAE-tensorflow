@@ -109,7 +109,7 @@ grads = [None for i in range(args.nr_gpu)]
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         locs[i], log_vars[i], out = model(mxs[i], **model_opt)
-        nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out)
+        nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
         print(nlls[i])
         klds[i] = - 0.5 * tf.reduce_mean(1 + log_vars[i] - tf.square(locs[i]) - tf.exp(log_vars[i]), axis=-1)
         print(klds[i])
