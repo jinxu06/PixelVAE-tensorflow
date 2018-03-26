@@ -58,7 +58,8 @@ args = parser.parse_args()
 
 print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
 
-
+rng = np.random.RandomState(args.seed)
+tf.set_random_seed(args.seed)
 # initialize data loaders for train/test splits
 if args.data_set == 'cifar':
     import data.cifar10_data as cifar10_data
