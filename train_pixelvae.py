@@ -10,6 +10,7 @@ import tensorflow as tf
 
 from pixelcnn import nn
 from pixelvae import pixel_vae
+from pixelcnn.nn import adam_updates
 from utils import plotting
 import utils.mfunc as uf
 import utils.mask as um
