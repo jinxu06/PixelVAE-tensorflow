@@ -11,7 +11,7 @@ import tensorflow as tf
 from pixelcnn import nn
 from pixelvae import pixel_vae
 from pixelcnn.nn import adam_updates
-import data.celeba_data as celeba_data
+
 from utils import plotting
 import utils.mfunc as uf
 import utils.mask as um
@@ -59,13 +59,31 @@ args = parser.parse_args()
 print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
 
 
-# Data IO
-if args.debug:
-    train_data = celeba_data.DataLoader(args.data_dir, 'valid', args.batch_size*args.nr_gpu, shuffle=True, size=args.img_size)
+# initialize data loaders for train/test splits
+if args.data_set == 'cifar':
+    import data.cifar10_data as cifar10_data
+    DataLoader = cifar10_data.DataLoader
+elif args.data_set == 'imagenet':
+    import data.imagenet_data as imagenet_data
+    DataLoader = imagenet_data.DataLoader
+elif 'celeba' in args.data_set:
+    import data.celeba_data as celeba_data
+    DataLoader = celeba_data.DataLoader
 else:
-    train_data = celeba_data.DataLoader(args.data_dir, 'train', args.batch_size*args.nr_gpu, shuffle=True, size=args.img_size)
-test_data = celeba_data.DataLoader(args.data_dir, 'valid', args.batch_size*args.nr_gpu, shuffle=False, size=args.img_size)
-
+    raise("unsupported dataset")
+if args.data_set=='celeba128':
+    if args.debug:
+        train_data = DataLoader(args.data_dir, 'valid', args.batch_size * args.nr_gpu, rng=rng, shuffle=True, size=128)
+    else:
+        train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu, rng=rng, shuffle=True, size=128)
+    test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shuffle=False, size=128)
+else:
+    if args.debug:
+        train_data = DataLoader(args.data_dir, 'valid', args.batch_size * args.nr_gpu, rng=rng, shuffle=True)
+    else:
+        train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu, rng=rng, shuffle=True)
+    test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shuffle=False)
+obs_shape = train_data.get_observation_size() # e.g. a tuple (32,32,3)
 
 # data place holder
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
