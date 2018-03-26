@@ -167,8 +167,10 @@ def sample_from_model(sess, data=None):
     handle = sess.partial_run_setup(test_fs+new_x_gen, xs)
     feed_dict = {xs[i]: ds[i] for i in range(args.nr_gpu)}
     fs_np = sess.partial_run(handle, test_fs, feed_dict=feed_dict)
-    new_x_gen_np = sess.partial_run(handle, new_x_gen)
-    print(new_x_gen_np)
+
+    for k in range(4):
+        new_x_gen_np = sess.partial_run(handle, new_x_gen)
+        print(new_x_gen_np[0].shape)
 
     # x_gen = [np.zeros_like(x[0]) for i in range(args.nr_gpu)]
     #
