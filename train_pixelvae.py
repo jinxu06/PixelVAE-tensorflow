@@ -25,11 +25,11 @@ parser = argparse.ArgumentParser()
 
 
 # vae
-parser.add_argument('-is', '--img_size', type=int, default=64, help="size of input image")
-parser.add_argument('-zd', '--z_dim', type=int, default=32, help="dimension of the latent variable z")
-parser.add_argument('-l', '--lam', type=float, default=1., help="threshold under which the KL divergence will not be punished")
-parser.add_argument('-b', '--beta', type=float, default=1., help="strength of the KL divergence penalty")
-parser.add_argument('-nffm', '--nr_final_feature_maps', type=int, default=32, help="number of final feature maps in the vae part")
+parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
+parser.add_argument('-zd', '--z_dim', type=int, default=cfg['z_dim'], help="dimension of the latent variable z")
+parser.add_argument('-l', '--lam', type=float, default=cfg['lam'], help="threshold under which the KL divergence will not be punished")
+parser.add_argument('-b', '--beta', type=float, default=cfg['beta'], help="strength of the KL divergence penalty")
+parser.add_argument('-nffm', '--nr_final_feature_maps', type=int, default=cfg['nr_final_feature_maps'], help="number of final feature maps in the vae part")
 
 # data I/O
 parser.add_argument('-dd', '--data_dir', type=str, default=cfg['data_dir'], help='Location for the dataset')
