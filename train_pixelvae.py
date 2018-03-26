@@ -88,6 +88,7 @@ obs_shape = train_data.get_observation_size() # e.g. a tuple (32,32,3)
 
 # data place holder
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
+ps = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 ms = [tf.placeholder_with_default(np.ones((args.batch_size, args.img_size, args.img_size), dtype=np.float32), shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
 mxs = [tf.multiply(xs[i], tf.stack([ms[i] for k in range(3)], axis=-1)) for i in range(args.nr_gpu)]
 
@@ -122,17 +123,17 @@ new_x_gen = [None for i in range(args.nr_gpu)]
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        out, locs[i], log_vars[i], _, _ = model(mxs[i], dropout_p=args.dropout_p, **model_opt)
+        out, locs[i], log_vars[i], _, _ = model(mxs[i], mxs[i], dropout_p=args.dropout_p, **model_opt)
         nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
         klds[i] = - 0.5 * tf.reduce_mean(1 + log_vars[i] - tf.square(locs[i]) - tf.exp(log_vars[i]), axis=-1)
         losses[i] = nlls[i] + args.beta * tf.maximum(args.lam, klds[i])
 
-        out, test_locs[i], test_log_vars[i], test_fs[i], _ = model(mxs[i], dropout_p=0., **model_opt)
+        out, test_locs[i], test_log_vars[i], test_fs[i], _ = model(mxs[i], mxs[i], dropout_p=0., **model_opt)
         test_nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
         test_klds[i] = - 0.5 * tf.reduce_mean(1 + test_log_vars[i] - tf.square(test_locs[i]) - tf.exp(test_log_vars[i]), axis=-1)
         test_losses[i] = test_nlls[i] + args.beta * tf.maximum(args.lam, test_klds[i])
 
-        out, sample_locs[i], sample_log_vars[i], sample_fs[i], _ = model(mxs[i], f=fs[i], dropout_p=0., **model_opt)
+        out, sample_locs[i], sample_log_vars[i], sample_fs[i], _ = model(mxs[i], ps[i], f=fs[i], dropout_p=0., **model_opt)
         epsilon = 0.05
         new_x_gen[i] = nn.sample_from_discretized_mix_logistic(out, args.nr_logistic_mix, epsilon=epsilon)
 
@@ -174,9 +175,16 @@ def sample_from_model(sess, data=None):
     feed_dict = {xs[i]: ds[i] for i in range(args.nr_gpu)}
     fs_np = sess.run(sample_fs, feed_dict=feed_dict)
 
+    x_gen = [np.zeros_like(ds[i]) for i in range(args.nr_gpu)]
+    feed_dict = {}
     feed_dict.update({fs[i]: fs_np[i] for i in range(args.nr_gpu)})
-    new_x_gen_np = sess.run(new_x_gen, feed_dict=feed_dict)
-    print(new_x_gen_np[0].shape)
+    for yi in range(obs_shape[0]):
+        for xi in range(obs_shape[1]):
+            feed_dict.update({ps[i]: x_gen[i] for i in range(args.nr_gpu)})
+            new_x_gen_np = sess.run(new_x_gen, feed_dict=feed_dict)
+            for i in range(args.nr_gpu):
+                x_gen[i][:,yi,xi,:] = new_x_gen_np[i][:,yi,xi,:]
+    return np.concatenate(x_gen, axis=0)
 
     # x_gen = [np.zeros_like(x[0]) for i in range(args.nr_gpu)]
     #
