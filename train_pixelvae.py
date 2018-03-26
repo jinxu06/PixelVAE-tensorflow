@@ -111,7 +111,7 @@ for i in range(args.nr_gpu):
         locs[i], log_vars[i], out = model(mxs[i], **model_opt)
         nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out)
         klds[i] = - 0.5 * tf.reduce_mean(1 + log_vars[i] - tf.square(locs[i]) - tf.exp(log_vars[i]), axis=-1)
-        losses[i] = tf.reduce_mean(nlls[i] + args.beta * tf.maximum(args.lam, klds[i]))
+        losses[i] = nlls[i] + args.beta * tf.maximum(args.lam, klds[i])
 
 all_params = tf.trainable_variables()
 for i in range(args.nr_gpu):
