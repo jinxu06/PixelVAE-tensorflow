@@ -58,7 +58,7 @@ def sample_z(loc, log_var, z_dim, seed=None):
 
 def vae_model(x, z_dim, img_size=64, output_feature_maps=False, nr_final_feature_maps=32, seed=None):
     with tf.variable_scope("vae"):
-        loc, log_var = inference_network(x, z_dim)
+        loc, log_var = inference_network(x, z_dim, img_size=img_size, nr_final_feature_maps=nr_final_feature_maps)
         z = sample_z(loc, log_var, z_dim, seed=seed)
-        x_hat = generative_network(z, z_dim)
+        x_hat = generative_network(z, z_dim, img_size=img_size, output_feature_maps=output_feature_maps, nr_final_feature_maps=nr_final_feature_maps)
         return loc, log_var, z, x_hat
