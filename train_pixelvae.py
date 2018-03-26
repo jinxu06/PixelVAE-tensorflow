@@ -9,6 +9,7 @@ import numpy as np
 import tensorflow as tf
 
 from pixelcnn import nn
+from pixelvae import pixel_vae
 from utils import plotting
 import utils.mfunc as uf
 import utils.mask as um
@@ -22,10 +23,12 @@ parser = argparse.ArgumentParser()
 
 
 # vae
-parser.add_argument('-is', '--image_size', type=int, default=64, help="size of input image")
+parser.add_argument('-is', '--img_size', type=int, default=64, help="size of input image")
 parser.add_argument('-zd', '--z_dim', type=int, default=32, help="dimension of the latent variable z")
 parser.add_argument('-l', '--lam', type=float, default=1., help="threshold under which the KL divergence will not be punished")
 parser.add_argument('-b', '--beta', type=float, default=1., help="strength of the KL divergence penalty")
+parser.add_argument('-nffm', '--nr_final_feature_maps', type=int, default=32, help="number of final feature maps in the vae part")
+
 # data I/O
 parser.add_argument('-dd', '--data_dir', type=str, default=cfg['data_dir'], help='Location for the dataset')
 parser.add_argument('-sd', '--save_dir', type=str, default=cfg['save_dir'], help='Location for parameter checkpoints and samples')
@@ -53,7 +56,6 @@ args = parser.parse_args()
 
 print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
 
-quit()
 
 # data place holder
 xs = [tf.placeholder(tf.float32, shape=(None, args.image_size, args.image_size, 3)) for i in range(args.nr_gpu)]
@@ -62,8 +64,10 @@ mxs = [tf.multiply(xs[i], tf.stack([ms for k in range(3)], axis=-1)) for i in ra
 # zs = [tf.placeholder(tf.float32, shape=(None, args.z_dim)) for i in range(args.nr_gpu)]
 
 # create the model
-model_opt = {}
+model_opt = {"z_dim":args.z_dim, "img_size":args.img_size, "nr_final_feature_maps":args.nr_final_feature_maps, "dropout_p":args.dropout_p, "nr_resnet":args.nr_resnet, "nr_filters":args.nr_filters, "nr_logistic_mix":args.nr_logistic_mix}
 model = tf.make_template('pixel_vae', pixel_vae)
+
+quit()
 
 
 # gradients

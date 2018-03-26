@@ -1,6 +1,6 @@
 
 default_config = {
-    'image_size': 64,
+    'img_size': 64,
     'z_dim': 32,
     'lam': 1.0,
     'beta': 1.0,
@@ -22,6 +22,7 @@ default_config = {
     'seed': 1,
     'context_conditioning': False,
     'debug': False,
+    'nr_final_feature_maps': 32,
 }
 
 
