@@ -164,16 +164,19 @@ def sample_from_model(sess, data=None):
     data = np.cast[np.float32]((data - 127.5) / 127.5) ## preprocessing
     ds = np.split(data, args.nr_gpu)
 
-    x = np.split(x, args.nr_gpu)
-    x_gen = [np.zeros_like(x[0]) for i in range(args.nr_gpu)]
+    setup = sess.partial_run_setup(test_fs+new_x_gen, xs)
+    feed_dict = {xs[i]: ds[i] for i in range(args.nr_gpu)}
+    sess.partial_run(setup, test_fs, feed_dict=feed_dict)
 
-    for yi in range(obs_shape[0]):
-        for xi in range(obs_shape[1]):
-            feed_dict.update({xs[i]: x_gen[i] for i in range(args.nr_gpu)})
-            new_x_gen_np = sess.run(new_x_gen, feed_dict=feed_dict)
-            for i in range(args.nr_gpu):
-                x_gen[i][:,yi,xi,:] = new_x_gen_np[i][:,yi,xi,:]
-    return np.concatenate(x_gen, axis=0)
+    # x_gen = [np.zeros_like(x[0]) for i in range(args.nr_gpu)]
+    #
+    # for yi in range(obs_shape[0]):
+    #     for xi in range(obs_shape[1]):
+    #         feed_dict.update({xs[i]: x_gen[i] for i in range(args.nr_gpu)})
+    #         new_x_gen_np = sess.run(new_x_gen, feed_dict=feed_dict)
+    #         for i in range(args.nr_gpu):
+    #             x_gen[i][:,yi,xi,:] = new_x_gen_np[i][:,yi,xi,:]
+    # return np.concatenate(x_gen, axis=0)
 
 
 config = tf.ConfigProto()
@@ -215,6 +218,12 @@ with tf.Session(config=config) as sess:
         print("epoch {0} --------------------- Time {1:.2f}s".format(epoch, time.time()-tt))
         print("train loss:{0:.3f}, train nll:{1:.3f}, train kld:{2:.3f}".format(train_loss, train_nll, train_kld))
         print("test loss:{0:.3f}, test nll:{1:.3f}, test kld:{2:.3f}".format(test_loss, test_nll, test_kld))
+
+        if epoch % args.save_interval == 0:
+
+            data = next(test_data)
+            sample_x = sample_from_model(sess, data)
+            test_data.reset()
 
         # if epoch % args.save_interval == 0:
         #
