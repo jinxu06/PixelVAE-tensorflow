@@ -58,6 +58,14 @@ args = parser.parse_args()
 print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
 
 
+# Data IO
+if args.debug:
+    train_data = celeba_data.DataLoader(args.data_dir, 'valid', args.batch_size*args.nr_gpu, shuffle=True, size=args.img_size)
+else:
+    train_data = celeba_data.DataLoader(args.data_dir, 'train', args.batch_size*args.nr_gpu, shuffle=True, size=args.img_size)
+test_data = celeba_data.DataLoader(args.data_dir, 'valid', args.batch_size*args.nr_gpu, shuffle=False, size=args.img_size)
+
+
 # data place holder
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 ms = [tf.placeholder_with_default(np.ones((args.batch_size, args.img_size, args.img_size), dtype=np.float32), shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
