@@ -90,6 +90,7 @@ obs_shape = train_data.get_observation_size() # e.g. a tuple (32,32,3)
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 ms = [tf.placeholder_with_default(np.ones((args.batch_size, args.img_size, args.img_size), dtype=np.float32), shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
 mxs = [tf.multiply(xs[i], tf.stack([ms[i] for k in range(3)], axis=-1)) for i in range(args.nr_gpu)]
+fs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, args.nr_final_feature_maps)) for i in range(args.nr_gpu)]
 # zs = [tf.placeholder(tf.float32, shape=(None, args.z_dim)) for i in range(args.nr_gpu)]
 
 # create the model
@@ -112,6 +113,10 @@ test_fs = [None for i in range(args.nr_gpu)]
 test_nlls = [None for i in range(args.nr_gpu)]
 test_klds = [None for i in range(args.nr_gpu)]
 test_losses = [None for i in range(args.nr_gpu)]
+
+sample_locs = [None for i in range(args.nr_gpu)]
+sample_log_vars = [None for i in range(args.nr_gpu)]
+sample_fs = [None for i in range(args.nr_gpu)]
 new_x_gen = [None for i in range(args.nr_gpu)]
 
 for i in range(args.nr_gpu):
@@ -125,8 +130,9 @@ for i in range(args.nr_gpu):
         test_nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
         test_klds[i] = - 0.5 * tf.reduce_mean(1 + test_log_vars[i] - tf.square(test_locs[i]) - tf.exp(test_log_vars[i]), axis=-1)
         test_losses[i] = test_nlls[i] + args.beta * tf.maximum(args.lam, test_klds[i])
-        epsilon = 0.05
 
+        out, sample_locs[i], sample_log_vars[i], sample_fs[i], _ = model(mxs[i], f=fs[i], dropout_p=0., **model_opt)
+        epsilon = 0.05
         new_x_gen[i] = nn.sample_from_discretized_mix_logistic(out, args.nr_logistic_mix, epsilon=epsilon)
 
 
@@ -164,13 +170,12 @@ def sample_from_model(sess, data=None):
     data = np.cast[np.float32]((data - 127.5) / 127.5) ## preprocessing
     ds = np.split(data, args.nr_gpu)
 
-    handle = sess.partial_run_setup(test_fs+new_x_gen, xs)
     feed_dict = {xs[i]: ds[i] for i in range(args.nr_gpu)}
-    fs_np = sess.partial_run(handle, test_fs, feed_dict=feed_dict)
+    fs_np = sess.run(sample_fs, feed_dict=feed_dict)
 
-    for k in range(4):
-        new_x_gen_np = sess.partial_run(handle, new_x_gen)
-        print(new_x_gen_np[0].shape)
+    feed_dict = {fs[i]: fs_np[i] for i in range(args.nr_gpu)}
+    new_x_gen_np = sess.run(new_x_gen, feed_dict=feed_dict)
+    print(new_x_gen_np[0].shape)
 
     # x_gen = [np.zeros_like(x[0]) for i in range(args.nr_gpu)]
     #
