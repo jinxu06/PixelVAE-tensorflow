@@ -51,6 +51,8 @@ parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Un
 #
 args = parser.parse_args()
 
+print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
+
 quit()
 
 # data place holder
