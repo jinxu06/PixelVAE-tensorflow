@@ -67,9 +67,17 @@ mxs = [tf.multiply(xs[i], tf.stack([ms for k in range(3)], axis=-1)) for i in ra
 model_opt = {"z_dim":args.z_dim, "img_size":args.img_size, "nr_final_feature_maps":args.nr_final_feature_maps, "dropout_p":args.dropout_p, "nr_resnet":args.nr_resnet, "nr_filters":args.nr_filters, "nr_logistic_mix":args.nr_logistic_mix}
 model = tf.make_template('pixel_vae', pixel_vae)
 
+
+locs = [None for i in range(args.nr_gpu)]
+log_vars = [None for i in range(args.nr_gpu)]
+x_hats = [None for i in range(args.nr_gpu)]
+
+for i in range(args.nr_gpu):
+    with tf.device('/gpu:%d' % i):
+        locs[i], log_vars[i], x_hats[i] = model(mxs[i], **model_opt)
+
+
 quit()
-
-
 # gradients
 grads = []
 loss_gen = []
