@@ -109,7 +109,7 @@ grads = [None for i in range(args.nr_gpu)]
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         locs[i], log_vars[i], out = model(mxs[i], **model_opt)
-        nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(mxs[i]), out)
+        nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out)
         klds[i] = - 0.5 * tf.reduce_mean(1 + log_vars[i] - tf.square(locs[i]) - tf.exp(log_vars[i]), axis=-1)
         losses[i] = nlls[i] + klds[i]
 
@@ -169,7 +169,7 @@ with tf.Session(config=config) as sess:
         loss_arr, nll_arr, kld_arr = [], [], []
         for data in test_data:
             feed_dict = make_feed_dict(data)
-            l, n, k, _ = sess.run([loss, nll, kld, train_step], feed_dict=feed_dict)
+            l, n, k = sess.run([loss, nll, kld], feed_dict=feed_dict)
             loss_arr.append(l)
             nll_arr.append(n)
             kld_arr.append(k)
