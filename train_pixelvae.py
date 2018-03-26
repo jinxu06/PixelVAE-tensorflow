@@ -72,9 +72,18 @@ locs = [None for i in range(args.nr_gpu)]
 log_vars = [None for i in range(args.nr_gpu)]
 x_hats = [None for i in range(args.nr_gpu)]
 
+nlls = [None for i in range(args.nr_gpu)]
+klds = [None for i in range(args.nr_gpu)]
+losses = [None for i in range(args.nr_gpu)]
+grads = [None for i in range(args.nr_gpu)]
+
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        locs[i], log_vars[i], x_hats[i] = model(mxs[i], **model_opt)
+        locs[i], log_vars[i], out = model(mxs[i], **model_opt)
+        nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(mxs[i]), out)
+        klds[i] = - 0.5 * tf.reduce_mean(1 + log_vars[i] - tf.square(locs[i]) - tf.exp(log_vars[i]), axis=-1)
+        losses[i] = nlls[i] + klds[i]
+        print(losses)
 
 
 quit()
