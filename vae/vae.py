@@ -47,6 +47,9 @@ def inference_network(x, z_dim, img_size=64, nr_final_feature_maps=32):
         net = tf.layers.dense(net, z_dim * 2, activation=None, kernel_initializer=kernel_initializer)
         loc = net[:, :z_dim]
         log_var = net[:, z_dim:]
+        print("****")
+        print(loc)
+        print(log_var)
     return loc, log_var
 
 
@@ -56,7 +59,6 @@ def sample_z(loc, log_var, z_dim, seed=None):
         dist = tf.distributions.Normal(loc=0., scale=1.)
         z = dist.sample(sample_shape=int_shape(loc), seed=None)
         z = loc + tf.multiply(z, scale)
-        print("z", z)
         return z
 
 def vae_model(x, z_dim, img_size=64, output_feature_maps=False, nr_final_feature_maps=32, seed=None):
