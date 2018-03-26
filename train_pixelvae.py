@@ -92,15 +92,78 @@ for i in range(args.nr_gpu):
 
 with tf.device('/gpu:0'):
     for i in range(1, args.nr_gpu):
-        losses[0] += losses[i]
         for j in range(len(grads[0])):
             grads[0][j] += grads[i][j]
+    nll = tf.reduce_mean(nlls)
+    kld = tf.reduce_mean(klds)
+    loss = tf.reduce_mean(losses)
 
     train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
-print(losses)
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
+
+def make_feed_dict(data):
+    data = np.cast[np.float32]((data - 127.5) / 127.5)
+    ds = np.split(data, args.nr_gpu)
+    for i in range(args.nr_gpu):
+        feed_dict = { xs[i]:ds[i] for i in range(args.nr_gpu) }
+    return feed_dict
+
+
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+with tf.Session(config=config) as sess:
+
+    # init
+    sess.run(initializer)
+
+    if args.load_params:
+        ckpt_file = args.save_dir + '/params_' + 'celeba' + '.ckpt'
+        print('restoring parameters from', ckpt_file)
+        saver.restore(sess, ckpt_file)
+
+    # train_mgen = m.RandomRectangleMaskGenerator(args.image_size, args.image_size, max_ratio=0.75)
+    # test_mgen = m.CenterMaskGenerator(args.image_size, args.image_size, 0.5)
+
+    max_num_epoch = 1000
+    for epoch in range(max_num_epoch):
+        tt = time.time()
+        loss_arr, nll_arr, kld_arr = [], [], []
+        for data in train_data:
+            feed_dict = make_feed_dict(data)
+            l, n, k, _ = sess.run([loss, nll, kld, train_step], feed_dict=feed_dict)
+            loss_arr.append(l)
+            nll_arr.append(n)
+            kld_arr.append(k)
+        train_loss, train_nll, train_kld = np.mean(loss_arr), np.mean(nll_arr), np.mean(kld_arr)
+
+        loss_arr, nll_arr, kld_arr = [], [], []
+        for data in test_data:
+            feed_dict = make_feed_dict(data)
+            l, n, k, _ = sess.run([loss, nll, kld, train_step], feed_dict=feed_dict)
+            loss_arr.append(l)
+            nll_arr.append(n)
+            kld_arr.append(k)
+        test_loss, test_nll, test_kld = np.mean(loss_arr), np.mean(nll_arr), np.mean(kld_arr)
+
+        print("epoch {0} --------------------- Time {1:.2f}s".format(epoch, time.time()-tt))
+        print("train loss:{0:.3f}, train mse:{1:.3f}, train kld:{2:.3f}".format(train_loss, train_nll, train_kld))
+        print("test loss:{0:.3f}, test mse:{1:.3f}, test kld:{2:.3f}".format(test_loss, test_nll, test_kld))
+
+        # if epoch % args.save_interval == 0:
+        #
+        #     saver.save(sess, args.save_dir + '/params_' + 'celeba' + '.ckpt')
+        #
+        #     data = next(test_data)
+        #     feed_dict = make_feed_dict(data)
+        #     sample_x = sess.run(x_hats, feed_dict=feed_dict)
+        #     sample_x = np.concatenate(sample_x, axis=0)
+        #     test_data.reset()
+        #
+        #     img_tile = plotting.img_tile(sample_x[:25], aspect_ratio=1.0, border_color=1.0, stretch=True)
+        #     img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
+        #     plotting.plt.savefig(os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)))
 
 quit()
 # gradients
