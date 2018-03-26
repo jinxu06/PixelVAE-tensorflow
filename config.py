@@ -39,6 +39,7 @@ configs['cifar'] = {
     "data_set": "cifar",
     "batch_size": 8,
     "init_batch_size": 8,
+    'learning_rate': 0.0001,
     "save_interval": 10,
     "nr_gpu": 4,
 }
