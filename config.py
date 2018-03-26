@@ -1,5 +1,9 @@
 
 default_config = {
+    'image_size': 64,
+    'z_dim': 32,
+    'lam': 1.0,
+    'beta': 1.0,
     'data_dir': '/tmp',
     'save_dir': '/tmp',
     'data_set': 'cifar',
@@ -8,7 +12,6 @@ default_config = {
     'nr_resnet': 5,
     'nr_filters': 100,
     'nr_logistic_mix': 10,
-    'resnet_nonlinearity': 'concat_elu',
     'learning_rate': 0.001,
     'lr_decay': 0.999995,
     'batch_size': 16,
@@ -16,16 +19,11 @@ default_config = {
     'dropout_p': 0.5,
     'max_epochs': 1000,
     'nr_gpu': 1,
-    'polyak_decay': 0.9995,
-    'num_samples': 1,
     'seed': 1,
-    'spatial_conditional': False,
-    'global_conditional': False,
-    'spatial_latent_num_channel': 4,
-    'global_latent_dim': 10,
     'context_conditioning': False,
     'debug': False,
 }
+
 
 
 
@@ -39,9 +37,6 @@ configs['cifar'] = {
     "data_set": "cifar",
     "batch_size": 8,
     "init_batch_size": 8,
-    "spatial_conditional": False,
-    "global_conditional": False,
-    "context_conditioning": False,
     "save_interval": 10,
     "nr_gpu": 4,
 }

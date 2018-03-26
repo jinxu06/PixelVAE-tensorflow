@@ -9,7 +9,6 @@ import numpy as np
 import tensorflow as tf
 
 from pixelcnn import nn
-from pixelcnn.mini_model import model_spec
 from utils import plotting
 import utils.mfunc as uf
 import utils.mask as um
@@ -17,7 +16,6 @@ import utils.mask as um
 from config import get_config
 
 cfg = get_config('cifar')
-
 
 
 parser = argparse.ArgumentParser()
