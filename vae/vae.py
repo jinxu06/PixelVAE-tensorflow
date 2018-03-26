@@ -14,11 +14,13 @@ def generative_network(z, z_dim, img_size=64, output_feature_maps=False, nr_fina
     kernel_initializer = None
     with tf.variable_scope("generative_network"):
         num_layer = np.rint(np.log2(img_size)).astype(np.int32) - 2
+        print(num_layer)
         net = tf.reshape(z, [-1, 1, 1, z_dim])
         net = tf.layers.conv2d_transpose(net, 2**num_layer*nr_final_feature_maps, 4, strides=1, padding='VALID', kernel_initializer=kernel_initializer)
         net = tf.layers.batch_normalization(net)
         net = nonlinearity(net)
         for i in reversed(range(num_layer)):
+            print(i)
             net = tf.layers.conv2d_transpose(net, 2**i*nr_final_feature_maps, 5, strides=2, padding='SAME', kernel_initializer=kernel_initializer)
             net = tf.layers.batch_normalization(net)
             net = nonlinearity(net)
