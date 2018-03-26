@@ -46,6 +46,8 @@ configs['cifar'] = {
     "nr_gpu": 4,
 }
 
+
+
 def get_config(config_name):
     config = {}
     for key, value in default_config.items():
