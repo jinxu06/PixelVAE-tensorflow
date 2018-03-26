@@ -3,9 +3,6 @@ import os
 import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope
 
-def int_shape(x):
-    return list(map(int, x.get_shape()))
-
 kernel_initializer = None
 nonlinearity = tf.nn.elu
 
@@ -52,7 +49,7 @@ def sample_z(loc, log_var, z_dim, seed=None):
     with tf.variable_scope("sample_z"):
         scale = tf.sqrt(tf.exp(log_var))
         dist = tf.distributions.Normal(loc=0., scale=1.)
-        z = dist.sample(sample_shape=(None, z_dim), seed=None)
+        z = dist.sample(sample_shape=tf.shape(loc), seed=None)
         z = loc + tf.multiply(z, scale)
         return z
 
