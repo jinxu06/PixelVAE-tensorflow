@@ -176,8 +176,8 @@ with tf.Session(config=config) as sess:
         test_loss, test_nll, test_kld = np.mean(loss_arr), np.mean(nll_arr), np.mean(kld_arr)
 
         print("epoch {0} --------------------- Time {1:.2f}s".format(epoch, time.time()-tt))
-        print("train loss:{0:.3f}, train mse:{1:.3f}, train kld:{2:.3f}".format(train_loss, train_nll, train_kld))
-        print("test loss:{0:.3f}, test mse:{1:.3f}, test kld:{2:.3f}".format(test_loss, test_nll, test_kld))
+        print("train loss:{0:.3f}, train nll:{1:.3f}, train kld:{2:.3f}".format(train_loss, train_nll, train_kld))
+        print("test loss:{0:.3f}, test nll:{1:.3f}, test kld:{2:.3f}".format(test_loss, test_nll, test_kld))
 
         # if epoch % args.save_interval == 0:
         #

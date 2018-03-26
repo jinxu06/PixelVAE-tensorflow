@@ -37,8 +37,8 @@ configs['cifar'] = {
     "nr_filters": 80,
     "nr_resnet": 6,
     "data_set": "cifar",
-    "batch_size": 8,
-    "init_batch_size": 8,
+    "batch_size": 32,
+    "init_batch_size": 32,
     "save_interval": 10,
     "nr_gpu": 4,
 }
