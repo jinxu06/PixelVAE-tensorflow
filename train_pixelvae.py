@@ -174,7 +174,7 @@ def sample_from_model(sess, data=None):
     feed_dict = {xs[i]: ds[i] for i in range(args.nr_gpu)}
     fs_np = sess.run(sample_fs, feed_dict=feed_dict)
 
-    feed_dict = {fs[i]: fs_np[i] for i in range(args.nr_gpu)}
+    feed_dict.update({fs[i]: fs_np[i] for i in range(args.nr_gpu)})
     new_x_gen_np = sess.run(new_x_gen, feed_dict=feed_dict)
     print(new_x_gen_np[0].shape)
 
