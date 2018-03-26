@@ -11,10 +11,11 @@ def pixel_vae(x, f=None, z_dim=32, img_size=64, nr_final_feature_maps=32, dropou
 
     loc, log_var, z, vae_features = vae_model(x, z_dim=z_dim, img_size=img_size,
                     output_feature_maps=True, nr_final_feature_maps=nr_final_feature_maps)
+    print(loc)
+    print(vae_features)
     if f is None:
         f = vae_features
-    print(f)
-    print(vae_features)
+
     x_out = shallow_pixel_cnn(x, sh=f, dropout_p=dropout_p, nr_resnet=nr_resnet,
                     nr_filters=nr_filters, nr_logistic_mix=nr_logistic_mix)
 
