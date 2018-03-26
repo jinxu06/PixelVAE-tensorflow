@@ -8,7 +8,6 @@ from pixelcnn.mini_model import shallow_pixel_cnn
 
 
 def pixel_vae(x, f=None, z_dim=32, img_size=64, nr_final_feature_maps=32, dropout_p=0.5, nr_resnet=5, nr_filters=160, nr_logistic_mix=10):
-    print(x)
     loc, log_var, z, vae_features = vae_model(x, z_dim=z_dim, img_size=img_size,
                     output_feature_maps=True, nr_final_feature_maps=nr_final_feature_maps)
     print(loc)
