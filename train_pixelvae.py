@@ -164,9 +164,13 @@ def sample_from_model(sess, data=None):
     data = np.cast[np.float32]((data - 127.5) / 127.5) ## preprocessing
     ds = np.split(data, args.nr_gpu)
 
-    setup = sess.partial_run_setup(test_fs+new_x_gen, xs)
     feed_dict = {xs[i]: ds[i] for i in range(args.nr_gpu)}
-    sess.partial_run(setup, test_fs, feed_dict=feed_dict)
+    fs_np = sess.run(test_fs, feed_dict=feed_dict)
+
+    handle = sess.partial_run_setup(new_x_gen, test_fs)
+    feed_dict = {test_fs[i]: fs_np[i] for i in range(args.nr_gpu)}
+    new_x_gen_np = sess.partial_run(handle, new_x_gen, feed_dict=feed_dict)
+    print(new_x_gen_np)
 
     # x_gen = [np.zeros_like(x[0]) for i in range(args.nr_gpu)]
     #
@@ -218,6 +222,7 @@ with tf.Session(config=config) as sess:
         print("epoch {0} --------------------- Time {1:.2f}s".format(epoch, time.time()-tt))
         print("train loss:{0:.3f}, train nll:{1:.3f}, train kld:{2:.3f}".format(train_loss, train_nll, train_kld))
         print("test loss:{0:.3f}, test nll:{1:.3f}, test kld:{2:.3f}".format(test_loss, test_nll, test_kld))
+        sys.stdout.flush()
 
         if epoch % args.save_interval == 0:
 
