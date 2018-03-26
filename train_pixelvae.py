@@ -90,6 +90,11 @@ obs_shape = train_data.get_observation_size() # e.g. a tuple (32,32,3)
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 ms = [tf.placeholder_with_default(np.ones((args.batch_size, args.img_size, args.img_size), dtype=np.float32), shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
 mxs = [tf.multiply(xs[i], tf.stack([ms[i] for k in range(3)], axis=-1)) for i in range(args.nr_gpu)]
+
+print(xs[0])
+print(ms[0])
+print(mxs[0])
+quit()
 fs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, args.nr_final_feature_maps)) for i in range(args.nr_gpu)]
 # zs = [tf.placeholder(tf.float32, shape=(None, args.z_dim)) for i in range(args.nr_gpu)]
 
