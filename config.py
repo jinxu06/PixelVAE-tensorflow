@@ -31,6 +31,7 @@ default_config = {
 configs = {}
 
 configs['cifar'] = {
+    "img_size": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/cifar",
     "save_dir": "/data/ziz/jxu/models/cifar-test",
     "nr_filters": 80,
