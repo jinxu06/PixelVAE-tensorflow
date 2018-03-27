@@ -18,7 +18,7 @@ import utils.mask as um
 # self define modules
 from config import get_config
 
-cfg = get_config('pixelvae-celeba64')
+cfg = get_config('cifar')
 
 
 parser = argparse.ArgumentParser()
