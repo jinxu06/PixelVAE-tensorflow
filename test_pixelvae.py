@@ -148,6 +148,7 @@ with tf.device('/gpu:0'):
     for i in range(1, args.nr_gpu):
         for j in range(len(grads[0])):
             grads[0][j] += grads[i][j]
+            
     nll = tf.concat(nlls, axis=0)
     kld = tf.concat(klds, axis=0)
     loss = tf.concat(losses, axis=0)

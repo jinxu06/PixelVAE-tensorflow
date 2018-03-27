@@ -128,7 +128,7 @@ for i in range(args.nr_gpu):
         klds[i] = - 0.5 * tf.reduce_mean(1 + log_vars[i] - tf.square(locs[i]) - tf.exp(log_vars[i]), axis=-1)
         losses[i] = nlls[i] + args.beta * tf.maximum(args.lam, klds[i])
 
-        out, test_locs[i], test_log_vars[i], test_fs[i], _ = model(mxs[i], mxs[i], dropout_p=0., **model_opt)
+        out, test_locs[i], test_log_vars[i], _, _ = model(mxs[i], mxs[i], dropout_p=0., **model_opt)
         test_nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
         test_klds[i] = - 0.5 * tf.reduce_mean(1 + test_log_vars[i] - tf.square(test_locs[i]) - tf.exp(test_log_vars[i]), axis=-1)
         test_losses[i] = test_nlls[i] + args.beta * tf.maximum(args.lam, test_klds[i])
