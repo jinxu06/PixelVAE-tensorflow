@@ -17,4 +17,4 @@ def pixel_vae(x, px, f=None, z_dim=32, img_size=64, nr_final_feature_maps=32, dr
     x_out = shallow_pixel_cnn(px, sh=None, dropout_p=dropout_p, nr_resnet=nr_resnet,
                     nr_filters=nr_filters, nr_logistic_mix=nr_logistic_mix)
 
-    return x_out, loc, log_var, f, z
+    return x_out, loc, log_var, vae_features, z
