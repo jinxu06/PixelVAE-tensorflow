@@ -27,10 +27,10 @@ def shallow_pixel_cnn(x, gh=None, sh=None, init=False, ema=None, dropout_p=0.5, 
                 for rep in range(nr_resnet):
                     u_list.append(nn.gated_resnet(u_list[-1], conv=nn.down_shifted_conv2d))
                     ul_list.append(nn.gated_resnet(ul_list[-1], u_list[-1], conv=nn.down_right_shifted_conv2d))
-                    if rep%2==0:
-                        for k in range(2):
-                            u_list[-1] = nn.nin(u_list[-1], nn.int_shape(u_list[-1])[-1])
-                            ul_list[-1] = nn.nin(ul_list[-1], nn.int_shape(ul_list[-1])[-1])
+                    # if rep%2==0:
+                    #     for k in range(2):
+                    #         u_list[-1] = nn.nin(u_list[-1], nn.int_shape(u_list[-1])[-1])
+                    #         ul_list[-1] = nn.nin(ul_list[-1], nn.int_shape(ul_list[-1])[-1])
 
                 # for t in u_list+ul_list:
                 #     tf.add_to_collection('checkpoints', t)
