@@ -215,18 +215,19 @@ with tf.Session(config=config) as sess:
     max_num_epoch = 1000
     for epoch in range(max_num_epoch):
         tt = time.time()
-        loss_arr, nll_arr, kld_arr = [], [], []
-        for data in train_data:
-            feed_dict = make_feed_dict(data)
-            l, n, k, _ = sess.run([loss, nll, kld, train_step], feed_dict=feed_dict)
-            loss_arr.append(l)
-            nll_arr.append(n)
-            kld_arr.append(k)
-        train_loss, train_nll, train_kld = np.mean(loss_arr), np.mean(nll_arr), np.mean(kld_arr)
+        # loss_arr, nll_arr, kld_arr = [], [], []
+        # for data in train_data:
+        #     feed_dict = make_feed_dict(data)
+        #     l, n, k, _ = sess.run([loss, nll, kld, train_step], feed_dict=feed_dict)
+        #     loss_arr.append(l)
+        #     nll_arr.append(n)
+        #     kld_arr.append(k)
+        # train_loss, train_nll, train_kld = np.mean(loss_arr), np.mean(nll_arr), np.mean(kld_arr)
 
         loss_arr, nll_arr, kld_arr = [], [], []
         for data in test_data:
             feed_dict = make_feed_dict(data)
+            print([test_loss, test_nll, test_kld])
             l, n, k = sess.run([test_loss, test_nll, test_kld], feed_dict=feed_dict)
             loss_arr.append(l)
             nll_arr.append(n)
