@@ -121,21 +121,28 @@ sample_log_vars = [None for i in range(args.nr_gpu)]
 sample_fs = [None for i in range(args.nr_gpu)]
 new_x_gen = [None for i in range(args.nr_gpu)]
 
+#
+x_hats = [None for i in range(args.nr_gpu)]
+test_x_hats = [None for i in range(args.nr_gpu)]
+
+
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        out, locs[i], log_vars[i], _, _ = model(mxs[i], mxs[i], dropout_p=args.dropout_p, **model_opt)
-        nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
+        out, locs[i], log_vars[i], x_hats[i], _ = model(mxs[i], mxs[i], dropout_p=args.dropout_p, **model_opt)
+        # nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
+        nlls[i] = tf.reduce_sum(tf.square(xs[i]-x_hats[i]), 1)
         klds[i] = - 0.5 * tf.reduce_mean(1 + log_vars[i] - tf.square(locs[i]) - tf.exp(log_vars[i]), axis=-1)
         losses[i] = nlls[i] + args.beta * tf.maximum(args.lam, klds[i])
 
         out, test_locs[i], test_log_vars[i], _, _ = model(mxs[i], mxs[i], dropout_p=0., **model_opt)
-        test_nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
+        # test_nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
+        test_nlls[i] = tf.reduce_sum(tf.square(xs[i]-test_x_hats[i]), 1)
         test_klds[i] = - 0.5 * tf.reduce_mean(1 + test_log_vars[i] - tf.square(test_locs[i]) - tf.exp(test_log_vars[i]), axis=-1)
         test_losses[i] = test_nlls[i] + args.beta * tf.maximum(args.lam, test_klds[i])
 
-        out, sample_locs[i], sample_log_vars[i], sample_fs[i], _ = model(mxs[i], ps[i], f=fs[i], dropout_p=0., **model_opt)
-        epsilon = 0.05
-        new_x_gen[i] = nn.sample_from_discretized_mix_logistic(out, args.nr_logistic_mix, epsilon=epsilon)
+        # out, sample_locs[i], sample_log_vars[i], sample_fs[i], _ = model(mxs[i], ps[i], f=fs[i], dropout_p=0., **model_opt)
+        # epsilon = 0.05
+        # new_x_gen[i] = nn.sample_from_discretized_mix_logistic(out, args.nr_logistic_mix, epsilon=epsilon)
 
 
 
@@ -227,7 +234,7 @@ with tf.Session(config=config) as sess:
         loss_arr, nll_arr, kld_arr = [], [], []
         for data in test_data:
             feed_dict = make_feed_dict(data)
-            l, n, k = sess.run([test_loss, test_nll, test_kld], feed_dict=feed_dict)
+            l, n, k = sess.run([t_loss, t_nll, t_kld], feed_dict=feed_dict)
             loss_arr.append(l)
             nll_arr.append(n)
             kld_arr.append(k)
@@ -238,14 +245,14 @@ with tf.Session(config=config) as sess:
         print("test loss:{0:.3f}, test nll:{1:.3f}, test kld:{2:.3f}".format(test_loss, test_nll, test_kld))
         sys.stdout.flush()
 
-        if epoch % args.save_interval == 0:
-
-            saver.save(sess, args.save_dir + '/params_' + 'celeba' + '.ckpt')
-
-            data = next(test_data)
-            sample_x = sample_from_model(sess, data)
-            test_data.reset()
-
-            img_tile = plotting.img_tile(sample_x[:25], aspect_ratio=1.0, border_color=1.0, stretch=True)
-            img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
-            plotting.plt.savefig(os.path.join(args.save_dir,'%s_pixelvae_sample%d.png' % (args.data_set, epoch)))
+        # if epoch % args.save_interval == 0:
+        #
+        #     saver.save(sess, args.save_dir + '/params_' + 'celeba' + '.ckpt')
+        #
+        #     data = next(test_data)
+        #     sample_x = sample_from_model(sess, data)
+        #     test_data.reset()
+        #
+        #     img_tile = plotting.img_tile(sample_x[:25], aspect_ratio=1.0, border_color=1.0, stretch=True)
+        #     img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
+        #     plotting.plt.savefig(os.path.join(args.save_dir,'%s_pixelvae_sample%d.png' % (args.data_set, epoch)))
