@@ -183,29 +183,28 @@ def sample_from_model(sess, data=None):
     data = np.cast[np.float32]((data - 127.5) / 127.5) ## preprocessing
     ds = np.split(data, args.nr_gpu)
 
-    feed_dict = {xs[i]: ds[i] for i in range(args.nr_gpu)}
-    fs_np = sess.run(sample_fs, feed_dict=feed_dict)
-
-    x_gen = [np.zeros_like(ds[i]) for i in range(args.nr_gpu)]
-    feed_dict = {}
-    feed_dict.update({fs[i]: fs_np[i] for i in range(args.nr_gpu)})
-    for yi in range(obs_shape[0]):
-        for xi in range(obs_shape[1]):
-            feed_dict.update({ps[i]: x_gen[i] for i in range(args.nr_gpu)})
-            new_x_gen_np = sess.run(new_x_gen, feed_dict=feed_dict)
-            for i in range(args.nr_gpu):
-                x_gen[i][:,yi,xi,:] = new_x_gen_np[i][:,yi,xi,:]
-    return np.concatenate(x_gen, axis=0)
-
-    # x_gen = [np.zeros_like(x[0]) for i in range(args.nr_gpu)]
     #
+    feed_dict = {xs[i]: ds[i] for i in range(args.nr_gpu)}
+    x_hats_np = sess.run(test_x_hats, feed_dict=feed_dict)
+    return np.concatenate(x_hats_np, axis=0)
+
+    #
+
+    # feed_dict = {xs[i]: ds[i] for i in range(args.nr_gpu)}
+    # fs_np = sess.run(sample_fs, feed_dict=feed_dict)
+    #
+    # x_gen = [np.zeros_like(ds[i]) for i in range(args.nr_gpu)]
+    # feed_dict = {}
+    # feed_dict.update({fs[i]: fs_np[i] for i in range(args.nr_gpu)})
     # for yi in range(obs_shape[0]):
     #     for xi in range(obs_shape[1]):
-    #         feed_dict.update({xs[i]: x_gen[i] for i in range(args.nr_gpu)})
+    #         feed_dict.update({ps[i]: x_gen[i] for i in range(args.nr_gpu)})
     #         new_x_gen_np = sess.run(new_x_gen, feed_dict=feed_dict)
     #         for i in range(args.nr_gpu):
     #             x_gen[i][:,yi,xi,:] = new_x_gen_np[i][:,yi,xi,:]
     # return np.concatenate(x_gen, axis=0)
+
+
 
 
 config = tf.ConfigProto()
@@ -249,14 +248,14 @@ with tf.Session(config=config) as sess:
         print("test loss:{0:.3f}, test nll:{1:.3f}, test kld:{2:.3f}".format(test_loss, test_nll, test_kld))
         sys.stdout.flush()
 
-        # if epoch % args.save_interval == 0:
-        #
-        #     saver.save(sess, args.save_dir + '/params_' + 'celeba' + '.ckpt')
-        #
-        #     data = next(test_data)
-        #     sample_x = sample_from_model(sess, data)
-        #     test_data.reset()
-        #
-        #     img_tile = plotting.img_tile(sample_x[:25], aspect_ratio=1.0, border_color=1.0, stretch=True)
-        #     img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
-        #     plotting.plt.savefig(os.path.join(args.save_dir,'%s_pixelvae_sample%d.png' % (args.data_set, epoch)))
+        if epoch % args.save_interval == 0:
+
+            saver.save(sess, args.save_dir + '/params_' + 'celeba' + '.ckpt')
+
+            data = next(test_data)
+            sample_x = sample_from_model(sess, data)
+            test_data.reset()
+
+            img_tile = plotting.img_tile(sample_x[:25], aspect_ratio=1.0, border_color=1.0, stretch=True)
+            img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
+            plotting.plt.savefig(os.path.join(args.save_dir,'%s_pixelvae_sample%d.png' % (args.data_set, epoch)))
