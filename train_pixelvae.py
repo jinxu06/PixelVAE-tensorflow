@@ -129,10 +129,13 @@ flatten = tf.contrib.layers.flatten
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         out, locs[i], log_vars[i], x_hats[i], _ = model(mxs[i], mxs[i], dropout_p=args.dropout_p, **model_opt)
+
         # nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
         nlls[i] = tf.reduce_sum(tf.square(flatten(xs[i])-flatten(x_hats[i])), 1)
         klds[i] = - 0.5 * tf.reduce_mean(1 + log_vars[i] - tf.square(locs[i]) - tf.exp(log_vars[i]), axis=-1)
         losses[i] = nlls[i] + args.beta * tf.maximum(args.lam, klds[i])
+
+        print(nlls[i], klds[i], losses[i])
 
         out, test_locs[i], test_log_vars[i], test_x_hats[i], _ = model(mxs[i], mxs[i], dropout_p=0., **model_opt)
         # test_nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
@@ -147,6 +150,7 @@ for i in range(args.nr_gpu):
 
 
 all_params = tf.trainable_variables()
+
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         grads[i] = tf.gradients(losses[i], all_params, colocate_gradients_with_ops=True)
@@ -155,6 +159,8 @@ with tf.device('/gpu:0'):
     for i in range(1, args.nr_gpu):
         for j in range(len(grads[0])):
             grads[0][j] += grads[i][j]
+
+
     nll = tf.concat(nlls, axis=0)
     kld = tf.concat(klds, axis=0)
     loss = tf.concat(losses, axis=0)
