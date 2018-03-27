@@ -25,7 +25,8 @@ def generative_network(z, z_dim, img_size=64, output_feature_maps=False, nr_fina
         if output_feature_maps:
             return net
         net = tf.layers.conv2d_transpose(net, 3, 1, strides=1, padding='SAME', kernel_initializer=kernel_initializer)
-        net = tf.nn.sigmoid(net)
+        # net = tf.nn.sigmoid(net)
+        net = tf.nn.tanh(net)
 
     return net
 
