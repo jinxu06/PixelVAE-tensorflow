@@ -176,15 +176,15 @@ def sample_from_model(sess, data=None):
     fs_np = sess.run(sample_fs, feed_dict=feed_dict)
 
     x_gen = [ds[i] for i in range(args.nr_gpu)]
-    # x_gen = [np.zeros_like(ds[i]) for i in range(args.nr_gpu)]
-    # feed_dict = {}
-    # feed_dict.update({fs[i]: fs_np[i] for i in range(args.nr_gpu)})
-    # for yi in range(obs_shape[0]):
-    #     for xi in range(obs_shape[1]):
-    #         feed_dict.update({ps[i]: x_gen[i] for i in range(args.nr_gpu)})
-    #         new_x_gen_np = sess.run(new_x_gen, feed_dict=feed_dict)
-    #         for i in range(args.nr_gpu):
-    #             x_gen[i][:,yi,xi,:] = new_x_gen_np[i][:,yi,xi,:]
+    x_gen = [np.zeros_like(ds[i]) for i in range(args.nr_gpu)]
+    feed_dict = {}
+    feed_dict.update({fs[i]: fs_np[i] for i in range(args.nr_gpu)})
+    for yi in range(obs_shape[0]):
+        for xi in range(obs_shape[1]):
+            feed_dict.update({ps[i]: x_gen[i] for i in range(args.nr_gpu)})
+            new_x_gen_np = sess.run(new_x_gen, feed_dict=feed_dict)
+            for i in range(args.nr_gpu):
+                x_gen[i][:,yi,xi,:] = new_x_gen_np[i][:,yi,xi,:]
     return np.concatenate(x_gen, axis=0)
 
     # x_gen = [np.zeros_like(x[0]) for i in range(args.nr_gpu)]
