@@ -15,7 +15,7 @@ import time
 import numpy as np
 import tensorflow as tf
 
-from pixel_cnn_pp import nn
+from pixelcnn import nn
 #from pixel_cnn_pp.model import model_spec
 from pixelcnn.mini_model import shallow_pixel_cnn
 from utils import plotting
@@ -23,8 +23,8 @@ from utils import plotting
 # -----------------------------------------------------------------------------
 parser = argparse.ArgumentParser()
 # data I/O
-parser.add_argument('-i', '--data_dir', type=str, default='/local_home/tim/pxpp/data', help='Location for the dataset')
-parser.add_argument('-o', '--save_dir', type=str, default='/local_home/tim/pxpp/save', help='Location for parameter checkpoints and samples')
+parser.add_argument('-i', '--data_dir', type=str, default='/data/ziz/not-backed-up/jxu/cifar', help='Location for the dataset')
+parser.add_argument('-o', '--save_dir', type=str, default='/data/ziz/jxu/models/cifar-test', help='Location for parameter checkpoints and samples')
 parser.add_argument('-d', '--data_set', type=str, default='cifar', help='Can be either cifar|imagenet')
 parser.add_argument('-t', '--save_interval', type=int, default=20, help='Every how many epochs to write checkpoint/samples?')
 parser.add_argument('-r', '--load_params', dest='load_params', action='store_true', help='Restore training from previous model checkpoint?')
