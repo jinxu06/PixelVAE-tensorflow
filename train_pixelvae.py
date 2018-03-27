@@ -227,7 +227,7 @@ with tf.Session(config=config) as sess:
         loss_arr, nll_arr, kld_arr = [], [], []
         for data in test_data:
             feed_dict = make_feed_dict(data)
-            l, n, k = sess.run([loss, nll, kld], feed_dict=feed_dict)
+            l, n, k = sess.run([test_loss, test_nll, test_kld], feed_dict=feed_dict)
             loss_arr.append(l)
             nll_arr.append(n)
             kld_arr.append(k)
