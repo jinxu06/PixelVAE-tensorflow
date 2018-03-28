@@ -21,11 +21,11 @@ def shallow_pixel_cnn(x, gh=None, sh=None, init=False, ema=None, dropout_p=0.5, 
                 xs = nn.int_shape(x)
                 x_pad = tf.concat([x,tf.ones(xs[:-1]+[1])],3) # add channel of ones to distinguish image from padding later on
 
-                #u_list = [nn.down_shift(nn.down_shifted_conv2d(x_pad, num_filters=nr_filters, filter_size=[2, 3]))] # stream for pixels above
+                u_list = [nn.down_shift(nn.down_shifted_conv2d(x_pad, num_filters=nr_filters, filter_size=[2, 3]))] # stream for pixels above
                 ul_list = [nn.down_shift(nn.down_shifted_conv2d(x_pad, num_filters=nr_filters, filter_size=[1,3])) + \
                            nn.right_shift(nn.down_right_shifted_conv2d(x_pad, num_filters=nr_filters, filter_size=[2,1]))] # stream for up and to the left
                 for rep in range(nr_resnet):
-                    #u_list.append(nn.gated_resnet(u_list[-1], conv=nn.down_shifted_conv2d))
+                    u_list.append(nn.gated_resnet(u_list[-1], conv=nn.down_shifted_conv2d))
                     ul_list.append(nn.gated_resnet(ul_list[-1], u_list[-1], conv=nn.down_right_shifted_conv2d))
                     # if rep%2==0:
                     #     for k in range(2):
