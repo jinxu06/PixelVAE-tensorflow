@@ -60,7 +60,8 @@ configs['pixelvae-celeba64'] = {
 
 configs['pixelvae-celeba32'] = {
     "img_size": 32,
-    'beta': 100.0,
+    "lam": 0.0,
+    'beta': 1.0,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/pixelvae-celeba32",
     "nr_filters": 100,
