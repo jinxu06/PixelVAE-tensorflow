@@ -58,6 +58,21 @@ configs['pixelvae-celeba64'] = {
     "nr_gpu": 4,
 }
 
+configs['pixelvae-celeba32'] = {
+    "img_size": 32,
+    'beta': 100.0,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/pixelvae-celeba32",
+    "nr_filters": 100,
+    "nr_resnet": 6,
+    "data_set": "celeba32",
+    "batch_size": 8,
+    "init_batch_size": 8,
+    'learning_rate': 0.0001,
+    "save_interval": 10,
+    "nr_gpu": 4,
+}
+
 
 
 def get_config(config_name):

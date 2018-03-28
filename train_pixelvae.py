@@ -18,7 +18,7 @@ import utils.mask as um
 # self define modules
 from config import get_config
 
-cfg = get_config('cifar')
+cfg = get_config('pixelvae-celeba32')
 
 
 parser = argparse.ArgumentParser()
@@ -129,18 +129,20 @@ flatten = tf.contrib.layers.flatten
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         out, locs[i], log_vars[i], x_hats[i], _ = model(mxs[i], mxs[i], dropout_p=args.dropout_p, **model_opt)
-        nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
+        nlls[i] = tf.reduce_sum(tf.square(flatten(xs[i])-flatten(x_hats[i])), 1)
+        # nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
         klds[i] = - 0.5 * tf.reduce_mean(1 + log_vars[i] - tf.square(locs[i]) - tf.exp(log_vars[i]), axis=-1)
         losses[i] = nlls[i] + args.beta * tf.maximum(args.lam, klds[i])
 
         out, test_locs[i], test_log_vars[i], test_x_hats[i], _ = model(mxs[i], mxs[i], dropout_p=0., **model_opt)
-        test_nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
+        test_nlls[i] = tf.reduce_sum(tf.square(flatten(xs[i])-flatten(test_x_hats[i])), 1)
+        # test_nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
         test_klds[i] = - 0.5 * tf.reduce_mean(1 + test_log_vars[i] - tf.square(test_locs[i]) - tf.exp(test_log_vars[i]), axis=-1)
         test_losses[i] = test_nlls[i] + args.beta * tf.maximum(args.lam, test_klds[i])
 
-        out, sample_locs[i], sample_log_vars[i], sample_fs[i], _ = model(mxs[i], ps[i], f=fs[i], dropout_p=0., **model_opt)
-        epsilon = 0.05
-        new_x_gen[i] = nn.sample_from_discretized_mix_logistic(out, args.nr_logistic_mix, epsilon=epsilon)
+        # out, sample_locs[i], sample_log_vars[i], sample_fs[i], _ = model(mxs[i], ps[i], f=fs[i], dropout_p=0., **model_opt)
+        # epsilon = 0.05
+        # new_x_gen[i] = nn.sample_from_discretized_mix_logistic(out, args.nr_logistic_mix, epsilon=epsilon)
 
 
 
@@ -180,21 +182,27 @@ def sample_from_model(sess, data=None):
     data = np.cast[np.float32]((data - 127.5) / 127.5) ## preprocessing
     ds = np.split(data, args.nr_gpu)
 
-
+    #
     feed_dict = {xs[i]: ds[i] for i in range(args.nr_gpu)}
-    fs_np = sess.run(sample_fs, feed_dict=feed_dict)
+    x_hats_np = sess.run(test_x_hats, feed_dict=feed_dict)
+    return np.concatenate(x_hats_np, axis=0)
+    #
 
-    x_gen = [ds[i] for i in range(args.nr_gpu)]
 
-    feed_dict = {}
-    feed_dict.update({fs[i]: fs_np[i] for i in range(args.nr_gpu)})
-    for yi in range(obs_shape[0]-obs_shape[0]//1, obs_shape[0]):
-        for xi in range(obs_shape[1]):
-            feed_dict.update({ps[i]: x_gen[i] for i in range(args.nr_gpu)})
-            new_x_gen_np = sess.run(new_x_gen, feed_dict=feed_dict)
-            for i in range(args.nr_gpu):
-                x_gen[i][:,yi,xi,:] = new_x_gen_np[i][:,yi,xi,:]
-    return np.concatenate(x_gen, axis=0)
+    # feed_dict = {xs[i]: ds[i] for i in range(args.nr_gpu)}
+    # fs_np = sess.run(sample_fs, feed_dict=feed_dict)
+    #
+    # x_gen = [ds[i] for i in range(args.nr_gpu)]
+    #
+    # feed_dict = {}
+    # feed_dict.update({fs[i]: fs_np[i] for i in range(args.nr_gpu)})
+    # for yi in range(obs_shape[0]-obs_shape[0]//1, obs_shape[0]):
+    #     for xi in range(obs_shape[1]):
+    #         feed_dict.update({ps[i]: x_gen[i] for i in range(args.nr_gpu)})
+    #         new_x_gen_np = sess.run(new_x_gen, feed_dict=feed_dict)
+    #         for i in range(args.nr_gpu):
+    #             x_gen[i][:,yi,xi,:] = new_x_gen_np[i][:,yi,xi,:]
+    # return np.concatenate(x_gen, axis=0)
 
 
 
