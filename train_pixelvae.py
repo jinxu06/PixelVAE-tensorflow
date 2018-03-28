@@ -121,8 +121,8 @@ x_hats = [None for i in range(args.nr_gpu)]
 test_x_hats = [None for i in range(args.nr_gpu)]
 
 #
-z_samples[i] = [None for i in range(args.nr_gpu)]
-test_z_samples[i] = [None for i in range(args.nr_gpu)]
+z_samples = [None for i in range(args.nr_gpu)]
+test_z_samples = [None for i in range(args.nr_gpu)]
 
 
 flatten = tf.contrib.layers.flatten
