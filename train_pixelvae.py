@@ -161,11 +161,11 @@ with tf.device('/gpu:0'):
 
 
     nll = tf.concat(nlls, axis=0)
-    kld = tf.concat(klds, axis=0)
+    kld = klds#tf.concat(klds, axis=0)
     loss = tf.concat(losses, axis=0)
 
     t_nll = tf.concat(test_nlls, axis=0)
-    t_kld = tf.concat(test_klds, axis=0)
+    t_kld = test_klds#tf.concat(test_klds, axis=0)
     t_loss = tf.concat(test_losses, axis=0)
 
     train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
