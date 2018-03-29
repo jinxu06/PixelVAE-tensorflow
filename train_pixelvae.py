@@ -88,7 +88,7 @@ ms = [tf.placeholder_with_default(np.ones((args.batch_size, args.img_size, args.
 mxs = [tf.multiply(xs[i], tf.stack([ms[i] for k in range(3)], axis=-1)) for i in range(args.nr_gpu)]
 
 fs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, args.nr_final_feature_maps)) for i in range(args.nr_gpu)]
-zs = [tf.placeholder(tf.float32, shape=(None, args.z_dim)) for i in range(args.nr_gpu)]
+zs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.z_dim)) for i in range(args.nr_gpu)]
 
 # create the model
 model_opt = {"z_dim":args.z_dim, "img_size":args.img_size, "nr_final_feature_maps":args.nr_final_feature_maps, "nr_resnet":args.nr_resnet, "nr_filters":args.nr_filters, "nr_logistic_mix":args.nr_logistic_mix}
