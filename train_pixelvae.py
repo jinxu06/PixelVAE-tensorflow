@@ -88,7 +88,7 @@ ms = [tf.placeholder_with_default(np.ones((args.batch_size, args.img_size, args.
 mxs = [tf.multiply(xs[i], tf.stack([ms[i] for k in range(3)], axis=-1)) for i in range(args.nr_gpu)]
 
 fs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, args.nr_final_feature_maps)) for i in range(args.nr_gpu)]
-zs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.z_dim)) for i in range(args.nr_gpu)]
+# zs = [tf.placeholder(tf.float32, shape=(None, args.z_dim)) for i in range(args.nr_gpu)]
 
 # create the model
 model_opt = {"z_dim":args.z_dim, "img_size":args.img_size, "nr_final_feature_maps":args.nr_final_feature_maps, "nr_resnet":args.nr_resnet, "nr_filters":args.nr_filters, "nr_logistic_mix":args.nr_logistic_mix}
@@ -114,7 +114,6 @@ test_losses = [None for i in range(args.nr_gpu)]
 sample_locs = [None for i in range(args.nr_gpu)]
 sample_log_vars = [None for i in range(args.nr_gpu)]
 sample_fs = [None for i in range(args.nr_gpu)]
-sample_zs = [None for i in range(args.nr_gpu)]
 new_x_gen = [None for i in range(args.nr_gpu)]
 
 #
@@ -143,7 +142,7 @@ for i in range(args.nr_gpu):
         #test_klds[i] = - 0.5 * tf.reduce_mean(1 + test_log_vars[i] - tf.square(test_locs[i]) - tf.exp(test_log_vars[i]), axis=-1)
         test_losses[i] = test_nlls[i] + args.beta * tf.maximum(args.lam, test_klds[i])
 
-        out, sample_locs[i], sample_log_vars[i], sample_fs[i], sample_zs[i] = model(mxs[i], ps[i], f=fs[i], z_ph=zs[i], dropout_p=0., **model_opt)
+        out, sample_locs[i], sample_log_vars[i], sample_fs[i], _ = model(mxs[i], ps[i], f=fs[i], dropout_p=0., **model_opt)
         epsilon = 0.05
         new_x_gen[i] = nn.sample_from_discretized_mix_logistic(out, args.nr_logistic_mix, epsilon=epsilon)
 
@@ -193,15 +192,12 @@ def sample_from_model(sess, data=None):
 
 
     feed_dict = {xs[i]: ds[i] for i in range(args.nr_gpu)}
-    ret = sess.run(sample_zs+sample_fs, feed_dict=feed_dict)
-    zs_np, fs_np = ret[:len(ret)//2], ret[len(ret)//2:]
-
+    fs_np = sess.run(sample_fs, feed_dict=feed_dict)
 
     x_gen = [ds[i] for i in range(args.nr_gpu)]
 
     feed_dict = {}
     feed_dict.update({fs[i]: fs_np[i] for i in range(args.nr_gpu)})
-    feed_dict.update({zs[i]: zs_np[i] for i in range(args.nr_gpu)})
     for yi in range(obs_shape[0]-obs_shape[0]//1, obs_shape[0]):
         for xi in range(obs_shape[1]):
             feed_dict.update({ps[i]: x_gen[i] for i in range(args.nr_gpu)})
