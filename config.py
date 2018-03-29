@@ -72,6 +72,7 @@ configs['pixelvae-celeba32'] = {
     "init_batch_size": 8,
     'learning_rate': 0.0001,
     "save_interval": 10,
+    'nr_final_feature_maps': 64,
     "nr_gpu": 4,
 }
 
