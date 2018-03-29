@@ -193,7 +193,6 @@ def sample_from_model(sess, data=None):
 
 
     feed_dict = {xs[i]: ds[i] for i in range(args.nr_gpu)}
-    fs_np =
     ret = sess.run(sample_zs+sample_fs, feed_dict=feed_dict)
     zs_np, fs_np = ret[:len(ret)//2], ret[len(ret)//2:]
 
@@ -201,7 +200,7 @@ def sample_from_model(sess, data=None):
     x_gen = [ds[i] for i in range(args.nr_gpu)]
 
     feed_dict = {}
-    feed_dict.update({fs[i]: fs_np[i] for i in range(args.nr_gpu)})
+    feed_dict.update({sample_fs[i]: fs_np[i] for i in range(args.nr_gpu)})
     feed_dict.update({zs[i]: zs_np[i] for i in range(args.nr_gpu)})
     for yi in range(obs_shape[0]-obs_shape[0]//1, obs_shape[0]):
         for xi in range(obs_shape[1]):
