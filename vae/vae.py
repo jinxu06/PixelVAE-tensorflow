@@ -2,9 +2,10 @@ import numpy as np
 import os
 import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope
+import pixelcnn.nn as nn
 
 kernel_initializer = None
-nonlinearity = tf.nn.elu
+nonlinearity = nn.concat_elu # tf.nn.elu
 
 def int_shape(x):
     return list(map(int, x.get_shape()))
