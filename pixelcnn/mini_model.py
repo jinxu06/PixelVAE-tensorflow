@@ -15,8 +15,6 @@ def shallow_pixel_cnn(x, gh=None, sh=None, init=False, ema=None, dropout_p=0.5, 
             resnet_nonlinearity = tf.nn.relu
             # sh = nn.latent_deconv_net(sh, scale_factor=1)
 
-            print(sh)
-
             with arg_scope([nn.gated_resnet], nonlinearity=resnet_nonlinearity, gh=gh, sh=sh):
 
 
