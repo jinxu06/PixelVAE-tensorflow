@@ -45,7 +45,9 @@ configs['cifar'] = {
 
 configs['pixelvae-celeba64'] = {
     "img_size": 64,
-    'beta': 10000.0,
+    "z_dim": 256,
+    "lam": 0.0,
+    'beta': 500.0,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/pixelvae-celeba64",
     "nr_filters": 100,
@@ -55,6 +57,7 @@ configs['pixelvae-celeba64'] = {
     "init_batch_size": 8,
     'learning_rate': 0.0001,
     "save_interval": 5,
+    'nr_final_feature_maps': 64,
     "nr_gpu": 4,
 }
 

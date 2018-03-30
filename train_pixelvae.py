@@ -19,7 +19,7 @@ import utils.mask as um
 from config import get_config
 from divergence import compute_mmd
 
-cfg = get_config('pixelvae-celeba32')
+cfg = get_config('pixelvae-celeba64')
 
 
 parser = argparse.ArgumentParser()
