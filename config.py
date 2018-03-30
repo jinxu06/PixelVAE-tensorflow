@@ -51,7 +51,7 @@ configs['pixelvae-celeba64'] = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/pixelvae-celeba64",
     "nr_filters": 100,
-    "nr_resnet": 6,
+    "nr_resnet": 5,
     "data_set": "celeba64",
     "batch_size": 8,
     "init_batch_size": 8,
