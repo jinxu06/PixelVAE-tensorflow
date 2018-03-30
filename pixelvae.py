@@ -12,7 +12,6 @@ def pixel_vae(x, px, f=None, z_dim=32, img_size=64, nr_final_feature_maps=32, dr
                     output_feature_maps=True, nr_final_feature_maps=nr_final_feature_maps)
     if f is None:
         f = vae_features
-    print(z)
 
     # px = tf.concat([px, f], axis=-1)
     x_out = shallow_pixel_cnn(px, sh=f, dropout_p=dropout_p, nr_resnet=nr_resnet,

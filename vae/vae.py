@@ -49,6 +49,7 @@ def inference_network(x, z_dim, img_size=64, nr_final_feature_maps=32):
         net = tf.layers.dense(net, z_dim * 2, activation=None, kernel_initializer=kernel_initializer)
         loc = net[:, :z_dim]
         log_var = net[:, z_dim:]
+        print(loc)
     return loc, log_var
 
 

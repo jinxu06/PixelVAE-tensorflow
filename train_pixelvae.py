@@ -129,7 +129,7 @@ flatten = tf.contrib.layers.flatten
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         out, locs[i], log_vars[i], x_hats[i], z_samples[i] = model(mxs[i], mxs[i], dropout_p=args.dropout_p, **model_opt)
-        #nlls[i] = tf.reduce_sum(tf.square(flatten(xs[i])-flatten(x_hats[i])), 1)
+        # nlls[i] = tf.reduce_sum(tf.square(flatten(xs[i])-flatten(x_hats[i])), 1)
         nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
         # klds[i] = - 0.5 * tf.reduce_mean(1 + log_vars[i] - tf.square(locs[i]) - tf.exp(log_vars[i]), axis=-1)
         klds[i] = compute_mmd(tf.random_normal(shape=(args.batch_size, args.z_dim)), z_samples[i], 2./args.z_dim)
