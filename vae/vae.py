@@ -36,7 +36,9 @@ def inference_network(x, z_dim, img_size=64, nr_final_feature_maps=32):
     assert img_size in [32, 64, 128, 256], "only support values in [32, 64, 128, 256]"
     with tf.variable_scope("inference_network"):
         num_layer = np.rint(np.log2(img_size)).astype(np.int32) - 2
+        print(x)
         net = tf.reshape(x, [-1, img_size, img_size, 3])
+        print(net)
         net = tf.layers.conv2d(net, nr_final_feature_maps, 1, strides=1, padding='SAME', kernel_initializer=kernel_initializer)
         for i in range(num_layer):
             net = tf.layers.conv2d(net, 2**(i+1)*nr_final_feature_maps, 5, strides=2, padding='SAME', kernel_initializer=kernel_initializer)
@@ -49,7 +51,6 @@ def inference_network(x, z_dim, img_size=64, nr_final_feature_maps=32):
         net = tf.layers.dense(net, z_dim * 2, activation=None, kernel_initializer=kernel_initializer)
         loc = net[:, :z_dim]
         log_var = net[:, z_dim:]
-        print(loc)
     return loc, log_var
 
 
