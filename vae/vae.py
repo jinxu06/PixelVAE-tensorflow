@@ -44,7 +44,9 @@ def inference_network(x, z_dim, img_size=64, nr_final_feature_maps=32):
             net = nonlinearity(net)
         net = tf.layers.conv2d(net, 2**num_layer*nr_final_feature_maps, 4, strides=1, padding='VALID', kernel_initializer=kernel_initializer)
         net = tf.layers.batch_normalization(net)
+        print(net)
         net = nonlinearity(net) # 1x1
+        print(net)
         net = tf.reshape(net, [-1, 2**num_layer*nr_final_feature_maps])
         print(2**num_layer*nr_final_feature_maps)
         print(net)
