@@ -12,7 +12,7 @@ def shallow_pixel_cnn(x, gh=None, sh=None, init=False, ema=None, dropout_p=0.5, 
         counters = {}
         with arg_scope([nn.conv2d, nn.conv2d_1x1, nn.deconv2d, nn.gated_resnet, nn.dense], counters=counters, init=init, ema=ema, dropout_p=dropout_p):
 
-            resnet_nonlinearity = nn.concat_elu # tf.nn.relu
+            resnet_nonlinearity = tf.nn.relu
             sh = nn.latent_deconv_net(sh, scale_factor=1)
 
             with arg_scope([nn.gated_resnet], nonlinearity=resnet_nonlinearity, gh=gh, sh=sh):
@@ -27,7 +27,7 @@ def shallow_pixel_cnn(x, gh=None, sh=None, init=False, ema=None, dropout_p=0.5, 
                 for rep in range(nr_resnet):
                     u_list.append(nn.gated_resnet(u_list[-1], conv=nn.down_shifted_conv2d))
                     ul_list.append(nn.gated_resnet(ul_list[-1], u_list[-1], conv=nn.down_right_shifted_conv2d))
-                    
+
                     # if rep%2==0:
                     #     for k in range(2):
                     #         u_list[-1] = nn.nin(u_list[-1], nn.int_shape(u_list[-1])[-1])
