@@ -129,6 +129,7 @@ flatten = tf.contrib.layers.flatten
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         out, locs[i], log_vars[i], x_hats[i], z_samples[i] = model(mxs[i], mxs[i], dropout_p=args.dropout_p, **model_opt)
+        train_out = out
         # nlls[i] = tf.reduce_sum(tf.square(flatten(xs[i])-flatten(x_hats[i])), 1)
         nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
         # klds[i] = - 0.5 * tf.reduce_mean(1 + log_vars[i] - tf.square(locs[i]) - tf.exp(log_vars[i]), axis=-1)
@@ -240,7 +241,7 @@ with tf.Session(config=config) as sess:
             #
             print("log_vars", sess.run(log_vars[0], feed_dict=feed_dict))
             print("x_hats", sess.run(x_hats[0], feed_dict=feed_dict))
-            print("out", sess.run(out[0], feed_dict=feed_dict))
+            print("out", sess.run(train_out[0], feed_dict=feed_dict))
             #
         train_loss, train_nll, train_kld = np.mean(loss_arr), np.mean(nll_arr), np.mean(kld_arr)
 
