@@ -150,6 +150,9 @@ for i in range(args.nr_gpu):
 
 all_params = tf.trainable_variables()
 
+print(all_params)
+quit()
+
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         grads[i] = tf.gradients(losses[i], all_params, colocate_gradients_with_ops=True)
@@ -235,6 +238,7 @@ with tf.Session(config=config) as sess:
             loss_arr.append(l)
             nll_arr.append(n)
             kld_arr.append(k)
+            print(l, n, k)
         train_loss, train_nll, train_kld = np.mean(loss_arr), np.mean(nll_arr), np.mean(kld_arr)
 
         loss_arr, nll_arr, kld_arr = [], [], []
