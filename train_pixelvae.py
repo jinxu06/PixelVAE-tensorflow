@@ -128,25 +128,23 @@ test_z_samples = [None for i in range(args.nr_gpu)]
 flatten = tf.contrib.layers.flatten
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        out, locs[i], log_vars[i], x_hats[i], z_samples[i] = model(mxs[i], mxs[i], dropout_p=args.dropout_p, **model_opt)
-        train_out = out
-
+        train_out, locs[i], log_vars[i], x_hats[i], z_samples[i] = model(mxs[i], mxs[i], dropout_p=args.dropout_p, **model_opt)
         # nlls[i] = tf.reduce_sum(tf.square(flatten(xs[i])-flatten(x_hats[i])), 1)
-        nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
+        nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), train_out, sum_all=False)
         # klds[i] = - 0.5 * tf.reduce_mean(1 + log_vars[i] - tf.square(locs[i]) - tf.exp(log_vars[i]), axis=-1)
         klds[i] = compute_mmd(tf.random_normal(shape=(args.batch_size, args.z_dim)), z_samples[i], 2./args.z_dim)
         losses[i] = nlls[i] + args.beta * tf.maximum(args.lam, klds[i])
 
-        out, test_locs[i], test_log_vars[i], test_x_hats[i], test_z_samples[i] = model(mxs[i], mxs[i], dropout_p=0., **model_opt)
+        test_out, test_locs[i], test_log_vars[i], test_x_hats[i], test_z_samples[i] = model(mxs[i], mxs[i], dropout_p=0., **model_opt)
         #test_nlls[i] = tf.reduce_sum(tf.square(flatten(xs[i])-flatten(test_x_hats[i])), 1)
-        test_nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), out, sum_all=False)
+        test_nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), test_out, sum_all=False)
         test_klds[i] = compute_mmd(tf.random_normal(shape=(args.batch_size, args.z_dim)), test_z_samples[i], 2./args.z_dim)
         #test_klds[i] = - 0.5 * tf.reduce_mean(1 + test_log_vars[i] - tf.square(test_locs[i]) - tf.exp(test_log_vars[i]), axis=-1)
         test_losses[i] = test_nlls[i] + args.beta * tf.maximum(args.lam, test_klds[i])
 
-        out, sample_locs[i], sample_log_vars[i], sample_fs[i], _ = model(mxs[i], ps[i], f=fs[i], dropout_p=0., **model_opt)
+        sample_out, sample_locs[i], sample_log_vars[i], sample_fs[i], _ = model(mxs[i], ps[i], f=fs[i], dropout_p=0., **model_opt)
         epsilon = 0.05
-        new_x_gen[i] = nn.sample_from_discretized_mix_logistic(out, args.nr_logistic_mix, epsilon=epsilon)
+        new_x_gen[i] = nn.sample_from_discretized_mix_logistic(sample_out, args.nr_logistic_mix, epsilon=epsilon)
 
 
 
@@ -238,6 +236,11 @@ with tf.Session(config=config) as sess:
             loss_arr.append(l)
             nll_arr.append(n)
             kld_arr.append(k)
+            print(l, n, k)
+            print(sess.run(xs[0], feed_dict=feed_dict))
+            print(sess.run(train_out[0], feed_dict=feed_dict))
+            print(sess.run(z_samples[0], feed_dict=feed_dict))
+            print("")
 
         train_loss, train_nll, train_kld = np.mean(loss_arr), np.mean(nll_arr), np.mean(kld_arr)
 
