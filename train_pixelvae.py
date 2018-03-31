@@ -162,13 +162,13 @@ with tf.device('/gpu:0'):
 
 
     nll = tf.concat(nlls, axis=0)
-    kld = tf.concat(klds, axis=0)
+    kld = klds #tf.concat(klds, axis=0)
     loss = tf.concat(losses, axis=0)
 
     print(nll, kld, loss)
 
     t_nll = tf.concat(test_nlls, axis=0)
-    t_kld = test_klds#tf.concat(test_klds, axis=0)
+    t_kld = test_klds #tf.concat(test_klds, axis=0)
     t_loss = tf.concat(test_losses, axis=0)
 
     train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
@@ -238,7 +238,9 @@ with tf.Session(config=config) as sess:
             loss_arr.append(l)
             nll_arr.append(n)
             kld_arr.append(k)
-            # print(l, n, k)
+            print(k)
+            print(sess.run(z_samples[0], feed_dict=feed_dict))
+
             # print(sess.run(xs[0], feed_dict=feed_dict))
             # print(sess.run(train_out[0], feed_dict=feed_dict))
             # print(sess.run(z_samples[0], feed_dict=feed_dict))
