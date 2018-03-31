@@ -16,5 +16,5 @@ def compute_mmd(x, y, sigma_sqr=1.0, batch_size=None):
     xy_kernel = compute_kernel(x, y)
     mmd = tf.reduce_mean(x_kernel) + tf.reduce_mean(y_kernel) - 2 * tf.reduce_mean(xy_kernel)
     if batch_size is not None:
-        mmd = tf.stack([mmd for i in range(batch_size)], axis=0)
+        mmd = tf.stack([[mmd] for i in range(batch_size)], axis=0)
     return mmd
