@@ -236,7 +236,6 @@ with tf.Session(config=config) as sess:
             loss_arr.append(l)
             nll_arr.append(n)
             kld_arr.append(k)
-            print(l, n, k)
 
         train_loss, train_nll, train_kld = np.mean(loss_arr), np.mean(nll_arr), np.mean(kld_arr)
 
