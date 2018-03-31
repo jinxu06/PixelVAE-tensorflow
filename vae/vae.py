@@ -5,7 +5,7 @@ from tensorflow.contrib.framework.python.ops import arg_scope
 import pixelcnn.nn as nn
 
 kernel_initializer = None
-nonlinearity = tf.nn.relu6 #nn.concat_elu # tf.nn.elu
+nonlinearity = tf.nn.elu
 
 def int_shape(x):
     return list(map(int, x.get_shape()))
