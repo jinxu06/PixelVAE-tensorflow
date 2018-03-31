@@ -238,7 +238,7 @@ with tf.Session(config=config) as sess:
             kld_arr.append(k)
 
             #
-            print("z", sess.run(z[0], feed_dict=feed_dict))
+            print("log_vars", sess.run(log_vars[0], feed_dict=feed_dict))
             print("x_hats", sess.run(x_hats[0], feed_dict=feed_dict))
             print("out", sess.run(out[0], feed_dict=feed_dict))
             #
