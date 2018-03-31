@@ -240,9 +240,6 @@ with tf.Session(config=config) as sess:
 
             print(l, n, k)
             #
-            print("log_vars", sess.run(log_vars[0], feed_dict=feed_dict)[0][0])
-            print("x_hats", sess.run(x_hats[0], feed_dict=feed_dict)[0][0])
-            print("out", sess.run(train_out[0], feed_dict=feed_dict)[0][0])
             #
         train_loss, train_nll, train_kld = np.mean(loss_arr), np.mean(nll_arr), np.mean(kld_arr)
 

@@ -12,7 +12,6 @@ def int_shape(x):
 
 def generative_network(z, z_dim, img_size=64, output_feature_maps=False, nr_final_feature_maps=32):
     assert img_size in [32, 64, 128, 256], "only support values in [32, 64, 128, 256]"
-    kernel_initializer = None
     with tf.variable_scope("generative_network"):
         num_layer = np.rint(np.log2(img_size)).astype(np.int32) - 2
         net = tf.reshape(z, [-1, 1, 1, z_dim])
