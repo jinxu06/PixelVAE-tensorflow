@@ -24,7 +24,7 @@ def generative_network(z, z_dim, img_size=64, output_feature_maps=False, nr_fina
             net = tf.layers.batch_normalization(net)
             net = nonlinearity(net)
         if output_feature_maps:
-            ret_num_channel = 32
+            ret_num_channel = nr_final_feature_maps
         else:
             ret_num_channel = 3
         net = tf.layers.conv2d_transpose(net, ret_num_channel, 1, strides=1, padding='SAME', kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
