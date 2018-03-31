@@ -150,8 +150,6 @@ for i in range(args.nr_gpu):
 
 all_params = tf.trainable_variables()
 
-print(all_params)
-quit()
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
@@ -238,7 +236,12 @@ with tf.Session(config=config) as sess:
             loss_arr.append(l)
             nll_arr.append(n)
             kld_arr.append(k)
-            print(l, n, k)
+
+            #
+            print("z", sess.run(z[0], feed_dict=feed_dict))
+            print("x_hats", sess.run(x_hats[0], feed_dict=feed_dict))
+            print("out", sess.run(out[0], feed_dict=feed_dict))
+            #
         train_loss, train_nll, train_kld = np.mean(loss_arr), np.mean(nll_arr), np.mean(kld_arr)
 
         loss_arr, nll_arr, kld_arr = [], [], []
