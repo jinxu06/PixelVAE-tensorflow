@@ -240,6 +240,7 @@ with tf.Session(config=config) as sess:
             kld_arr.append(k)
             print(k)
             print(sess.run(z_samples[0], feed_dict=feed_dict))
+            print(np.exp(sess.run(log_vars[0], feed_dict=feed_dict)))
 
             # print(sess.run(xs[0], feed_dict=feed_dict))
             # print(sess.run(train_out[0], feed_dict=feed_dict))
