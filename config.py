@@ -55,7 +55,7 @@ configs['pixelvae-celeba64'] = {
     "data_set": "celeba64",
     "batch_size": 8,
     "init_batch_size": 8,
-    'learning_rate': 1e-4,
+    'learning_rate': 1e-5,
     "save_interval": 5,
     'nr_final_feature_maps': 64,
     "nr_gpu": 4,

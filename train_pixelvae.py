@@ -132,13 +132,13 @@ for i in range(args.nr_gpu):
         # nlls[i] = tf.reduce_sum(tf.square(flatten(xs[i])-flatten(x_hats[i])), 1)
         nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), train_out, sum_all=False)
         # klds[i] = - 0.5 * tf.reduce_mean(1 + log_vars[i] - tf.square(locs[i]) - tf.exp(log_vars[i]), axis=-1)
-        klds[i] = compute_mmd(tf.random_normal(shape=(args.batch_size, args.z_dim))*10., z_samples[i], 2./args.z_dim)
+        klds[i] = compute_mmd(tf.random_normal(shape=(args.batch_size, args.z_dim)), z_samples[i], 2./args.z_dim)
         losses[i] = nlls[i] + args.beta * tf.maximum(args.lam, klds[i])
 
         test_out, test_locs[i], test_log_vars[i], test_x_hats[i], test_z_samples[i] = model(mxs[i], mxs[i], dropout_p=0., **model_opt)
         #test_nlls[i] = tf.reduce_sum(tf.square(flatten(xs[i])-flatten(test_x_hats[i])), 1)
         test_nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), test_out, sum_all=False)
-        test_klds[i] = compute_mmd(tf.random_normal(shape=(args.batch_size, args.z_dim))*10., test_z_samples[i], 2./args.z_dim)
+        test_klds[i] = compute_mmd(tf.random_normal(shape=(args.batch_size, args.z_dim)), test_z_samples[i], 2./args.z_dim)
         #test_klds[i] = - 0.5 * tf.reduce_mean(1 + test_log_vars[i] - tf.square(test_locs[i]) - tf.exp(test_log_vars[i]), axis=-1)
         test_losses[i] = test_nlls[i] + args.beta * tf.maximum(args.lam, test_klds[i])
 
@@ -164,8 +164,6 @@ with tf.device('/gpu:0'):
     nll = tf.concat(nlls, axis=0)
     kld = klds #tf.concat(klds, axis=0)
     loss = tf.concat(losses, axis=0)
-
-    print(nll, kld, loss)
 
     t_nll = tf.concat(test_nlls, axis=0)
     t_kld = test_klds #tf.concat(test_klds, axis=0)
@@ -238,14 +236,7 @@ with tf.Session(config=config) as sess:
             loss_arr.append(l)
             nll_arr.append(n)
             kld_arr.append(k)
-            print(k)
-            print(sess.run(z_samples[0], feed_dict=feed_dict))
-            print(np.exp(sess.run(log_vars[0], feed_dict=feed_dict)))
-
-            # print(sess.run(xs[0], feed_dict=feed_dict))
-            # print(sess.run(train_out[0], feed_dict=feed_dict))
-            # print(sess.run(z_samples[0], feed_dict=feed_dict))
-            # print("")
+            print(l, n, k)
 
         train_loss, train_nll, train_kld = np.mean(loss_arr), np.mean(nll_arr), np.mean(kld_arr)
 
