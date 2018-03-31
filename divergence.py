@@ -10,8 +10,11 @@ def compute_kernel(x, y):
     tiled_y = tf.tile(tf.reshape(y, tf.stack([1, y_size, dim])), tf.stack([x_size, 1, 1]))
     return tf.exp(-tf.reduce_mean(tf.square(tiled_x - tiled_y), axis=2) / tf.cast(dim, tf.float32))
 
-def compute_mmd(x, y, sigma_sqr=1.0):
+def compute_mmd(x, y, sigma_sqr=1.0, batch_size=None):
     x_kernel = compute_kernel(x, x)
     y_kernel = compute_kernel(y, y)
     xy_kernel = compute_kernel(x, y)
-    return tf.reduce_mean(x_kernel) + tf.reduce_mean(y_kernel) - 2 * tf.reduce_mean(xy_kernel)
+    mmd = tf.reduce_mean(x_kernel) + tf.reduce_mean(y_kernel) - 2 * tf.reduce_mean(xy_kernel)
+    if batch_size is not None:
+        mmd = tf.stack([mmd for i in range(batch_size)], axis=0)
+    return mmd

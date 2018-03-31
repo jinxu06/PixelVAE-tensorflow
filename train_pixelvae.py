@@ -162,7 +162,7 @@ with tf.device('/gpu:0'):
 
 
     nll = tf.concat(nlls, axis=0)
-    kld = klds #tf.concat(klds, axis=0)
+    kld = tf.concat(klds, axis=0)
     loss = tf.concat(losses, axis=0)
 
     print(nll, kld, loss)
@@ -238,11 +238,11 @@ with tf.Session(config=config) as sess:
             loss_arr.append(l)
             nll_arr.append(n)
             kld_arr.append(k)
-            print(l, n, k)
-            print(sess.run(xs[0], feed_dict=feed_dict))
-            print(sess.run(train_out[0], feed_dict=feed_dict))
-            print(sess.run(z_samples[0], feed_dict=feed_dict))
-            print("")
+            # print(l, n, k)
+            # print(sess.run(xs[0], feed_dict=feed_dict))
+            # print(sess.run(train_out[0], feed_dict=feed_dict))
+            # print(sess.run(z_samples[0], feed_dict=feed_dict))
+            # print("")
 
         train_loss, train_nll, train_kld = np.mean(loss_arr), np.mean(nll_arr), np.mean(kld_arr)
 
