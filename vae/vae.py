@@ -5,6 +5,7 @@ from tensorflow.contrib.framework.python.ops import arg_scope
 import pixelcnn.nn as nn
 
 kernel_initializer = None
+kernel_regularizer = tf.contrib.layers.l2_regularizer(scale=0.1)
 nonlinearity = tf.nn.elu
 
 def int_shape(x):
@@ -15,16 +16,18 @@ def generative_network(z, z_dim, img_size=64, output_feature_maps=False, nr_fina
     with tf.variable_scope("generative_network"):
         num_layer = np.rint(np.log2(img_size)).astype(np.int32) - 2
         net = tf.reshape(z, [-1, 1, 1, z_dim])
-        net = tf.layers.conv2d_transpose(net, 2**num_layer*nr_final_feature_maps, 4, strides=1, padding='VALID', kernel_initializer=kernel_initializer)
+        net = tf.layers.conv2d_transpose(net, 2**num_layer*nr_final_feature_maps, 4, strides=1, padding='VALID', kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
         net = tf.layers.batch_normalization(net)
         net = nonlinearity(net)
         for i in reversed(range(num_layer)):
-            net = tf.layers.conv2d_transpose(net, 2**i*nr_final_feature_maps, 5, strides=2, padding='SAME', kernel_initializer=kernel_initializer)
+            net = tf.layers.conv2d_transpose(net, 2**i*nr_final_feature_maps, 5, strides=2, padding='SAME', kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
             net = tf.layers.batch_normalization(net)
             net = nonlinearity(net)
         if output_feature_maps:
-            return net
-        net = tf.layers.conv2d_transpose(net, 3, 1, strides=1, padding='SAME', kernel_initializer=kernel_initializer)
+            ret_num_channel = 32
+        else:
+            ret_num_channel = 3
+        net = tf.layers.conv2d_transpose(net, ret_num_channel, 1, strides=1, padding='SAME', kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
         # net = tf.nn.sigmoid(net)
         net = tf.nn.tanh(net)
 
@@ -36,16 +39,16 @@ def inference_network(x, z_dim, img_size=64, nr_final_feature_maps=32):
     with tf.variable_scope("inference_network"):
         num_layer = np.rint(np.log2(img_size)).astype(np.int32) - 2
         net = tf.reshape(x, [-1, img_size, img_size, 3])
-        net = tf.layers.conv2d(net, nr_final_feature_maps, 1, strides=1, padding='SAME', kernel_initializer=kernel_initializer)
+        net = tf.layers.conv2d(net, nr_final_feature_maps, 1, strides=1, padding='SAME', kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
         for i in range(num_layer):
-            net = tf.layers.conv2d(net, 2**(i+1)*nr_final_feature_maps, 5, strides=2, padding='SAME', kernel_initializer=kernel_initializer)
+            net = tf.layers.conv2d(net, 2**(i+1)*nr_final_feature_maps, 5, strides=2, padding='SAME', kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
             net = tf.layers.batch_normalization(net)
             net = nonlinearity(net)
-        net = tf.layers.conv2d(net, 2**num_layer*nr_final_feature_maps, 4, strides=1, padding='VALID', kernel_initializer=kernel_initializer)
+        net = tf.layers.conv2d(net, 2**num_layer*nr_final_feature_maps, 4, strides=1, padding='VALID', kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
         net = tf.layers.batch_normalization(net)
         net = nonlinearity(net) # 1x1
         net = tf.reshape(net, [-1, 2**num_layer*nr_final_feature_maps])
-        net = tf.layers.dense(net, z_dim * 2, activation=None, kernel_initializer=kernel_initializer)
+        net = tf.layers.dense(net, z_dim * 2, activation=None, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
         loc = net[:, :z_dim]
         log_var = net[:, z_dim:]
     return loc, log_var
