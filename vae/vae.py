@@ -50,7 +50,7 @@ def inference_network(x, z_dim, img_size=64, nr_final_feature_maps=32):
         net = tf.reshape(net, [-1, 2**num_layer*nr_final_feature_maps])
         net = tf.layers.dense(net, z_dim * 2, activation=None, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
         loc = net[:, :z_dim]
-        log_var = net[:, z_dim:]
+        log_var = tf.minimum(3.0, net[:, z_dim:])
     return loc, log_var
 
 
