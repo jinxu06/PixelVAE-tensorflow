@@ -5,7 +5,7 @@ The core Pixel-CNN model
 import numpy as np
 import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope
-import pixel_cnn_pp.nn as nn
+import pixelcnn.nn as nn
 
 def deep_pixel_cnn(x, gh=None, sh=None, init=False, ema=None, dropout_p=0.5, nr_resnet=5, nr_filters=160, nr_logistic_mix=10):
     print("Use Deep PixelCNN")
