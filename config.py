@@ -63,7 +63,7 @@ configs['pixelvae-celeba64'] = {
 
 configs['pixelvae-celeba64-deep'] = {
     "img_size": 64,
-    "z_dim": 128,
+    "z_dim": 64,
     "lam": 0.0,
     'beta': 1e7,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
