@@ -132,13 +132,13 @@ for i in range(args.nr_gpu):
         # nlls[i] = tf.reduce_sum(tf.square(flatten(xs[i])-flatten(x_hats[i])), 1)
         nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), train_out, sum_all=False)
         # klds[i] = - 0.5 * tf.reduce_mean(1 + log_vars[i] - tf.square(locs[i]) - tf.exp(log_vars[i]), axis=-1)
-        klds[i] = compute_mmd(tf.random_normal(shape=(args.batch_size, args.z_dim)), z_samples[i], 2./args.z_dim)
+        klds[i] = compute_mmd(tf.random_normal(shape=(200, args.z_dim)), z_samples[i], 2./args.z_dim)
         losses[i] = nlls[i] + args.beta * tf.maximum(args.lam, klds[i])
 
         test_out, test_locs[i], test_log_vars[i], test_x_hats[i], test_z_samples[i] = model(mxs[i], mxs[i], dropout_p=0., **model_opt)
         #test_nlls[i] = tf.reduce_sum(tf.square(flatten(xs[i])-flatten(test_x_hats[i])), 1)
         test_nlls[i] = nn.discretized_mix_logistic_loss(tf.stop_gradient(xs[i]), test_out, sum_all=False)
-        test_klds[i] = compute_mmd(tf.random_normal(shape=(args.batch_size, args.z_dim)), test_z_samples[i], 2./args.z_dim)
+        test_klds[i] = compute_mmd(tf.random_normal(shape=(200, args.z_dim)), test_z_samples[i], 2./args.z_dim)
         #test_klds[i] = - 0.5 * tf.reduce_mean(1 + test_log_vars[i] - tf.square(test_locs[i]) - tf.exp(test_log_vars[i]), axis=-1)
         test_losses[i] = test_nlls[i] + args.beta * tf.maximum(args.lam, test_klds[i])
 
