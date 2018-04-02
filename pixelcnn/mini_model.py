@@ -8,6 +8,7 @@ from tensorflow.contrib.framework.python.ops import arg_scope
 import pixelcnn.nn as nn
 
 def shallow_pixel_cnn(x, gh=None, sh=None, init=False, ema=None, dropout_p=0.5, nr_resnet=5, nr_filters=160, nr_logistic_mix=10):
+    print("Use Shallow PixelCNN")
     with tf.variable_scope('pixelcnn'):
         counters = {}
         with arg_scope([nn.conv2d, nn.conv2d_1x1, nn.deconv2d, nn.gated_resnet, nn.dense], counters=counters, init=init, ema=ema, dropout_p=dropout_p):

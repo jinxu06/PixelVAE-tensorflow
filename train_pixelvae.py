@@ -19,7 +19,7 @@ import utils.mask as um
 from config import get_config
 from divergence import compute_mmd
 
-cfg = get_config('pixelvae-celeba64')
+cfg = get_config('pixelvae-celeba64-deep')
 
 
 parser = argparse.ArgumentParser()
@@ -91,7 +91,7 @@ fs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img
 # zs = [tf.placeholder(tf.float32, shape=(None, args.z_dim)) for i in range(args.nr_gpu)]
 
 # create the model
-model_opt = {"z_dim":args.z_dim, "img_size":args.img_size, "nr_final_feature_maps":args.nr_final_feature_maps, "nr_resnet":args.nr_resnet, "nr_filters":args.nr_filters, "nr_logistic_mix":args.nr_logistic_mix}
+model_opt = {"deep":True, "z_dim":args.z_dim, "img_size":args.img_size, "nr_final_feature_maps":args.nr_final_feature_maps, "nr_resnet":args.nr_resnet, "nr_filters":args.nr_filters, "nr_logistic_mix":args.nr_logistic_mix}
 model = tf.make_template('pixel_vae', pixel_vae)
 
 
