@@ -51,14 +51,15 @@ test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shu
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 
-vladders = [VLadderAE(z_dims=None, num_filters=None, beta=1.0) for i in range(args.nr_gpu)]
+vladders = [VLadderAE(z_dims=None, num_filters=None, beta=1.0, counters={}) for i in range(args.nr_gpu)]
 
 model_opt = {}
-build_graph = tf.make_template('build_graph', VLadderAE.build_graph)
+model = tf.make_template('build_graph', VLadderAE.build_graph)
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        build_graph(vladders[i], xs[i])
+        model(vladders[i], xs[i])
+        print(vladders[i].zs)
 
 
 
