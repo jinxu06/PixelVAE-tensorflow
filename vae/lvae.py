@@ -8,9 +8,11 @@ class VLadderAE(object):
 
     def __init__(self, z_dims=None, num_filters=None, beta=1., reg_type='mmd', counters={}):
         if z_dims is None:
-            self.z_dims = [20, 20, 20]
+            z_dims = [20, 20, 20]
         if num_filters is None:
-            self.num_filters = [32, 64, 128]
+            num_filters = [32, 64, 128]
+        self.z_dims = z_dims
+        self.num_filters = num_filters
         assert len(self.z_dims)==len(self.num_filters), "lengths of z_dims, num_filters do not match"
         self.num_blocks = len(self.z_dims)
         self.beta = beta
