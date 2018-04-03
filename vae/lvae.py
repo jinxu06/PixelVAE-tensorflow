@@ -6,12 +6,13 @@ flatten = tf.contrib.layers.flatten
 
 class VLadderAE(object):
 
-    def __init__(self, x, num_blocks, z_dims=None, num_filters=None, counters={}):
-        self.num_blocks = num_blocks
+    def __init__(self, x, z_dims=None, num_filters=None, counters={}):
         if z_dims is None:
             self.z_dims = [20, 20, 20]
         if num_filters is None:
-            self.num_filters = [64, 128, 256]
+            self.num_filters = [32, 64, 128]
+        assert len(self.z_dims)==len(self.num_filters), "lengths of z_dims, num_filters do not match"
+        self.num_blocks = len(self.z_dims)
         self.zs = []
         self.z_locs = []
         self.z_scales = []
