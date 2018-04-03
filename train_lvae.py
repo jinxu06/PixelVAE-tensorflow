@@ -49,9 +49,20 @@ else:
 test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shuffle=False, size=args.img_size)
 
 
-x = tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3))
-vladder = VLadderAE(x, z_dims=None, num_filters=None, beta=1.0)
+xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 
+for i in range(args.nr_gpu):
+    with tf.device('/gpu:%d' % i):
+        vladder = VLadderAE(xs[i], z_dims=None, num_filters=None, beta=1.0)
+
+
+
+def make_feed_dict(data):
+    data = np.cast[np.float32]((data - 127.5) / 127.5)
+    ds = np.split(data, args.nr_gpu)
+    for i in range(args.nr_gpu):
+        feed_dict = { xs[i]:ds[i] for i in range(args.nr_gpu) }
+    return feed_dict
 
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
