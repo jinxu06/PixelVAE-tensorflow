@@ -71,7 +71,7 @@ def dense_layer(inputs, num_outputs, nonlinearity=None, bn=True):
 
 @add_arg_scope
 def z_sampler(loc, scale, counters={}):
-    name = get_name("z_sampler")
+    name = get_name("z_sampler", counters)
     print("construct", name)
     with tf.variable_scope(name):
         dist = tf.distributions.Normal(loc=loc, scale=scale)
@@ -82,7 +82,7 @@ def z_sampler(loc, scale, counters={}):
 
 @add_arg_scope
 def generative_block(latent, ladder, num_filters, kernel_size=4, nonlinearity=None, bn=True, counters={}):
-    name = get_name("generative_block")
+    name = get_name("generative_block", counters)
     print("construct", name)
     with tf.variable_scope(name):
         outputs= combine_noise(latent, ladder)
@@ -93,7 +93,7 @@ def generative_block(latent, ladder, num_filters, kernel_size=4, nonlinearity=No
 
 @add_arg_scope
 def inference_block(inputs, num_filters, kernel_size=4, nonlinearity=None, bn=True, counters={}):
-    name = get_name("inference_block")
+    name = get_name("inference_block", counters)
     print("construct", name)
     with tf.variable_scope(name):
         with arg_scope([conv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
@@ -103,7 +103,7 @@ def inference_block(inputs, num_filters, kernel_size=4, nonlinearity=None, bn=Tr
 
 @add_arg_scope
 def ladder_block(inputs, ladder_dim, num_filters, kernel_size, nonlinearity=None, bn=True, counters={}):
-    name = get_name("ladder_block")
+    name = get_name("ladder_block", counters)
     print("construct", name)
     with tf.variable_scope(name):
         with arg_scope([conv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
