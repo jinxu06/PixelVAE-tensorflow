@@ -64,9 +64,10 @@ for i in range(args.nr_gpu):
 
 all_params = tf.trainable_variables()
 
+grads = []
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        grads[i] = tf.gradients(vladders[i].loss, all_params, colocate_gradients_with_ops=True)
+        grads.append(tf.gradients(vladders[i].loss, all_params, colocate_gradients_with_ops=True))
 
 with tf.device('/gpu:0'):
     for i in range(1, args.nr_gpu):
