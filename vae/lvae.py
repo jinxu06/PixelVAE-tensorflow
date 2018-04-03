@@ -15,6 +15,7 @@ class VLadderAE(object):
         self.zs = []
         self.z_locs = []
         self.z_scales = []
+        self.z_tildes = []
         self.hs = []
         self.x = x
 
@@ -34,6 +35,10 @@ class VLadderAE(object):
                 self.z_scales.append(z_scale)
                 z = z_sampler(z_loc, z_scale)
                 self.zs.append(z)
+            z_tilde = None
+            for l in reversed(range(self.num_blocks)):
+                z_tilde = generative_block(z_tilde, ladder, self.num_filters[l], output_shape=int_shape(self.hs[l]))
+                self.z_tildes.append(z_tilde)
 
 
     def loss(self, reg='elbo'): # reg = kld or mmd
@@ -41,7 +46,6 @@ class VLadderAE(object):
 
 @add_arg_scope
 def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True):
-
     outputs = tf.layers.conv2d(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding)
     if bn:
         outputs = tf.layers.batch_normalization(outputs)
@@ -85,10 +89,13 @@ def z_sampler(loc, scale, counters={}):
 
 
 @add_arg_scope
-def generative_block(latent, ladder, num_filters, kernel_size=4, nonlinearity=None, bn=True, counters={}):
+def generative_block(latent, ladder, num_filters, kernel_size=4, output_shape=None, nonlinearity=None, bn=True, counters={}):
     name = get_name("generative_block", counters)
     print("construct", name, "...")
     with tf.variable_scope(name):
+        if latent is None:
+            outputs = combine_noise(latent, ladder, output_shape)
+            return outputs
         outputs= combine_noise(latent, ladder)
         with arg_scope([deconv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
             outputs = deconv2d_layer(outputs, num_filters, strides=2)
@@ -130,8 +137,14 @@ def get_name(layer_name, counters):
     counters[layer_name] += 1
     return name
 
-def combine_noise(latent, ladder):
+def combine_noise(latent, ladder, latent_shape=None):
+    if latent is None:
+        ladder = dense_layer(ladder, np.prod(latent_shape), nonlinearity=tf.nn.elu, bn=True)
+        ladder = dense_layer(ladder, np.prod(latent_shape), nonlinearity=tf.nn.elu, bn=True)
+        ladder = tf.reshape(ladder, [-1]+latent_shape)
+        return ladder
     latent_shape = int_shape(latent)[1:]
     ladder = dense_layer(ladder, np.prod(latent_shape), nonlinearity=tf.nn.elu, bn=True)
     ladder = tf.reshape(ladder, [-1]+latent_shape)
-    return tf.concat([latent, ladder], axis=-1)
+    return latent + ladder
+    # return tf.concat([latent, ladder], axis=-1)
