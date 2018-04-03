@@ -102,7 +102,7 @@ def inference_block(inputs, num_filters, kernel_size=4, nonlinearity=None, bn=Tr
             return outputs
 
 @add_arg_scope
-def ladder_block(inputs, ladder_dim, num_filters, kernel_size, nonlinearity=None, bn=True, counters={}):
+def ladder_block(inputs, ladder_dim, num_filters, kernel_size=4, nonlinearity=None, bn=True, counters={}):
     name = get_name("ladder_block", counters)
     print("construct", name)
     with tf.variable_scope(name):
