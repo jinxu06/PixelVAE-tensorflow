@@ -74,9 +74,9 @@ with tf.device('/gpu:0'):
         for j in range(len(grads[0])):
             grads[0][j] += grads[i][j]
 
-    loss = tf.addn([v.loss for v in vladders]) / args.nr_gpu
-    loss_ae = tf.addn([v.loss_ae for v in vladders]) / args.nr_gpu
-    loss_reg = tf.addn([v.loss_reg for v in vladders]) / args.nr_gpu
+    loss = tf.add_n([v.loss for v in vladders]) / args.nr_gpu
+    loss_ae = tf.add_n([v.loss_ae for v in vladders]) / args.nr_gpu
+    loss_reg = tf.add_n([v.loss_reg for v in vladders]) / args.nr_gpu
     train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
 
