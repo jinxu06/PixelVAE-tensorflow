@@ -39,7 +39,7 @@ class VLadderAE(object):
     def loss(self, reg='elbo'): # reg = kld or mmd
         pass
 
-
+@add_arg_scope
 def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True):
     outputs = tf.layers.conv2d(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding)
     if bn:
@@ -48,6 +48,7 @@ def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', no
         outputs = nonlinearity(outputs)
     return outputs
 
+@add_arg_scope
 def deconv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True):
     outputs = tf.layers.conv2d_transpose(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding)
     if bn:
@@ -56,6 +57,7 @@ def deconv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', 
         outputs = nonlinearity(outputs)
     return outputs
 
+@add_arg_scope
 def dense_layer(inputs, num_outputs, nonlinearity=None, bn=True):
     inputs_shape = int_shape(inputs)
     assert len(inputs_shape)==2, "inputs should be flattened first"
@@ -67,6 +69,7 @@ def dense_layer(inputs, num_outputs, nonlinearity=None, bn=True):
     return outputs
 
 
+@add_arg_scope
 def z_sampler(loc, scale, counters={}):
     name = get_name("z_sampler")
     print("construct", name)
@@ -77,6 +80,7 @@ def z_sampler(loc, scale, counters={}):
         return z
 
 
+@add_arg_scope
 def generative_block(latent, ladder, num_filters, kernel_size=4, nonlinearity=None, bn=True, counters={}):
     name = get_name("generative_block")
     print("construct", name)
@@ -87,6 +91,7 @@ def generative_block(latent, ladder, num_filters, kernel_size=4, nonlinearity=No
             outputs = deconv2d_layer(outputs, num_filters, strides=1)
             return outputs
 
+@add_arg_scope
 def inference_block(inputs, num_filters, kernel_size=4, nonlinearity=None, bn=True, counters={}):
     name = get_name("inference_block")
     print("construct", name)
@@ -96,6 +101,7 @@ def inference_block(inputs, num_filters, kernel_size=4, nonlinearity=None, bn=Tr
             outputs = conv2d_layer(outputs, num_filters, strides=2)
             return outputs
 
+@add_arg_scope
 def ladder_block(inputs, ladder_dim, num_filters, kernel_size, nonlinearity=None, bn=True, counters={}):
     name = get_name("ladder_block")
     print("construct", name)
