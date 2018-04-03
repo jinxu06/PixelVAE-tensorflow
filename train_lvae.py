@@ -32,8 +32,13 @@ parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to us
 # new features
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
 
+args = parser.parse_args()
+print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
+
 rng = np.random.RandomState(args.seed)
 tf.set_random_seed(args.seed)
+
+
 
 import data.celeba_data as celeba_data
 DataLoader = celeba_data.DataLoader
