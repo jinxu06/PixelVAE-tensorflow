@@ -31,14 +31,14 @@ class VLadderAE(object):
     def __build_graph(self):
         print("******   Building Graph   ******")
         h = self.x
-        with arg_scope([inference_block, generative_block, ladder_block, z_sampler], nonlinearity=self.nonlinearity, bn=True, counters=self.counters):
+        with arg_scope([inference_block, generative_block, ladder_block], nonlinearity=self.nonlinearity, bn=True, counters=self.counters):
             for l in range(self.num_blocks):
                 h = inference_block(h, num_filters=self.num_filters[l])
                 self.hs.append(h)
                 z_loc, z_scale = ladder_block(h, ladder_dim=self.z_dims[l], num_filters=self.num_filters[l])
                 self.z_locs.append(z_loc)
                 self.z_scales.append(z_scale)
-                z = z_sampler(z_loc, z_scale)
+                z = z_sampler(z_loc, z_scale, counters=self.counters)
                 self.zs.append(z)
             z_tilde = None
             for l in reversed(range(self.num_blocks)):
