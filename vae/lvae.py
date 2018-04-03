@@ -49,7 +49,7 @@ class VLadderAE(object):
 
     def __loss(self, reg='kld'): # reg = kld or mmd or None
         print("******   Compute Loss   ******")
-        self.loss_ae = tf.reduce_mean(tf.reduce_sum(tf.square(flatten(self.x)-flatten(self.x_hats)), 1))
+        self.loss_ae = tf.reduce_mean(tf.reduce_sum(tf.square(flatten(self.x)-flatten(self.x_hat)), 1))
         if reg is None:
             self.loss = self.loss_ae
             return
