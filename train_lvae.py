@@ -16,7 +16,7 @@ cfg = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/lvae-celeba32",
     "data_set": "celeba32",
-    "batch_size": 8,
+    "batch_size": 32,
     "nr_gpu": 1,
     "learning_rate": 0.0001,
     "beta": 5e3,
@@ -57,8 +57,8 @@ test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shu
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 
-z_dims = [20, 20, 20]
-num_filters = [64, 128, 256]
+z_dims = [32, 32, 32, 32]
+num_filters = [64, 128, 256, 512]
 vladders = [VLadderAE(z_dims=z_dims, num_filters=num_filters, beta=args.beta, counters={}) for i in range(args.nr_gpu)]
 
 model_opt = {}
