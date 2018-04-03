@@ -6,6 +6,7 @@ import time
 from pixelcnn.nn import adam_updates
 import numpy as np
 import tensorflow as tf
+from utils import plotting
 from vae.lvae import VLadderAE
 
 parser = argparse.ArgumentParser()
