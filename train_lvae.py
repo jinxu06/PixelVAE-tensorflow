@@ -113,7 +113,7 @@ with tf.Session(config=config) as sess:
 
     sess.run(initializer)
 
-    max_num_epoch = 1000
+    max_num_epoch = 200
     for epoch in range(max_num_epoch):
         tt = time.time()
         loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
