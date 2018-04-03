@@ -39,6 +39,7 @@ class VLadderAE(object):
             for l in reversed(range(self.num_blocks)):
                 z_tilde = generative_block(z_tilde, self.zs[l], self.num_filters[l], output_shape=int_shape(self.hs[l])[1:])
                 self.z_tildes.append(z_tilde)
+            x_hat = generative_block(z_tilde, None, 3)
 
 
     def loss(self, reg='elbo'): # reg = kld or mmd
@@ -143,6 +144,8 @@ def combine_noise(latent, ladder, latent_shape=None):
         ladder = dense_layer(ladder, np.prod(latent_shape), nonlinearity=tf.nn.elu, bn=True)
         ladder = tf.reshape(ladder, [-1]+latent_shape)
         return ladder
+    if ladder is None:
+        return latent
     latent_shape = int_shape(latent)[1:]
     ladder = dense_layer(ladder, np.prod(latent_shape), nonlinearity=tf.nn.elu, bn=True)
     ladder = tf.reshape(ladder, [-1]+latent_shape)
