@@ -37,7 +37,7 @@ class VLadderAE(object):
                 self.zs.append(z)
             z_tilde = None
             for l in reversed(range(self.num_blocks)):
-                z_tilde = generative_block(z_tilde, self.zs[l], self.num_filters[l], output_shape=int_shape(self.hs[l]))
+                z_tilde = generative_block(z_tilde, self.zs[l], self.num_filters[l], output_shape=int_shape(self.hs[l])[1:])
                 self.z_tildes.append(z_tilde)
 
 
