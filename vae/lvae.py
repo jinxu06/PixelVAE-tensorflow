@@ -47,7 +47,7 @@ def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', no
         outputs = tf.layers.batch_normalization(outputs)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
-    print("    + conv2d_layer", int_shape(outputs))
+    print("    + conv2d_layer", int_shape(inputs), int_shape(outputs))
     return outputs
 
 @add_arg_scope
@@ -57,7 +57,7 @@ def deconv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', 
         outputs = tf.layers.batch_normalization(outputs)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
-    print("    + deconv2d_layer", int_shape(outputs))
+    print("    + deconv2d_layer", int_shape(inputs), int_shape(outputs))
     return outputs
 
 @add_arg_scope
@@ -80,6 +80,7 @@ def z_sampler(loc, scale, counters={}):
         dist = tf.distributions.Normal(loc=loc, scale=scale)
         z = dist.sample(sample_shape=int_shape(loc), seed=None)
         z = loc + tf.multiply(z, scale)
+        print("    + normal_sampler", int_shape(z))
         return z
 
 
