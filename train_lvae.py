@@ -18,6 +18,7 @@ cfg = {
     "batch_size": 8,
     "nr_gpu": 1,
     "learning_rate": 0.0001,
+    "beta": 1e3,
 }
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -30,6 +31,7 @@ parser.add_argument('-ds', '--data_set', type=str, default=cfg['data_set'], help
 parser.add_argument('-bs', '--batch_size', type=int, default=cfg['batch_size'], help='Batch size during training per GPU')
 parser.add_argument('-ng', '--nr_gpu', type=int, default=cfg['nr_gpu'], help='How many GPUs to distribute the training across?')
 parser.add_argument('-lr', '--learning_rate', type=float, default=cfg['learning_rate'], help='Base learning rate')
+parser.add_argument('-b', '--beta', type=float, default=cfg['beta'], help="strength of the KL divergence penalty")
 parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to use')
 # new features
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
@@ -53,7 +55,9 @@ test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shu
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 
-vladders = [VLadderAE(z_dims=None, num_filters=None, beta=1.0, counters={}) for i in range(args.nr_gpu)]
+z_dims = [20, 20, 20]
+num_filters = [64, 128, 256]
+vladders = [VLadderAE(z_dims=z_dims, num_filters=num_filters, beta=args.beta, counters={}) for i in range(args.nr_gpu)]
 
 model_opt = {}
 model = tf.make_template('build_graph', VLadderAE.build_graph)
@@ -109,9 +113,18 @@ with tf.Session(config=config) as sess:
             loss_arr.append(l)
             loss_ae_arr.append(la)
             loss_reg_arr.append(lr)
-
         train_loss, train_loss_ae, train_loss_reg = np.mean(loss_arr), np.mean(loss_ae_arr), np.mean(loss_reg_arr)
 
+        loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
+        for data in test_data:
+            feed_dict = make_feed_dict(data)
+            l, la, lr = sess.run([loss, loss_ae, loss_reg], feed_dict=feed_dict)
+            loss_arr.append(l)
+            loss_ae_arr.append(la)
+            loss_reg_arr.append(lr)
+        test_loss, test_loss_ae, test_loss_reg = np.mean(loss_arr), np.mean(loss_ae_arr), np.mean(loss_reg_arr)
+
         print("epoch {0} --------------------- Time {1:.2f}s".format(epoch, time.time()-tt))
-        print("train loss:{0:.3f}, train nll:{1:.3f}, train kld:{2:.6f}".format(train_loss, train_loss_ae, train_loss_reg))
+        print("train loss:{0:.3f}, train ae loss:{1:.3f}, train reg loss:{2:.6f}".format(train_loss, train_loss_ae, train_loss_reg))
+        print("test loss:{0:.3f}, test ae loss:{1:.3f}, test reg loss:{2:.6f}".format(test_loss, test_loss_ae, test_loss_reg))
         sys.stdout.flush()
