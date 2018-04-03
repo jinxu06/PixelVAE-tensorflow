@@ -21,6 +21,8 @@ class VLadderAE(object):
         self.counters = counters
         self.nonlinearity = tf.nn.elu
 
+        self._build_graph()
+
     def _build_graph(self):
         h = self.x
         with arg_scope([inference_block, generative_block, ladder_block, z_sampler], counters=self.counters):
