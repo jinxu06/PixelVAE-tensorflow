@@ -6,13 +6,15 @@ flatten = tf.contrib.layers.flatten
 
 class VLadderAE(object):
 
-    def __init__(self, x, z_dims=None, num_filters=None, counters={}):
+    def __init__(self, x, z_dims=None, num_filters=None, beta=1., reg_type='mmd', counters={}):
         if z_dims is None:
             self.z_dims = [20, 20, 20]
         if num_filters is None:
             self.num_filters = [32, 64, 128]
         assert len(self.z_dims)==len(self.num_filters), "lengths of z_dims, num_filters do not match"
         self.num_blocks = len(self.z_dims)
+        self.beta = beta
+        self.reg_type = reg_type
         self.zs = []
         self.z_locs = []
         self.z_scales = []
@@ -23,12 +25,13 @@ class VLadderAE(object):
         self.counters = counters
         self.nonlinearity = tf.nn.elu
 
-        self._build_graph()
+        self.__build_graph()
+        self.__loss(reg=self.reg_type)
 
-    def _build_graph(self):
-        print("**** Building Graph ****")
+    def __build_graph(self):
+        print("******   Building Graph   ******")
         h = self.x
-        with arg_scope([inference_block, generative_block, ladder_block, z_sampler], counters=self.counters):
+        with arg_scope([inference_block, generative_block, ladder_block, z_sampler], nonlinearity=self.nonlinearity, bn=True, counters=self.counters):
             for l in range(self.num_blocks):
                 h = inference_block(h, num_filters=self.num_filters[l])
                 self.hs.append(h)
@@ -41,11 +44,30 @@ class VLadderAE(object):
             for l in reversed(range(self.num_blocks)):
                 z_tilde = generative_block(z_tilde, self.zs[l], self.num_filters[l], output_shape=int_shape(self.hs[l])[1:])
                 self.z_tildes.append(z_tilde)
-            self.x_hat = generative_block(z_tilde, None, 3)
+            self.x_hat = generative_block(z_tilde, None, 3, nonlinearity=tf.nn.tanh, bn=False)
 
 
-    def loss(self, reg='elbo'): # reg = kld or mmd
-        pass
+    def __loss(self, reg='kld'): # reg = kld or mmd or None
+        print("******   Compute Loss   ******")
+        self.loss_ae = tf.reduce_sum(tf.square(flatten(self.x)-flatten(self.x_hats)), 1)
+        if reg is None:
+            self.loss = self.loss_ae
+            return
+
+        z = tf.concat(self.zs, axis=-1)
+        z_loc = tf.concat(self.z_locs, axis=-1)
+        z_scale = tf.concat(self.z_scales, axis=-1)
+        if reg=='kld':
+            z_log_var = tf.log(tf.square(z_scale))
+            self.loss_reg = - 0.5 * tf.reduce_mean(1 + z_log_var - tf.square(z_loc) - tf.exp(z_log_var), axis=-1)
+        elif reg=='mmd':
+            self.loss_reg = compute_mmd(tf.random_normal(int_shape(z)), z)
+
+        self.loss = self.loss_ae + self.beta * self.loss_reg
+        print(self.loss)
+
+
+
 
 @add_arg_scope
 def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True):
@@ -156,3 +178,18 @@ def combine_noise(latent, ladder, latent_shape=None):
     ladder = tf.reshape(ladder, [-1]+latent_shape)
     return latent + ladder
     # return tf.concat([latent, ladder], axis=-1)
+
+def compute_kernel(x, y):
+    x_size = tf.shape(x)[0]
+    y_size = tf.shape(y)[0]
+    dim = tf.shape(x)[1]
+    tiled_x = tf.tile(tf.reshape(x, tf.stack([x_size, 1, dim])), tf.stack([1, y_size, 1]))
+    tiled_y = tf.tile(tf.reshape(y, tf.stack([1, y_size, dim])), tf.stack([x_size, 1, 1]))
+    return tf.exp(-tf.reduce_mean(tf.square(tiled_x - tiled_y), axis=2) / tf.cast(dim, tf.float32))
+
+def compute_mmd(x, y, sigma_sqr=1.0):
+    x_kernel = compute_kernel(x, x)
+    y_kernel = compute_kernel(y, y)
+    xy_kernel = compute_kernel(x, y)
+    mmd = tf.reduce_mean(x_kernel) + tf.reduce_mean(y_kernel) - 2 * tf.reduce_mean(xy_kernel)
+    return mmd
