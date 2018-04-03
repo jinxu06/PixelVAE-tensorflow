@@ -25,7 +25,7 @@ class VLadderAE(object):
         self._build_graph()
 
     def _build_graph(self):
-        print("**** Building Graph ****\n")
+        print("**** Building Graph ****")
         h = self.x
         with arg_scope([inference_block, generative_block, ladder_block, z_sampler], counters=self.counters):
             for l in range(self.num_blocks):
@@ -98,6 +98,8 @@ def generative_block(latent, ladder, num_filters, kernel_size=4, output_shape=No
     with tf.variable_scope(name):
         if latent is None:
             outputs = combine_noise(latent, ladder, output_shape)
+            with arg_scope([deconv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
+                outputs = deconv2d_layer(outputs, num_filters, strides=1)
             return outputs
         outputs= combine_noise(latent, ladder)
         with arg_scope([deconv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
