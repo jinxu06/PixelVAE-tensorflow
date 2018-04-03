@@ -81,7 +81,7 @@ def z_sampler(loc, scale, counters={}):
     name = get_name("z_sampler", counters)
     print("construct", name, "...")
     with tf.variable_scope(name):
-        dist = tf.distributions.Normal(loc=loc, scale=scale)
+        dist = tf.distributions.Normal(loc=0., scale=1.)
         z = dist.sample(sample_shape=int_shape(loc), seed=None)
         z = loc + tf.multiply(z, scale)
         print("    + normal_sampler", int_shape(z))
