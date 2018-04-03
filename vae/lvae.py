@@ -25,6 +25,7 @@ class VLadderAE(object):
         self._build_graph()
 
     def _build_graph(self):
+        print("**** Building Graph ****\n")
         h = self.x
         with arg_scope([inference_block, generative_block, ladder_block, z_sampler], counters=self.counters):
             for l in range(self.num_blocks):
@@ -39,7 +40,7 @@ class VLadderAE(object):
             for l in reversed(range(self.num_blocks)):
                 z_tilde = generative_block(z_tilde, self.zs[l], self.num_filters[l], output_shape=int_shape(self.hs[l])[1:])
                 self.z_tildes.append(z_tilde)
-            x_hat = generative_block(z_tilde, None, 3)
+            self.x_hat = generative_block(z_tilde, None, 3)
 
 
     def loss(self, reg='elbo'): # reg = kld or mmd
@@ -74,6 +75,7 @@ def dense_layer(inputs, num_outputs, nonlinearity=None, bn=True):
         outputs = tf.layers.batch_normalization(outputs)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
+    print("    + dense_layer", int_shape(inputs), int_shape(outputs))
     return outputs
 
 
