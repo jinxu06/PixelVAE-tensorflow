@@ -49,7 +49,7 @@ class VLadderAE(object):
 
     def __loss(self, reg='kld'): # reg = kld or mmd or None
         print("******   Compute Loss   ******")
-        self.loss_ae = tf.reduce_sum(tf.square(flatten(self.x)-flatten(self.x_hats)), 1)
+        self.loss_ae = tf.reduce_mean(tf.reduce_sum(tf.square(flatten(self.x)-flatten(self.x_hats)), 1))
         if reg is None:
             self.loss = self.loss_ae
             return
@@ -59,7 +59,7 @@ class VLadderAE(object):
         z_scale = tf.concat(self.z_scales, axis=-1)
         if reg=='kld':
             z_log_var = tf.log(tf.square(z_scale))
-            self.loss_reg = - 0.5 * tf.reduce_mean(1 + z_log_var - tf.square(z_loc) - tf.exp(z_log_var), axis=-1)
+            self.loss_reg = tf.reduce_mean(- 0.5 * tf.reduce_mean(1 + z_log_var - tf.square(z_loc) - tf.exp(z_log_var), axis=-1))
         elif reg=='mmd':
             self.loss_reg = compute_mmd(tf.random_normal(int_shape(z)), z)
 
