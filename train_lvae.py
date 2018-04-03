@@ -93,7 +93,7 @@ def make_feed_dict(data):
         feed_dict = { xs[i]:ds[i] for i in range(args.nr_gpu) }
     return feed_dict
 
-def sample_from_model(data, sess):
+def sample_from_model(sess, data):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = { xs[i]:ds[i] for i in range(args.nr_gpu) }
