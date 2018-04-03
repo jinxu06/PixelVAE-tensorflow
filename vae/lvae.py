@@ -6,7 +6,7 @@ flatten = tf.contrib.layers.flatten
 
 class VLadderAE(object):
 
-    def __init__(self, x, z_dims=None, num_filters=None, beta=1., reg_type='mmd', counters={}):
+    def __init__(self, z_dims=None, num_filters=None, beta=1., reg_type='mmd', counters={}):
         if z_dims is None:
             self.z_dims = [20, 20, 20]
         if num_filters is None:
@@ -20,16 +20,17 @@ class VLadderAE(object):
         self.z_scales = []
         self.z_tildes = []
         self.hs = []
-        self.x = x
 
         self.counters = counters
         self.nonlinearity = tf.nn.elu
 
-        self.__build_graph()
+    def build_graph(self, x):
+        self.__model(x)
         self.__loss(reg=self.reg_type)
 
-    def __build_graph(self):
+    def __model(self, x):
         print("******   Building Graph   ******")
+        self.x = x
         h = self.x
         with arg_scope([inference_block, generative_block, ladder_block], nonlinearity=self.nonlinearity, bn=True, counters=self.counters):
             for l in range(self.num_blocks):
