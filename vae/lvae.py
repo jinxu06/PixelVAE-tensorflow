@@ -1,7 +1,7 @@
 import numpy as np
 import os
 import tensorflow as tf
-from tensorflow.contrib.framework.python.ops import arg_scope
+from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
 flatten = tf.contrib.layers.flatten
 
 class VLadderAE(object):
