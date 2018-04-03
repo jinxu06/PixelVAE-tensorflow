@@ -123,7 +123,3 @@ def combine_noise(latent, ladder):
     ladder = dense_layer(ladder, np.prod(latent_shape), nonlinearity=tf.nn.elu, bn=True)
     ladder = tf.reshape(ladder, [-1]+latent_shape)
     return tf.concat([latent, ladder], axis=-1)
-
-
-x = tf.placeholder(tf.float32, shape=(8, 64, 64, 3))
-vladder = VLadderAE(x, 3)

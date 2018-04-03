@@ -1,31 +1,10 @@
-"""
-Trains a Pixel-CNN++ generative model on CIFAR-10 or Tiny ImageNet data.
-Uses multiple GPUs, indicated by the flag --nr_gpu
-
-Example usage:
-CUDA_VISIBLE_DEVICES=0,1,2,3 python train_double_cnn.py --nr_gpu 4
-"""
-
-import os
-
-import sys
-import json
-import argparse
-import time
-
 import numpy as np
+import os
+import time
 import tensorflow as tf
 
-from pixelcnn import nn
-from pixelcnn.mini_model import model_spec
-from utils import plotting
-import utils.mfunc as uf
-import utils.mask as um
+from vae.lvae import VLadderAE
 
-import vae.load_vae as lv
 
-config = tf.ConfigProto()
-config.gpu_options.allow_growth = True
-with tf.Session(config=config) as sess:
-
-    lv.load_vae(sess, lv.saver)
+x = tf.placeholder(tf.float32, shape=(8, 64, 64, 3))
+vladder = VLadderAE(x, 3)
