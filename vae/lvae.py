@@ -62,7 +62,7 @@ class VLadderAE(object):
             self.loss_reg = tf.reduce_mean(- 0.5 * tf.reduce_mean(1 + z_log_var - tf.square(z_loc) - tf.exp(z_log_var), axis=-1))
         elif reg=='mmd':
             self.loss_reg = compute_mmd(tf.random_normal(int_shape(z)), z)
-        print("beta:{0}, reg type:{1}".format(self.beta, self.reg_type))
+        print("beta:{0}, reg_type:{1}".format(self.beta, self.reg_type))
         self.loss = self.loss_ae + self.beta * self.loss_reg
 
 @add_arg_scope
