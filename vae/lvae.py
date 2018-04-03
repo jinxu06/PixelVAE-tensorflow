@@ -41,11 +41,13 @@ class VLadderAE(object):
 
 @add_arg_scope
 def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True):
+
     outputs = tf.layers.conv2d(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding)
     if bn:
         outputs = tf.layers.batch_normalization(outputs)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
+    print("    + conv2d_layer", int_shape(outputs))
     return outputs
 
 @add_arg_scope
@@ -55,6 +57,7 @@ def deconv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', 
         outputs = tf.layers.batch_normalization(outputs)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
+    print("    + deconv2d_layer", int_shape(outputs))
     return outputs
 
 @add_arg_scope
@@ -72,7 +75,7 @@ def dense_layer(inputs, num_outputs, nonlinearity=None, bn=True):
 @add_arg_scope
 def z_sampler(loc, scale, counters={}):
     name = get_name("z_sampler", counters)
-    print("construct", name)
+    print("construct", name, "...")
     with tf.variable_scope(name):
         dist = tf.distributions.Normal(loc=loc, scale=scale)
         z = dist.sample(sample_shape=int_shape(loc), seed=None)
@@ -83,7 +86,7 @@ def z_sampler(loc, scale, counters={}):
 @add_arg_scope
 def generative_block(latent, ladder, num_filters, kernel_size=4, nonlinearity=None, bn=True, counters={}):
     name = get_name("generative_block", counters)
-    print("construct", name)
+    print("construct", name, "...")
     with tf.variable_scope(name):
         outputs= combine_noise(latent, ladder)
         with arg_scope([deconv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
@@ -94,7 +97,7 @@ def generative_block(latent, ladder, num_filters, kernel_size=4, nonlinearity=No
 @add_arg_scope
 def inference_block(inputs, num_filters, kernel_size=4, nonlinearity=None, bn=True, counters={}):
     name = get_name("inference_block", counters)
-    print("construct", name)
+    print("construct", name, "...")
     with tf.variable_scope(name):
         with arg_scope([conv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
             outputs = conv2d_layer(inputs, num_filters, strides=1)
@@ -104,7 +107,7 @@ def inference_block(inputs, num_filters, kernel_size=4, nonlinearity=None, bn=Tr
 @add_arg_scope
 def ladder_block(inputs, ladder_dim, num_filters, kernel_size=4, nonlinearity=None, bn=True, counters={}):
     name = get_name("ladder_block", counters)
-    print("construct", name)
+    print("construct", name, "...")
     with tf.variable_scope(name):
         with arg_scope([conv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
             outputs = conv2d_layer(inputs, num_filters, strides=2)
