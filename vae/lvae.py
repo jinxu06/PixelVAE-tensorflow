@@ -34,8 +34,6 @@ class VLadderAE(object):
         self.__model(x, mode)
         if mode=='train':
             self.__loss(reg=self.reg_type)
-        else:
-            self.__loss(reg=self.reg_type)
 
     def __model(self, x, mode='train'):
         print("******   Building Graph   ******")
@@ -46,7 +44,6 @@ class VLadderAE(object):
                 h = inference_block(h, num_filters=self.num_filters[l])
                 self.hs.append(h)
                 z_loc, z_scale = ladder_block(h, ladder_dim=self.z_dims[l], num_filters=self.num_filters[l])
-                # z_scale += 0.001 ##
                 self.z_locs.append(z_loc)
                 self.z_scales.append(z_scale)
                 if mode=='train':
@@ -81,13 +78,11 @@ class VLadderAE(object):
             for z in self.zs:
                 self.loss_reg += compute_mmd(z, tf.random_normal(int_shape(z)))
         print("beta:{0}, reg_type:{1}".format(self.beta, self.reg_type))
-        self.loss_ae *= 100
-        self.loss_reg *= 100
         self.loss = self.loss_ae + self.beta * self.loss_reg
 
 @add_arg_scope
-def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True, is_training=True):
-    outputs = tf.layers.conv2d(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding)
+def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, is_training=False):
+    outputs = tf.layers.conv2d(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
     if bn:
         outputs = tf.layers.batch_normalization(outputs, training=is_training)
     if nonlinearity is not None:
@@ -96,8 +91,8 @@ def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', no
     return outputs
 
 @add_arg_scope
-def deconv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True, is_training=True):
-    outputs = tf.layers.conv2d_transpose(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding)
+def deconv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, is_training=False):
+    outputs = tf.layers.conv2d_transpose(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
     if bn:
         outputs = tf.layers.batch_normalization(outputs, training=is_training)
     if nonlinearity is not None:
@@ -106,10 +101,10 @@ def deconv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', 
     return outputs
 
 @add_arg_scope
-def dense_layer(inputs, num_outputs, nonlinearity=None, bn=True, is_training=True):
+def dense_layer(inputs, num_outputs, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, is_training=False):
     inputs_shape = int_shape(inputs)
     assert len(inputs_shape)==2, "inputs should be flattened first"
-    outputs = tf.layers.dense(inputs, num_outputs)
+    outputs = tf.layers.dense(inputs, num_outputs, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
     if bn:
         outputs = tf.layers.batch_normalization(outputs, training=is_training)
     if nonlinearity is not None:
@@ -131,43 +126,47 @@ def z_sampler(loc, scale, counters={}):
 
 
 @add_arg_scope
-def generative_block(latent, ladder, num_filters, kernel_size=4, output_shape=None, nonlinearity=None, bn=True, counters={}):
+def generative_block(latent, ladder, num_filters, kernel_size=4, output_shape=None, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, is_training=False, counters={}):
     name = get_name("generative_block", counters)
     print("construct", name, "...")
     with tf.variable_scope(name):
-        if latent is None:
-            outputs = combine_noise(latent, ladder, output_shape)
+        with arg_scope([conv2d_layer, deconv2d_layer, dense_layer], kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
+            if latent is None:
+                outputs = combine_noise(latent, ladder, output_shape)
+                with arg_scope([deconv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
+                    outputs = deconv2d_layer(outputs, num_filters, strides=1)
+                return outputs
+            outputs= combine_noise(latent, ladder)
             with arg_scope([deconv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
+                outputs = deconv2d_layer(outputs, num_filters, strides=2)
                 outputs = deconv2d_layer(outputs, num_filters, strides=1)
-            return outputs
-        outputs= combine_noise(latent, ladder)
-        with arg_scope([deconv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
-            outputs = deconv2d_layer(outputs, num_filters, strides=2)
-            outputs = deconv2d_layer(outputs, num_filters, strides=1)
-            return outputs
+                return outputs
 
 @add_arg_scope
-def inference_block(inputs, num_filters, kernel_size=4, nonlinearity=None, bn=True, counters={}):
+def inference_block(inputs, num_filters, kernel_size=4, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, is_training=False, counters={}):
     name = get_name("inference_block", counters)
     print("construct", name, "...")
     with tf.variable_scope(name):
-        with arg_scope([conv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
-            outputs = conv2d_layer(inputs, num_filters, strides=1)
-            outputs = conv2d_layer(outputs, num_filters, strides=2)
-            return outputs
+        with arg_scope([conv2d_layer, deconv2d_layer, dense_layer], kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
+            with arg_scope([conv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
+                outputs = conv2d_layer(inputs, num_filters, strides=1)
+                outputs = conv2d_layer(outputs, num_filters, strides=2)
+                return outputs
 
 @add_arg_scope
-def ladder_block(inputs, ladder_dim, num_filters, kernel_size=4, nonlinearity=None, bn=True, counters={}):
+def ladder_block(inputs, ladder_dim, num_filters, kernel_size=4, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, is_training=False, counters={}):
     name = get_name("ladder_block", counters)
     print("construct", name, "...")
     with tf.variable_scope(name):
-        with arg_scope([conv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
-            outputs = conv2d_layer(inputs, num_filters, strides=2)
-            outputs = conv2d_layer(outputs, num_filters, strides=2)
-        outputs = flatten(outputs)
-        loc = dense_layer(outputs, ladder_dim, nonlinearity=None, bn=False)
-        scale = dense_layer(outputs, ladder_dim, nonlinearity=tf.sigmoid, bn=False)
-        return loc, scale
+        with arg_scope([conv2d_layer, deconv2d_layer, dense_layer], kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
+            with arg_scope([conv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
+                outputs = conv2d_layer(inputs, num_filters, strides=2)
+                outputs = conv2d_layer(outputs, num_filters, strides=2)
+            outputs = flatten(outputs)
+            loc = dense_layer(outputs, ladder_dim, nonlinearity=None, bn=False)
+            scale = dense_layer(outputs, ladder_dim, nonlinearity=tf.sigmoid, bn=False)
+            scale += 0.001
+            return loc, scale
 
 
 def int_shape(x):
