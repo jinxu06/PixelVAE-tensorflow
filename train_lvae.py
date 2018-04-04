@@ -89,17 +89,18 @@ with tf.device('/gpu:0'):
 
 
 
-def make_feed_dict(data):
+def make_feed_dict(data, is_training=True):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
-    for i in range(args.nr_gpu):
-        feed_dict = { xs[i]:ds[i] for i in range(args.nr_gpu) }
+    feed_dict = {is_trainings[i]: is_training for i in range(args.nr_gpu)}
+    feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     return feed_dict
 
 def sample_from_model(sess, data):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
-    feed_dict = { xs[i]:ds[i] for i in range(args.nr_gpu) }
+    feed_dict = {is_trainings[i]: False for i in range(args.nr_gpu)}
+    feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     x_hats = sess.run([vladders[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
     return np.concatenate(x_hats, axis=0)
 
@@ -125,7 +126,7 @@ with tf.Session(config=config) as sess:
         tt = time.time()
         loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
         for data in train_data:
-            feed_dict = make_feed_dict(data)
+            feed_dict = make_feed_dict(data, is_training=True)
             _, l, la, lr = sess.run([train_step, loss, loss_ae, loss_reg], feed_dict=feed_dict)
             loss_arr.append(l)
             loss_ae_arr.append(la)
@@ -134,7 +135,7 @@ with tf.Session(config=config) as sess:
 
         loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
         for data in test_data:
-            feed_dict = make_feed_dict(data)
+            feed_dict = make_feed_dict(data, is_training=False)
             l, la, lr = sess.run([loss, loss_ae, loss_reg], feed_dict=feed_dict)
             loss_arr.append(l)
             loss_ae_arr.append(la)
