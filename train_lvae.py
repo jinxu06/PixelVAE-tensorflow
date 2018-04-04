@@ -12,7 +12,7 @@ from vae.lvae import VLadderAE
 parser = argparse.ArgumentParser()
 
 cfg = {
-    "img_size": 32,
+    "img_size": 64,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/lvae-test",
     "data_set": "celeba64",
@@ -58,7 +58,7 @@ test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shu
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 
-z_dims = [20, 20, 20, 20]
+z_dims = [10, 10, 10, 10]
 num_filters = [64, 128, 256, 512]
 vladders = [VLadderAE(z_dims=z_dims, num_filters=num_filters, beta=args.beta, reg_type="mmd", counters={}) for i in range(args.nr_gpu)]
 
@@ -154,6 +154,6 @@ with tf.Session(config=config) as sess:
             sample_x = sample_from_model(sess, data)
             test_data.reset()
 
-            img_tile = plotting.img_tile(sample_x[:100], aspect_ratio=1.0, border_color=1.0, stretch=True)
+            img_tile = plotting.img_tile(sample_x[:25], aspect_ratio=1.0, border_color=1.0, stretch=True)
             img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
             plotting.plt.savefig(os.path.join(args.save_dir,'%s_lvae_sample%d.png' % (args.data_set, epoch)))

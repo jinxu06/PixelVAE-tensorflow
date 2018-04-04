@@ -139,7 +139,6 @@ def generative_block(latent, ladder, num_filters, kernel_size=4, output_shape=No
                 outputs = combine_noise(latent, ladder, output_shape)
                 with arg_scope([deconv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
                     outputs = deconv2d_layer(outputs, num_filters, strides=1)
-                    outputs = deconv2d_layer(outputs, num_filters, strides=1)
                 return outputs
             outputs= combine_noise(latent, ladder)
             with arg_scope([deconv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
