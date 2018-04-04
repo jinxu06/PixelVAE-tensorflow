@@ -196,6 +196,7 @@ def compute_kernel(x, y):
     return tf.exp(-tf.reduce_mean(tf.square(tiled_x - tiled_y), axis=2) / tf.cast(dim, tf.float32))
 
 def compute_mmd(x, y, sigma_sqr=1.0):
+    print(tf.shape(x), tf.shape(y))
     x_kernel = compute_kernel(x, x)
     y_kernel = compute_kernel(y, y)
     xy_kernel = compute_kernel(x, y)
