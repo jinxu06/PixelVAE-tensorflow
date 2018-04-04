@@ -26,13 +26,15 @@ class VLadderAE(object):
         self.counters = counters
         self.nonlinearity = tf.nn.elu
         self.kernel_initializer = tf.random_normal_initializer(stddev=0.02)
-        self.kernel_regularizer = None 
+        self.kernel_regularizer = None
 
     def build_graph(self, x, mode='train'):
         assert mode in ['train', 'test'], "mode is either train or test"
         print("build graph mode: {0}".format(mode))
         self.__model(x, mode)
         if mode=='train':
+            self.__loss(reg=self.reg_type)
+        else:
             self.__loss(reg=self.reg_type)
 
     def __model(self, x, mode='train'):
