@@ -107,13 +107,12 @@ def sample_from_model(sess, data):
         z_scales = sess.run(vladders[i].z_scales, feed_dict=feed_dict)
         zs = []
         for loc, scale in zip(z_locs, z_scales):
-            z = np.random.normal(loc=loc, scale=scale)
+            z = np.random.normal(loc=loc, scale=scale*10)
             zs.append(z)
         feed_dict = {vladders[i].zs[k]:zs[k] for k in range(vladders[i].num_blocks)}
         x_hat = sess.run(vladders[i].x_hat, feed_dict=feed_dict)
         x_hats.append(x_hat)
     return np.concatenate(x_hats, axis=0)
-
 
 
 
