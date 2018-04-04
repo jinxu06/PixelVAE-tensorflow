@@ -12,14 +12,14 @@ from vae.lvae import VLadderAE
 parser = argparse.ArgumentParser()
 
 cfg = {
-    "img_size": 32,
+    "img_size": 64,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/lvae-celeba32",
-    "data_set": "celeba32",
-    "batch_size": 32,
+    "save_dir": "/data/ziz/jxu/models/lvae-test",
+    "data_set": "celeba64",
+    "batch_size": 100,
     "nr_gpu": 1,
     "learning_rate": 0.0001,
-    "beta": 5e4,
+    "beta": 1.0, #5e4,
     "save_interval": 10,
 }
 
@@ -59,9 +59,9 @@ xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img
 
 z_dims = [10, 10, 10, 10]
 num_filters = [64, 128, 256, 512]
-vladders = [VLadderAE(z_dims=z_dims, num_filters=num_filters, beta=args.beta, counters={}) for i in range(args.nr_gpu)]
+vladders = [VLadderAE(z_dims=z_dims, num_filters=num_filters, beta=args.beta, reg_type="mmd", counters={}) for i in range(args.nr_gpu)]
 
-model_opt = {}
+model_opt = {"mode": 'train'}
 model = tf.make_template('build_graph', VLadderAE.build_graph)
 
 for i in range(args.nr_gpu):
@@ -83,6 +83,7 @@ with tf.device('/gpu:0'):
     loss = tf.add_n([v.loss for v in vladders]) / args.nr_gpu
     loss_ae = tf.add_n([v.loss_ae for v in vladders]) / args.nr_gpu
     loss_reg = tf.add_n([v.loss_reg for v in vladders]) / args.nr_gpu
+
     train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
 
@@ -124,7 +125,7 @@ with tf.Session(config=config) as sess:
         loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
         for data in train_data:
             feed_dict = make_feed_dict(data)
-            l, la, lr, _ = sess.run([loss, loss_ae, loss_reg, train_step], feed_dict=feed_dict)
+            _, l, la, lr = sess.run([train_step, loss, loss_ae, loss_reg], feed_dict=feed_dict)
             loss_arr.append(l)
             loss_ae_arr.append(la)
             loss_reg_arr.append(lr)
@@ -137,6 +138,8 @@ with tf.Session(config=config) as sess:
             loss_arr.append(l)
             loss_ae_arr.append(la)
             loss_reg_arr.append(lr)
+
+            print(l, la, lr)
         test_loss, test_loss_ae, test_loss_reg = np.mean(loss_arr), np.mean(loss_ae_arr), np.mean(loss_reg_arr)
 
         print("epoch {0} --------------------- Time {1:.2f}s".format(epoch, time.time()-tt))

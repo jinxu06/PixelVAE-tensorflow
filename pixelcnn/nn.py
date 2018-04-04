@@ -158,7 +158,10 @@ def adam_updates(params, cost_or_grads, lr=0.001, mom1=0.9, mom2=0.999):
         updates.append(mg.assign(mg_t))
         updates.append(p.assign(p_t))
     updates.append(t.assign_add(1))
-    return tf.group(*updates)
+    update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+    with tf.control_dependencies(update_ops):
+        adam_updates_op = tf.group(*updates)
+    return adam_updates_op
 
 def get_name(layer_name, counters):
     ''' utlity for keeping track of layer names '''

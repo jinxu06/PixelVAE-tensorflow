@@ -3,8 +3,18 @@ import os
 import time
 import tensorflow as tf
 
-from vae.lvae import VLadderAE
+from divergence import compute_mmd
 
 
-x = tf.placeholder(tf.float32, shape=(8, 64, 64, 3))
-vladder = VLadderAE(x, z_dims=None, num_filters=None, beta=1.0)
+x = tf.random_normal((100, 10))
+y = tf.random_uniform((100, 10))
+
+mmd = compute_mmd(x, y) * 100
+
+initializer = tf.global_variables_initializer()
+
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+with tf.Session(config=config) as sess:
+
+    print(sess.run(mmd))

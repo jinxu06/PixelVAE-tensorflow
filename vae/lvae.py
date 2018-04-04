@@ -42,6 +42,7 @@ class VLadderAE(object):
                 h = inference_block(h, num_filters=self.num_filters[l])
                 self.hs.append(h)
                 z_loc, z_scale = ladder_block(h, ladder_dim=self.z_dims[l], num_filters=self.num_filters[l])
+                z_scale += 0.001 ##
                 self.z_locs.append(z_loc)
                 self.z_scales.append(z_scale)
                 if mode=='train':
@@ -53,54 +54,59 @@ class VLadderAE(object):
             for l in reversed(range(self.num_blocks)):
                 z_tilde = generative_block(z_tilde, self.zs[l], self.num_filters[l], output_shape=int_shape(self.hs[l])[1:])
                 self.z_tildes.append(z_tilde)
-            self.x_hat = generative_block(z_tilde, None, 3, nonlinearity=tf.nn.tanh, bn=False)
+            self.x_hat = generative_block(z_tilde, None, 3, nonlinearity=tf.nn.sigmoid, bn=False)
+            self.x_hat = 2.0 * self.x_hat - 1.0
 
 
-    def __loss(self, reg='kld'): # reg = kld or mmd or None
+    def __loss(self, reg='mmd'): # reg = kld or mmd or None
         print("******   Compute Loss   ******")
-        self.loss_ae = tf.reduce_mean(tf.reduce_sum(tf.square(flatten(self.x)-flatten(self.x_hat)), 1))
+        # self.loss_ae = tf.reduce_mean(tf.reduce_sum(tf.square(flatten(self.x)-flatten(self.x_hat)), 1))
+        self.loss_ae = tf.reduce_mean(tf.abs(self.x - self.x_hat))
         if reg is None:
             self.loss = self.loss_ae
             return
-
-        z = tf.concat(self.zs, axis=-1)
         z_loc = tf.concat(self.z_locs, axis=-1)
         z_scale = tf.concat(self.z_scales, axis=-1)
         if reg=='kld':
             z_log_var = tf.log(tf.square(z_scale))
             self.loss_reg = tf.reduce_mean(- 0.5 * tf.reduce_mean(1 + z_log_var - tf.square(z_loc) - tf.exp(z_log_var), axis=-1))
         elif reg=='mmd':
-            self.loss_reg = compute_mmd(tf.random_normal(int_shape(z)), z)
+            # self.loss_reg = compute_mmd(tf.random_normal(int_shape(z)), z)
+            self.loss_reg = 0.
+            for z in self.zs:
+                self.loss_reg += compute_mmd(z, tf.random_normal(int_shape(z)))
         print("beta:{0}, reg_type:{1}".format(self.beta, self.reg_type))
+        self.loss_ae *= 100
+        self.loss_reg *= 100
         self.loss = self.loss_ae + self.beta * self.loss_reg
 
 @add_arg_scope
-def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True):
+def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True, is_training=True):
     outputs = tf.layers.conv2d(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding)
     if bn:
-        outputs = tf.layers.batch_normalization(outputs)
+        outputs = tf.layers.batch_normalization(outputs, training=is_training)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
     print("    + conv2d_layer", int_shape(inputs), int_shape(outputs))
     return outputs
 
 @add_arg_scope
-def deconv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True):
+def deconv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True, is_training=True):
     outputs = tf.layers.conv2d_transpose(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding)
     if bn:
-        outputs = tf.layers.batch_normalization(outputs)
+        outputs = tf.layers.batch_normalization(outputs, training=is_training)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
     print("    + deconv2d_layer", int_shape(inputs), int_shape(outputs))
     return outputs
 
 @add_arg_scope
-def dense_layer(inputs, num_outputs, nonlinearity=None, bn=True):
+def dense_layer(inputs, num_outputs, nonlinearity=None, bn=True, is_training=True):
     inputs_shape = int_shape(inputs)
     assert len(inputs_shape)==2, "inputs should be flattened first"
     outputs = tf.layers.dense(inputs, num_outputs)
     if bn:
-        outputs = tf.layers.batch_normalization(outputs)
+        outputs = tf.layers.batch_normalization(outputs, training=is_training)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
     print("    + dense_layer", int_shape(inputs), int_shape(outputs))
