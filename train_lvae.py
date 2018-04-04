@@ -85,8 +85,8 @@ with tf.device('/gpu:0'):
     loss_reg = tf.add_n([v.loss_reg for v in vladders]) / args.nr_gpu
 
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
-    #with tf.control_dependencies(update_ops):
-    train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
+    with tf.control_dependencies(update_ops):
+        train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
 
 
@@ -115,6 +115,8 @@ config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
 
     sess.run(initializer)
+
+    quit()
 
     if args.load_params:
         ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
