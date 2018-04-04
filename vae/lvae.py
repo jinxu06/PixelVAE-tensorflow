@@ -79,6 +79,8 @@ class VLadderAE(object):
             self.loss_reg = 0.
             for z in self.zs:
                 self.loss_reg += compute_mmd(z, tf.random_normal(int_shape(z)))
+        self.loss_ae *= 100
+        self.loss_reg *= 100
         print("beta:{0}, reg_type:{1}".format(self.beta, self.reg_type))
         self.loss = self.loss_ae + self.beta * self.loss_reg
 
@@ -140,6 +142,7 @@ def generative_block(latent, ladder, num_filters, kernel_size=4, output_shape=No
                 return outputs
             outputs= combine_noise(latent, ladder)
             with arg_scope([deconv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
+                outputs = deconv2d_layer(outputs, num_filters, strides=1)
                 outputs = deconv2d_layer(outputs, num_filters, strides=2)
                 outputs = deconv2d_layer(outputs, num_filters, strides=1)
                 return outputs
@@ -153,6 +156,7 @@ def inference_block(inputs, num_filters, kernel_size=4, nonlinearity=None, bn=Tr
             with arg_scope([conv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
                 outputs = conv2d_layer(inputs, num_filters, strides=1)
                 outputs = conv2d_layer(outputs, num_filters, strides=2)
+                outputs = conv2d_layer(outputs, num_filters, strides=1)
                 return outputs
 
 @add_arg_scope
