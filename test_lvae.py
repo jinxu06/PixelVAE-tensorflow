@@ -64,7 +64,7 @@ z_dims = [32, 32, 32, 32]
 num_filters = [64, 128, 256, 512]
 vladders = [VLadderAE(z_dims=z_dims, num_filters=num_filters, beta=args.beta, counters={}) for i in range(args.nr_gpu)]
 
-model_opt = {}
+model_opt = {"mode": 'test'}
 model = tf.make_template('build_graph', VLadderAE.build_graph)
 
 for i in range(args.nr_gpu):
@@ -100,9 +100,21 @@ def make_feed_dict(data):
 def sample_from_model(sess, data):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
-    feed_dict = { xs[i]:ds[i] for i in range(args.nr_gpu) }
-    x_hats = sess.run([vladders[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+    x_hats = []
+    for i in range(args.nr_gpu):
+        feed_dict = {xs[i]: ds[i]}
+        z_locs = sess.run(vladders[i].z_locs, feed_dict=feed_dict)
+        z_scales = sess.run(vladders[i].z_scales, feed_dict=feed_dict)
+        zs = []
+        for loc, scale in zip(z_locs, z_scales):
+            z = np.random.normal(loc=loc, scale=scale)
+            zs.append(z)
+        feed_dict = {vladders[i].zs[k]:zs[k] for k in range(vladders[i].num_blocks)}
+        x_hat = sess.run(vladders[i].x_hat, feed_dict=feed_dict)
+        x_hats.append(x_hat)
     return np.concatenate(x_hats, axis=0)
+
+
 
 
 
