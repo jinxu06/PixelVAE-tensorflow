@@ -6,7 +6,7 @@ flatten = tf.contrib.layers.flatten
 
 class VLadderAE(object):
 
-    def __init__(self, z_dims=None, num_filters=None, beta=1., reg_type='mmd', counters={}):
+    def __init__(self, z_dims=None, num_filters=None, beta=1., lam=0., reg_type='mmd', counters={}):
         if z_dims is None:
             z_dims = [20, 20, 20]
         if num_filters is None:
@@ -16,6 +16,7 @@ class VLadderAE(object):
         assert len(self.z_dims)==len(self.num_filters), "lengths of z_dims, num_filters do not match"
         self.num_blocks = len(self.z_dims)
         self.beta = beta
+        self.lam = lam
         self.reg_type = reg_type
         self.zs = []
         self.z_locs = []
@@ -82,7 +83,7 @@ class VLadderAE(object):
         self.loss_ae *= 100
         self.loss_reg *= 100
         print("beta:{0}, reg_type:{1}".format(self.beta, self.reg_type))
-        self.loss = self.loss_ae + self.beta * self.loss_reg
+        self.loss = self.loss_ae + self.beta * tf.maximum(self.lam, self.loss_reg)
 
 @add_arg_scope
 def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, is_training=False):
