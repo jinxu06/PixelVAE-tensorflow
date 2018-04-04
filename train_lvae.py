@@ -20,7 +20,7 @@ cfg = {
     "nr_gpu": 1,
     "learning_rate": 0.0002,
     "beta": 1.0, #5e4,
-    "lam": 0.0,
+    "lam": 0.5,
     "save_interval": 10,
     "reg": "kld",
 }
