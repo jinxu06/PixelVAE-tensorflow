@@ -26,11 +26,14 @@ class VLadderAE(object):
         self.counters = counters
         self.nonlinearity = tf.nn.elu
 
-    def build_graph(self, x):
-        self.__model(x)
-        self.__loss(reg=self.reg_type)
+    def build_graph(self, x, mode='train'):
+        assert mode in ['train', 'test'], "mode is either train or test"
+        print("build graph mode: {0}".format(mode))
+        self.__model(x, mode)
+        if mode=='train':
+            self.__loss(reg=self.reg_type)
 
-    def __model(self, x):
+    def __model(self, x, mode='train'):
         print("******   Building Graph   ******")
         self.x = x
         h = self.x
@@ -41,7 +44,10 @@ class VLadderAE(object):
                 z_loc, z_scale = ladder_block(h, ladder_dim=self.z_dims[l], num_filters=self.num_filters[l])
                 self.z_locs.append(z_loc)
                 self.z_scales.append(z_scale)
-                z = z_sampler(z_loc, z_scale, counters=self.counters)
+                if mode=='train':
+                    z = z_sampler(z_loc, z_scale, counters=self.counters)
+                elif mode=='test':
+                    z = tf.placeholder(tf.float32, shape=int_shape(z_loc))
                 self.zs.append(z)
             z_tilde = None
             for l in reversed(range(self.num_blocks)):
