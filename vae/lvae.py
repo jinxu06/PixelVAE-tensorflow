@@ -79,8 +79,8 @@ class VLadderAE(object):
             self.loss_reg = 0.
             for z in self.zs:
                 self.loss_reg += compute_mmd(z, tf.random_normal(int_shape(z)))
-        #self.loss_ae *= 100
-        #self.loss_reg *= 100
+        self.loss_ae *= 100
+        self.loss_reg *= 100
         print("beta:{0}, reg_type:{1}".format(self.beta, self.reg_type))
         self.loss = self.loss_ae + self.beta * self.loss_reg
 
@@ -167,7 +167,7 @@ def ladder_block(inputs, ladder_dim, num_filters, kernel_size=4, nonlinearity=No
         with arg_scope([conv2d_layer, deconv2d_layer, dense_layer], kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
             with arg_scope([conv2d_layer], kernel_size=kernel_size, nonlinearity=nonlinearity, bn=bn):
                 outputs = conv2d_layer(inputs, num_filters, strides=2)
-                outputs = conv2d_layer(inputs, num_filters, strides=1)
+                outputs = conv2d_layer(outputs, num_filters, strides=1)
                 outputs = conv2d_layer(outputs, num_filters, strides=2)
             outputs = flatten(outputs)
             loc = dense_layer(outputs, ladder_dim, nonlinearity=None, bn=False)
