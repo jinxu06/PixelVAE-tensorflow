@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser()
 cfg = {
     "img_size": 64,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/lvae-celeba64",
+    "save_dir": "/data/ziz/jxu/models/lvae-celeba64-kld",
     "data_set": "celeba64",
     "batch_size": 100,
     "nr_gpu": 1,
@@ -22,7 +22,7 @@ cfg = {
     "beta": 1.0, #5e4,
     "lam": 0.0,
     "save_interval": 10,
-    "reg": "mmd",
+    "reg": "kld",
 }
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
