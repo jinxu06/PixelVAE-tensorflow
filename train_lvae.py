@@ -59,9 +59,9 @@ xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img
 
 z_dims = [10, 10, 10, 10]
 num_filters = [64, 128, 256, 512]
-vladders = [VLadderAE(z_dims=z_dims, num_filters=num_filters, beta=args.beta, counters={}) for i in range(args.nr_gpu)]
+vladders = [VLadderAE(z_dims=z_dims, num_filters=num_filters, beta=args.beta, reg_type="mmd", counters={}) for i in range(args.nr_gpu)]
 
-model_opt = {}
+model_opt = {"mode": 'train'}
 model = tf.make_template('build_graph', VLadderAE.build_graph)
 
 for i in range(args.nr_gpu):
