@@ -14,12 +14,12 @@ parser = argparse.ArgumentParser()
 cfg = {
     "img_size": 64,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/lvae-celeba32",
+    "save_dir": "/data/ziz/jxu/models/lvae-test",
     "data_set": "celeba64",
-    "batch_size": 32,
+    "batch_size": 100,
     "nr_gpu": 1,
     "learning_rate": 0.0001,
-    "beta": 5e4,
+    "beta": 1.0, #5e4,
     "save_interval": 10,
 }
 
