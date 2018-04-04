@@ -56,6 +56,7 @@ test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shu
 
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
+is_trainings = [tf.placeholder(tf.bool, shape=() for i in range(args.nr_gpu)]
 
 z_dims = [10, 10, 10, 10]
 num_filters = [64, 128, 256, 512]
@@ -66,7 +67,7 @@ model = tf.make_template('build_graph', VLadderAE.build_graph)
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        model(vladders[i], xs[i],  **model_opt)
+        model(vladders[i], xs[i],  is_trainings[i], **model_opt)
 
 all_params = tf.trainable_variables()
 
@@ -129,7 +130,6 @@ with tf.Session(config=config) as sess:
             loss_arr.append(l)
             loss_ae_arr.append(la)
             loss_reg_arr.append(lr)
-            print(l, la, lr)
         train_loss, train_loss_ae, train_loss_reg = np.mean(loss_arr), np.mean(loss_ae_arr), np.mean(loss_reg_arr)
 
         loss_arr, loss_ae_arr, loss_reg_arr = [], [], []

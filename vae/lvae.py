@@ -28,18 +28,19 @@ class VLadderAE(object):
         self.kernel_initializer = tf.random_normal_initializer(stddev=0.02)
         self.kernel_regularizer = None
 
-    def build_graph(self, x, mode='train'):
+    def build_graph(self, x, is_training, mode='train'):
         assert mode in ['train', 'test'], "mode is either train or test"
         print("build graph mode: {0}".format(mode))
-        self.__model(x, mode)
+        self.__model(x, is_training, mode)
         if mode=='train':
             self.__loss(reg=self.reg_type)
 
-    def __model(self, x, mode='train'):
+    def __model(self, x, is_training, mode='train'):
         print("******   Building Graph   ******")
         self.x = x
+        self.is_training = is_training
         h = self.x
-        with arg_scope([inference_block, generative_block, ladder_block], nonlinearity=self.nonlinearity, bn=True, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=True, counters=self.counters):
+        with arg_scope([inference_block, generative_block, ladder_block], nonlinearity=self.nonlinearity, bn=True, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
             for l in range(self.num_blocks):
                 h = inference_block(h, num_filters=self.num_filters[l])
                 self.hs.append(h)
