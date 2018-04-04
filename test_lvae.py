@@ -71,22 +71,6 @@ for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         model(vladders[i], xs[i], **model_opt)
 
-all_params = tf.trainable_variables()
-
-grads = []
-for i in range(args.nr_gpu):
-    with tf.device('/gpu:%d' % i):
-        grads.append(tf.gradients(vladders[i].loss, all_params, colocate_gradients_with_ops=True))
-
-with tf.device('/gpu:0'):
-    for i in range(1, args.nr_gpu):
-        for j in range(len(grads[0])):
-            grads[0][j] += grads[i][j]
-
-    loss = tf.add_n([v.loss for v in vladders]) / args.nr_gpu
-    loss_ae = tf.add_n([v.loss_ae for v in vladders]) / args.nr_gpu
-    loss_reg = tf.add_n([v.loss_reg for v in vladders]) / args.nr_gpu
-    train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
 
 
