@@ -79,32 +79,32 @@ class VLadderAE(object):
         self.loss = self.loss_ae + self.beta * self.loss_reg
 
 @add_arg_scope
-def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True):
+def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True, is_training=True):
     outputs = tf.layers.conv2d(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding)
     if bn:
-        outputs = tf.layers.batch_normalization(outputs)
+        outputs = tf.layers.batch_normalization(outputs, is_training=is_training)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
     print("    + conv2d_layer", int_shape(inputs), int_shape(outputs))
     return outputs
 
 @add_arg_scope
-def deconv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True):
+def deconv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True, is_training=True):
     outputs = tf.layers.conv2d_transpose(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding)
     if bn:
-        outputs = tf.layers.batch_normalization(outputs)
+        outputs = tf.layers.batch_normalization(outputs, is_training=is_training)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
     print("    + deconv2d_layer", int_shape(inputs), int_shape(outputs))
     return outputs
 
 @add_arg_scope
-def dense_layer(inputs, num_outputs, nonlinearity=None, bn=True):
+def dense_layer(inputs, num_outputs, nonlinearity=None, bn=True, is_training=True):
     inputs_shape = int_shape(inputs)
     assert len(inputs_shape)==2, "inputs should be flattened first"
     outputs = tf.layers.dense(inputs, num_outputs)
     if bn:
-        outputs = tf.layers.batch_normalization(outputs)
+        outputs = tf.layers.batch_normalization(outputs, is_training=is_training)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
     print("    + dense_layer", int_shape(inputs), int_shape(outputs))
