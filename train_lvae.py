@@ -58,7 +58,7 @@ test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shu
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 
-z_dims = [10, 10, 10, 10]
+z_dims = [20, 20, 20, 20]
 num_filters = [64, 128, 256, 512]
 vladders = [VLadderAE(z_dims=z_dims, num_filters=num_filters, beta=args.beta, reg_type="mmd", counters={}) for i in range(args.nr_gpu)]
 
@@ -71,6 +71,8 @@ for i in range(args.nr_gpu):
 
 all_params = tf.trainable_variables()
 
+print(all_params)
+
 grads = []
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
@@ -79,6 +81,7 @@ for i in range(args.nr_gpu):
 with tf.device('/gpu:0'):
     for i in range(1, args.nr_gpu):
         for j in range(len(grads[0])):
+            print(grads[0][j])
             grads[0][j] += grads[i][j]
 
     loss = tf.add_n([v.loss for v in vladders]) / args.nr_gpu
