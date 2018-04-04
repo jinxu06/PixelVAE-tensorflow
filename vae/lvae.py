@@ -25,6 +25,8 @@ class VLadderAE(object):
 
         self.counters = counters
         self.nonlinearity = tf.nn.elu
+        self.kernel_initializer = tf.random_normal_initializer(stddev=0.02)
+        self.kernel_regularizer = None 
 
     def build_graph(self, x, mode='train'):
         assert mode in ['train', 'test'], "mode is either train or test"
@@ -160,8 +162,8 @@ def ladder_block(inputs, ladder_dim, num_filters, kernel_size=4, nonlinearity=No
             outputs = conv2d_layer(inputs, num_filters, strides=2)
             outputs = conv2d_layer(outputs, num_filters, strides=2)
         outputs = flatten(outputs)
-        loc = dense_layer(outputs, ladder_dim, nonlinearity=None)
-        scale = dense_layer(outputs, ladder_dim, nonlinearity=tf.sigmoid)
+        loc = dense_layer(outputs, ladder_dim, nonlinearity=None, bn=False)
+        scale = dense_layer(outputs, ladder_dim, nonlinearity=tf.sigmoid, bn=False)
         return loc, scale
 
 
