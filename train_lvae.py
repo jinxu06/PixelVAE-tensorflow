@@ -129,6 +129,7 @@ with tf.Session(config=config) as sess:
             loss_arr.append(l)
             loss_ae_arr.append(la)
             loss_reg_arr.append(lr)
+            print(l, la, lr)
         train_loss, train_loss_ae, train_loss_reg = np.mean(loss_arr), np.mean(loss_ae_arr), np.mean(loss_reg_arr)
 
         loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
@@ -138,8 +139,6 @@ with tf.Session(config=config) as sess:
             loss_arr.append(l)
             loss_ae_arr.append(la)
             loss_reg_arr.append(lr)
-
-            print(l, la, lr)
         test_loss, test_loss_ae, test_loss_reg = np.mean(loss_arr), np.mean(loss_ae_arr), np.mean(loss_reg_arr)
 
         print("epoch {0} --------------------- Time {1:.2f}s".format(epoch, time.time()-tt))
