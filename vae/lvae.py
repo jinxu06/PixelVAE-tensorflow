@@ -58,7 +58,8 @@ class VLadderAE(object):
 
     def __loss(self, reg='kld'): # reg = kld or mmd or None
         print("******   Compute Loss   ******")
-        self.loss_ae = tf.reduce_mean(tf.reduce_sum(tf.square(flatten(self.x)-flatten(self.x_hat)), 1))
+        # self.loss_ae = tf.reduce_mean(tf.reduce_sum(tf.square(flatten(self.x)-flatten(self.x_hat)), 1))
+        self.loss_ae = tf.reduce_mean(tf.abs(self.x - self.x_hat))
         if reg is None:
             self.loss = self.loss_ae
             return
@@ -72,6 +73,8 @@ class VLadderAE(object):
         elif reg=='mmd':
             self.loss_reg = compute_mmd(tf.random_normal(int_shape(z)), z)
         print("beta:{0}, reg_type:{1}".format(self.beta, self.reg_type))
+        self.loss_ae *= 100
+        self.loss_reg *= 100
         self.loss = self.loss_ae + self.beta * self.loss_reg
 
 @add_arg_scope
