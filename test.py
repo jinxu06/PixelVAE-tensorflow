@@ -7,7 +7,7 @@ from divergence import compute_mmd
 
 
 x = tf.random_normal((100, 10))
-y = tf.random_normal((100, 10))
+y = tf.random_uniform((100, 10))
 
 mmd = compute_mmd(x, y)
 
