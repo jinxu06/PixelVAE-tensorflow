@@ -12,10 +12,10 @@ from vae.lvae import VLadderAE
 parser = argparse.ArgumentParser()
 
 cfg = {
-    "img_size": 32,
+    "img_size": 64,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/lvae-celeba32",
-    "data_set": "celeba32",
+    "data_set": "celeba64",
     "batch_size": 32,
     "nr_gpu": 1,
     "learning_rate": 0.0001,
