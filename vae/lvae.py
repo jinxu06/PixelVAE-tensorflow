@@ -197,8 +197,8 @@ def combine_noise(latent, ladder, latent_shape=None):
     latent_shape = int_shape(latent)[1:]
     ladder = dense_layer(ladder, np.prod(latent_shape), nonlinearity=tf.nn.elu, bn=True)
     ladder = tf.reshape(ladder, [-1]+latent_shape)
-    return latent + ladder
-    # return tf.concat([latent, ladder], axis=-1)
+    # return latent + ladder
+    return tf.concat([latent, ladder], axis=-1)
 
 def compute_kernel(x, y):
     x_size = tf.shape(x)[0]
