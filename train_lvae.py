@@ -66,7 +66,7 @@ model = tf.make_template('build_graph', VLadderAE.build_graph)
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        model(vladders[i], xs[i])
+        model(vladders[i], xs[i],  **model_opt)
 
 all_params = tf.trainable_variables()
 
