@@ -12,7 +12,7 @@ from vae.lvae import VLadderAE
 parser = argparse.ArgumentParser()
 
 cfg = {
-    "img_size": 64,
+    "img_size": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/lvae-test",
     "data_set": "celeba64",
@@ -58,8 +58,8 @@ test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shu
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 
-z_dims = [10, 10, 10, 10]
-num_filters = [64, 128, 256, 512]
+z_dims = [10, 10, 10]
+num_filters = [64, 128, 256]
 vladders = [VLadderAE(z_dims=z_dims, num_filters=num_filters, beta=args.beta, reg_type="mmd", counters={}) for i in range(args.nr_gpu)]
 
 model_opt = {"mode": 'train'}
