@@ -114,8 +114,6 @@ with tf.Session(config=config) as sess:
 
     sess.run(initializer)
 
-    quit()
-
     if args.load_params:
         ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
         print('restoring parameters from', ckpt_file)
