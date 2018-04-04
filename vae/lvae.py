@@ -39,7 +39,7 @@ class VLadderAE(object):
         print("******   Building Graph   ******")
         self.x = x
         h = self.x
-        with arg_scope([inference_block, generative_block, ladder_block], nonlinearity=self.nonlinearity, bn=True, counters=self.counters):
+        with arg_scope([inference_block, generative_block, ladder_block], nonlinearity=self.nonlinearity, bn=True, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=True, counters=self.counters):
             for l in range(self.num_blocks):
                 h = inference_block(h, num_filters=self.num_filters[l])
                 self.hs.append(h)
