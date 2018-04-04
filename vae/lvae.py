@@ -79,8 +79,8 @@ class VLadderAE(object):
             self.loss_reg = 0.
             for z in self.zs:
                 self.loss_reg += compute_mmd(z, tf.random_normal(int_shape(z)))
-        self.loss_ae *= 100
-        self.loss_reg *= 100
+        #self.loss_ae *= 100
+        #self.loss_reg *= 100
         print("beta:{0}, reg_type:{1}".format(self.beta, self.reg_type))
         self.loss = self.loss_ae + self.beta * self.loss_reg
 

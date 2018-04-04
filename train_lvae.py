@@ -71,7 +71,6 @@ for i in range(args.nr_gpu):
 
 all_params = tf.trainable_variables()
 
-print(all_params)
 
 grads = []
 for i in range(args.nr_gpu):
@@ -81,7 +80,6 @@ for i in range(args.nr_gpu):
 with tf.device('/gpu:0'):
     for i in range(1, args.nr_gpu):
         for j in range(len(grads[0])):
-            print(grads[0][j])
             grads[0][j] += grads[i][j]
 
     loss = tf.add_n([v.loss for v in vladders]) / args.nr_gpu
