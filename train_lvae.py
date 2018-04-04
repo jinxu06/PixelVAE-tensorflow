@@ -56,7 +56,7 @@ test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shu
 
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
-is_trainings = [tf.placeholder(tf.bool, shape=() for i in range(args.nr_gpu)]
+is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 
 z_dims = [10, 10, 10, 10]
 num_filters = [64, 128, 256, 512]
