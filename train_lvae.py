@@ -20,7 +20,9 @@ cfg = {
     "nr_gpu": 1,
     "learning_rate": 0.0002,
     "beta": 1.0, #5e4,
+    "lam": 0.0,
     "save_interval": 10,
+    "reg": "mmd",
 }
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -28,12 +30,14 @@ parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help
 parser.add_argument('-dd', '--data_dir', type=str, default=cfg['data_dir'], help='Location for the dataset')
 parser.add_argument('-sd', '--save_dir', type=str, default=cfg['save_dir'], help='Location for parameter checkpoints and samples')
 parser.add_argument('-ds', '--data_set', type=str, default=cfg['data_set'], help='Can be either cifar|imagenet')
+parser.add_argument('-r', '--reg', type=str, default=cfg['reg'], help='regularization type')
 parser.add_argument('-si', '--save_interval', type=int, default=cfg['save_interval'], help='Every how many epochs to write checkpoint/samples?')
 parser.add_argument('-lp', '--load_params', dest='load_params', action='store_true', help='Restore training from previous model checkpoint?')
 parser.add_argument('-bs', '--batch_size', type=int, default=cfg['batch_size'], help='Batch size during training per GPU')
 parser.add_argument('-ng', '--nr_gpu', type=int, default=cfg['nr_gpu'], help='How many GPUs to distribute the training across?')
 parser.add_argument('-lr', '--learning_rate', type=float, default=cfg['learning_rate'], help='Base learning rate')
 parser.add_argument('-b', '--beta', type=float, default=cfg['beta'], help="strength of the KL divergence penalty")
+parser.add_argument('-l', '--lam', type=float, default=cfg['lam'], help="")
 parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to use')
 # new features
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
@@ -60,7 +64,7 @@ is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 
 z_dims = [20, 20, 20, 20]
 num_filters = [64, 128, 256, 512]
-vladders = [VLadderAE(z_dims=z_dims, num_filters=num_filters, beta=args.beta, reg_type="mmd", counters={}) for i in range(args.nr_gpu)]
+vladders = [VLadderAE(z_dims=z_dims, num_filters=num_filters, beta=args.beta, lam=args.lam, reg_type=args.reg, counters={}) for i in range(args.nr_gpu)]
 
 model_opt = {"mode": 'train'}
 model = tf.make_template('VLAE', VLadderAE.build_graph)
