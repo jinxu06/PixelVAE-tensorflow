@@ -91,8 +91,6 @@ def sample_from_model(sess, data):
         z_scales = sess.run(vladders[i].z_scales, feed_dict=feed_dict)
         zs = []
         for loc, scale in zip(z_locs, z_scales):
-            print("loc", z_locs)
-            print("scale", z_scales)
             z = np.random.normal(loc=loc, scale=scale)
             zs.append(z)
         loc, scale = np.zeros_like(loc), np.ones_like(scale)

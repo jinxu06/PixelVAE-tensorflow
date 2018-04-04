@@ -46,7 +46,7 @@ class VLadderAE(object):
                 h = inference_block(h, num_filters=self.num_filters[l])
                 self.hs.append(h)
                 z_loc, z_scale = ladder_block(h, ladder_dim=self.z_dims[l], num_filters=self.num_filters[l])
-                z_scale += 0.001 ##
+                # z_scale += 0.001 ##
                 self.z_locs.append(z_loc)
                 self.z_scales.append(z_scale)
                 if mode=='train':
@@ -58,8 +58,9 @@ class VLadderAE(object):
             for l in reversed(range(self.num_blocks)):
                 z_tilde = generative_block(z_tilde, self.zs[l], self.num_filters[l], output_shape=int_shape(self.hs[l])[1:])
                 self.z_tildes.append(z_tilde)
-            self.x_hat = generative_block(z_tilde, None, 3, nonlinearity=tf.nn.sigmoid, bn=False)
-            self.x_hat = 2.0 * self.x_hat - 1.0
+            self.x_hat = generative_block(z_tilde, None, 3, nonlinearity=tf.nn.tanh, bn=False)
+            #self.x_hat = generative_block(z_tilde, None, 3, nonlinearity=tf.nn.sigmoid, bn=False)
+            #self.x_hat = 2.0 * self.x_hat - 1.0
 
 
     def __loss(self, reg='mmd'): # reg = kld or mmd or None
