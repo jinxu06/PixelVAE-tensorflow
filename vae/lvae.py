@@ -63,8 +63,6 @@ class VLadderAE(object):
         if reg is None:
             self.loss = self.loss_ae
             return
-
-        z = tf.concat(self.zs, axis=-1)
         z_loc = tf.concat(self.z_locs, axis=-1)
         z_scale = tf.concat(self.z_scales, axis=-1)
         if reg=='kld':
@@ -199,8 +197,6 @@ def compute_kernel(x, y):
     return tf.exp(-tf.reduce_mean(tf.square(tiled_x - tiled_y), axis=2) / tf.cast(dim, tf.float32))
 
 def compute_mmd(x, y, sigma_sqr=1.0):
-    print("x", int_shape(x))
-    print("y", int_shape(y))
     x_kernel = compute_kernel(x, x)
     y_kernel = compute_kernel(y, y)
     xy_kernel = compute_kernel(x, y)
