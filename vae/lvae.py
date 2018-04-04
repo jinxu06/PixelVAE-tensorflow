@@ -42,6 +42,7 @@ class VLadderAE(object):
                 h = inference_block(h, num_filters=self.num_filters[l])
                 self.hs.append(h)
                 z_loc, z_scale = ladder_block(h, ladder_dim=self.z_dims[l], num_filters=self.num_filters[l])
+                z_scale += 0.001
                 self.z_locs.append(z_loc)
                 self.z_scales.append(z_scale)
                 if mode=='train':
