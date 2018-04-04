@@ -159,6 +159,7 @@ def adam_updates(params, cost_or_grads, lr=0.001, mom1=0.9, mom2=0.999):
         updates.append(p.assign(p_t))
     updates.append(t.assign_add(1))
     update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+    print(update_ops)
     with tf.control_dependencies(update_ops):
         adam_updates_op = tf.group(*updates)
     return adam_updates_op

@@ -18,7 +18,7 @@ cfg = {
     "data_set": "celeba64",
     "batch_size": 100,
     "nr_gpu": 1,
-    "learning_rate": 0.0001,
+    "learning_rate": 0.0002,
     "beta": 1.0, #5e4,
     "save_interval": 10,
 }
@@ -58,8 +58,8 @@ test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shu
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 
-z_dims = [10, 10, 10]
-num_filters = [64, 128, 256]
+z_dims = [10, 10, 10, 10]
+num_filters = [64, 128, 256, 512]
 vladders = [VLadderAE(z_dims=z_dims, num_filters=num_filters, beta=args.beta, reg_type="mmd", counters={}) for i in range(args.nr_gpu)]
 
 model_opt = {"mode": 'train'}
