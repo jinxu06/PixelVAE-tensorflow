@@ -83,7 +83,10 @@ with tf.device('/gpu:0'):
     loss = tf.add_n([v.loss for v in vladders]) / args.nr_gpu
     loss_ae = tf.add_n([v.loss_ae for v in vladders]) / args.nr_gpu
     loss_reg = tf.add_n([v.loss_reg for v in vladders]) / args.nr_gpu
-    train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
+
+    update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+        with tf.control_dependencies(update_ops):
+            train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
 
 
