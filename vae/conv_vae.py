@@ -32,7 +32,11 @@ class ConvVAE(object):
         with arg_scope([encoder, decoder], nonlinearity=self.nonlinearity, bn=True, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
             self.z_mu, self.z_log_sigma_sq = encoder(x, self.z_dim)
             sigma = tf.sqrt(tf.exp(self.z_log_sigma_sq))
-            self.z = z_sampler(self.z_mu, sigma)
+            if self.use_mode=='train':
+                self.z = z_sampler(self.z_mu, sigma)
+            elif self.use_mode=='test':
+                self.z = tf.placeholder(tf.float32, shape=int_shape(self.z_mu))
+            print("use mode:{0}".format(self.use_mode))
             self.x_hat = decoder(self.z)
 
 
