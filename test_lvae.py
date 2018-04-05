@@ -91,7 +91,7 @@ for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         model(vladders[i], xs[i],  is_trainings[i], **model_opt)
 
-if mode == 'train':
+if args.mode == 'train':
 
     all_params = tf.trainable_variables()
 
