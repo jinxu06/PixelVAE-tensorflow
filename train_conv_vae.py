@@ -7,7 +7,7 @@ from pixelcnn.nn import adam_updates
 import numpy as np
 import tensorflow as tf
 from utils import plotting
-from vae.lvae import VLadderAE
+from vae.conv_vae import ConvVAE
 
 parser = argparse.ArgumentParser()
 
