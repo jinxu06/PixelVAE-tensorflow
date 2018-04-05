@@ -17,14 +17,14 @@ cfg = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/convvae-celeba64",
     "data_set": "celeba64",
-    "batch_size": 32,
+    "batch_size": 128,
     "nr_gpu": 4,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.0002,
-    "beta": 1.0,
-    "lam": 0.0,
+    "beta": 5.0,
+    "lam": 0.5,
     "save_interval": 10,
-    "reg": "mmd",
+    "reg": "kld",
     "use_mode": "train",
 }
 
