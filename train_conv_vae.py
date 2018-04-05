@@ -13,6 +13,7 @@ parser = argparse.ArgumentParser()
 
 cfg = {
     "img_size": 64,
+    "z_dim": 10,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/convvae-celeba64",
     "data_set": "celeba64",
@@ -41,6 +42,7 @@ parser.add_argument('-ng', '--nr_gpu', type=int, default=cfg['nr_gpu'], help='Ho
 parser.add_argument('-lr', '--learning_rate', type=float, default=cfg['learning_rate'], help='Base learning rate')
 parser.add_argument('-b', '--beta', type=float, default=cfg['beta'], help="strength of the KL divergence penalty")
 parser.add_argument('-l', '--lam', type=float, default=cfg['lam'], help="")
+parser.add_argument('-zd', '--z_dim', type=float, default=cfg['z_dim'], help="")
 parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to use')
 # new features
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
