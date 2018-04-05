@@ -146,7 +146,8 @@ def generate_samples(sess, data):
             zs.append(z)
         #loc, scale = np.zeros_like(loc), np.ones_like(scale)
         #zs[3] = np.random.normal(loc=loc, scale=scale)
-        zs[0][0] = np.random.normal(loc=0, scale=3)
+        target = zs[0][:, 0]
+        target = np.random.normal(loc=0, scale=3, size=target.shape)
         feed_dict.update({vladders[i].zs[k]:zs[k] for k in range(vladders[i].num_blocks)})
         x_hat = sess.run(vladders[i].x_hat, feed_dict=feed_dict)
         x_hats.append(x_hat)
