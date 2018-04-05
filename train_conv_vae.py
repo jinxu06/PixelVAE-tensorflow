@@ -47,7 +47,7 @@ parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Un
 parser.add_argument('-um', '--use_mode', type=str, default="test", help='')
 
 args = parser.parse_args()
-if args.mode == 'test':
+if args.use_mode == 'test':
     args.debug = True
 
 print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
