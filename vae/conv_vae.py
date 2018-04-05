@@ -27,11 +27,13 @@ class ConvVAE(object):
         print("******   Building Graph   ******")
         self.x = x
         self.is_training = is_training
-        with arg_scope([conv_encoder_64_block, conv_decoder_64_block], nonlinearity=self.nonlinearity, bn=True, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
-            self.z_mu, self.z_log_sigma_sq = conv_encoder_64_block(x, self.z_dim)
+        encoder = conv_encoder_64_block
+        decoder = conv_decoder_64_block
+        with arg_scope([encoder, decoder], nonlinearity=self.nonlinearity, bn=True, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
+            self.z_mu, self.z_log_sigma_sq = encoder(x, self.z_dim)
             sigma = tf.sqrt(tf.exp(self.z_log_sigma_sq))
             self.z = z_sampler(self.z_mu, sigma)
-            self.x_hat = conv_decoder_64_block(self.z)
+            self.x_hat = decoder(self.z)
 
 
     def __loss(self, reg):
