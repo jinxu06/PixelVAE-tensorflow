@@ -6,7 +6,7 @@ import tensorflow as tf
 from vae.conv_vae import ConvVAE
 
 
-x = tf.placeholder(tf.float32, shape=(8, 32, 32, 3))
+x = tf.placeholder(tf.float32, shape=(8, 64, 64, 3))
 is_training = tf.placeholder(tf.bool, shape=())
 model_opt = {
     "z_dim": 10,
