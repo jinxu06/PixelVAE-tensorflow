@@ -30,8 +30,8 @@ class ConvVAE(object):
         with arg_scope([conv_encoder_64_block, conv_decoder_64_block], nonlinearity=self.nonlinearity, bn=True, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
             self.z_mu, self.z_log_sigma_sq = conv_encoder_64_block(x, self.z_dim)
             sigma = tf.sqrt(tf.exp(self.z_log_sigma_sq))
-            self.z = z_sampler(z_mu, sigma)
-            self.x_hat = conv_decoder_64_block(z)
+            self.z = z_sampler(self.z_mu, sigma)
+            self.x_hat = conv_decoder_64_block(self.z)
 
 
     def __loss(self, reg):
