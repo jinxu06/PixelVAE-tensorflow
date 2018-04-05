@@ -134,6 +134,7 @@ def sample_from_model(sess, data):
 def generate_samples(sess, data):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
+    return np.concatenate(ds, axis=0)
     x_hats = []
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
     for i in range(args.nr_gpu):
@@ -167,8 +168,8 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
     data = next(test_data)
-    for k in range(data.shape[0]):
-        data[k] = data[0].copy()
+    # for k in range(data.shape[0]):
+    #     data[k] = data[0].copy()
     sample_x = generate_samples(sess, data)
     test_data.reset()
 
