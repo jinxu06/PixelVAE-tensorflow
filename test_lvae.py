@@ -32,7 +32,7 @@ cfg = {
     "data_set": "celeba64",
     "batch_size": 100,
     "nr_gpu": 4,
-    "gpus": "4,5,6,7"
+    "gpus": "4,5,6,7",
     "learning_rate": 0.0002,
     "beta": 1.0,
     "lam": 0.0,
