@@ -142,7 +142,7 @@ def generate_samples(sess, data):
             z = np.random.normal(loc=loc, scale=scale)
             zs.append(z)
         loc, scale = np.zeros_like(loc), np.ones_like(scale)
-        zs[2] = np.random.normal(loc=loc, scale=scale)
+        zs[3] = np.random.normal(loc=loc, scale=scale)
         feed_dict.update({vladders[i].zs[k]:zs[k] for k in range(vladders[i].num_blocks)})
         x_hat = sess.run(vladders[i].x_hat, feed_dict=feed_dict)
         x_hats.append(x_hat)
@@ -170,4 +170,4 @@ with tf.Session(config=config) as sess:
 
     img_tile = plotting.img_tile(sample_x[:100], aspect_ratio=1.0, border_color=1.0, stretch=True)
     img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
-    plotting.plt.savefig(os.path.join("results",'%s_lvae_generate_sample_2.png' % (args.data_set)))
+    plotting.plt.savefig(os.path.join("results",'%s_lvae_generate_sample_3.png' % (args.data_set)))
