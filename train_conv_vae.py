@@ -78,7 +78,7 @@ model_opt = {
     "beta": args.beta,
     "lam": args.lam,
     "nonlinearity": tf.nn.elu,
-    "bn": True,
+    "bn": False
     "kernel_initializer": None,
     "kernel_regularizer": None,
 }
