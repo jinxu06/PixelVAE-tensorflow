@@ -46,7 +46,7 @@ parser.add_argument('-zd', '--z_dim', type=float, default=cfg['z_dim'], help="")
 parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to use')
 # new features
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
-parser.add_argument('-um', '--use_mode', type=str, default="test", help='')
+parser.add_argument('-um', '--use_mode', type=str, default=cfg['use_mode'], help='')
 
 args = parser.parse_args()
 if args.use_mode == 'test':
