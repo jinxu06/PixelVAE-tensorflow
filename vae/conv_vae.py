@@ -8,11 +8,11 @@ from layers import int_shape, get_name, compute_mmd
 
 class ConvVAE(object):
 
-    def __init__(self, , counters={}):
+    def __init__(self, counters={}):
         self.counters = counters
 
     def build_graph(self, x, is_training, z_dim, reg='mmd', nonlinearity=tf.nn.elu, bn=True, kernel_initializer=None, kernel_regularizer=None):
-        self.z_dim = z_dim 
+        self.z_dim = z_dim
         self.nonlinearity = nonlinearity
         self.kernel_initializer = kernel_initializer
         self.kernel_regularizer = kernel_regularizer
