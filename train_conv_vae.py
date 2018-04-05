@@ -19,4 +19,4 @@ model_opt = {
 
 
 v = ConvVAE(counters={})
-v.build_graph(x, is_training, model_opt)
+v.build_graph(x, is_training, **model_opt)
