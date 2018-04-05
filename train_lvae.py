@@ -132,8 +132,9 @@ def generate_samples(sess, data):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     x_hats = []
+    feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
     for i in range(args.nr_gpu):
-        feed_dict = {xs[i]: ds[i]}
+        feed_dict.update({xs[i]: ds[i]})
         z_locs = sess.run(vladders[i].z_locs, feed_dict=feed_dict)
         z_scales = sess.run(vladders[i].z_scales, feed_dict=feed_dict)
         zs = []
@@ -142,7 +143,7 @@ def generate_samples(sess, data):
             zs.append(z)
         # loc, scale = np.zeros_like(loc), np.ones_like(scale)
         # zs[0] = np.random.normal(loc=loc, scale=scale)
-        feed_dict = {vladders[i].zs[k]:zs[k] for k in range(vladders[i].num_blocks)}
+        feed_dict.update({vladders[i].zs[k]:zs[k] for k in range(vladders[i].num_blocks)})
         x_hat = sess.run(vladders[i].x_hat, feed_dict=feed_dict)
         x_hats.append(x_hat)
     return np.concatenate(x_hats, axis=0)
