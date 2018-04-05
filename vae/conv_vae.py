@@ -11,8 +11,9 @@ class ConvVAE(object):
     def __init__(self, counters={}):
         self.counters = counters
 
-    def build_graph(self, x, is_training, z_dim, reg='mmd', beta=1., lam=0., nonlinearity=tf.nn.elu, bn=True, kernel_initializer=None, kernel_regularizer=None):
+    def build_graph(self, x, is_training, z_dim, use_mode="test", reg='mmd', beta=1., lam=0., nonlinearity=tf.nn.elu, bn=True, kernel_initializer=None, kernel_regularizer=None):
         self.z_dim = z_dim
+        self.use_mode = use_mode 
         self.nonlinearity = nonlinearity
         self.kernel_initializer = kernel_initializer
         self.kernel_regularizer = kernel_regularizer
