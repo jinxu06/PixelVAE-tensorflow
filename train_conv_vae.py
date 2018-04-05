@@ -70,7 +70,7 @@ is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 
 vaes = [ConvVAE(counters={}) for i in range(args.nr_gpu)]
 model_opt = {
-    "use_mode": args.use_mode
+    "use_mode": args.use_mode,
     "z_dim": args.z_dim,
     "reg": args.reg,
     "beta": args.beta,
