@@ -31,7 +31,8 @@ cfg = {
     "save_dir": "/data/ziz/jxu/models/lvae-celeba64",
     "data_set": "celeba64",
     "batch_size": 100,
-    "nr_gpu": 1,
+    "nr_gpu": 4,
+    "gpus": "4,5,6,7"
     "learning_rate": 0.0002,
     "beta": 1.0,
     "lam": 0.0,
@@ -50,6 +51,7 @@ parser.add_argument('-si', '--save_interval', type=int, default=cfg['save_interv
 parser.add_argument('-lp', '--load_params', dest='load_params', action='store_true', help='Restore training from previous model checkpoint?')
 parser.add_argument('-bs', '--batch_size', type=int, default=cfg['batch_size'], help='Batch size during training per GPU')
 parser.add_argument('-ng', '--nr_gpu', type=int, default=cfg['nr_gpu'], help='How many GPUs to distribute the training across?')
+parser.add_argument('-g', '--gpus', type=str, default=cfg['gpus'], help='')
 parser.add_argument('-lr', '--learning_rate', type=float, default=cfg['learning_rate'], help='Base learning rate')
 parser.add_argument('-b', '--beta', type=float, default=cfg['beta'], help="strength of the KL divergence penalty")
 parser.add_argument('-l', '--lam', type=float, default=cfg['lam'], help="")
