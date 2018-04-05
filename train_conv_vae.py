@@ -86,23 +86,20 @@ for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         model(vladders[i], xs[i],  is_trainings[i], **model_opt)
 
-if args.mode == 'train':
-
+if args.use_mode == 'train':
     all_params = tf.trainable_variables()
-
     grads = []
     for i in range(args.nr_gpu):
         with tf.device('/gpu:%d' % i):
-            grads.append(tf.gradients(vladders[i].loss, all_params, colocate_gradients_with_ops=True))
-
+            grads.append(tf.gradients(vaes[i].loss, all_params, colocate_gradients_with_ops=True))
     with tf.device('/gpu:0'):
         for i in range(1, args.nr_gpu):
             for j in range(len(grads[0])):
                 grads[0][j] += grads[i][j]
 
-        loss = tf.add_n([v.loss for v in vladders]) / args.nr_gpu
-        loss_ae = tf.add_n([v.loss_ae for v in vladders]) / args.nr_gpu
-        loss_reg = tf.add_n([v.loss_reg for v in vladders]) / args.nr_gpu
+        loss = tf.add_n([v.loss for v in vaes]) / args.nr_gpu
+        loss_ae = tf.add_n([v.loss_ae for v in vaes]) / args.nr_gpu
+        loss_reg = tf.add_n([v.loss_reg for v in vaes]) / args.nr_gpu
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
 
@@ -119,28 +116,26 @@ def sample_from_model(sess, data):
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]: False for i in range(args.nr_gpu)}
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
-    x_hats = sess.run([vladders[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+    x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
     return np.concatenate(x_hats, axis=0)
 
-def generate_samples(sess, data):
-    data = np.cast[np.float32]((data - 127.5) / 127.5)
-    ds = np.split(data, args.nr_gpu)
-    x_hats = []
-    feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
-    for i in range(args.nr_gpu):
-        feed_dict.update({xs[i]: ds[i]})
-        z_locs = sess.run(vladders[i].z_locs, feed_dict=feed_dict)
-        z_scales = sess.run(vladders[i].z_scales, feed_dict=feed_dict)
-        zs = []
-        for loc, scale in zip(z_locs, z_scales):
-            z = np.random.normal(loc=loc, scale=scale)
-            zs.append(z)
-        # loc, scale = np.zeros_like(loc), np.ones_like(scale)
-        # zs[0] = np.random.normal(loc=loc, scale=scale)
-        feed_dict.update({vladders[i].zs[k]:zs[k] for k in range(vladders[i].num_blocks)})
-        x_hat = sess.run(vladders[i].x_hat, feed_dict=feed_dict)
-        x_hats.append(x_hat)
-    return np.concatenate(x_hats, axis=0)
+# def generate_samples(sess, data):
+#     data = np.cast[np.float32]((data - 127.5) / 127.5)
+#     ds = np.split(data, args.nr_gpu)
+#     x_hats = []
+#     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
+#     for i in range(args.nr_gpu):
+#         feed_dict.update({xs[i]: ds[i]})
+#         z_locs = sess.run(vladders[i].z_locs, feed_dict=feed_dict)
+#         z_scales = sess.run(vladders[i].z_scales, feed_dict=feed_dict)
+#         zs = []
+#         for loc, scale in zip(z_locs, z_scales):
+#             z = np.random.normal(loc=loc, scale=scale)
+#             zs.append(z)
+#         feed_dict.update({vladders[i].zs[k]:zs[k] for k in range(vladders[i].num_blocks)})
+#         x_hat = sess.run(vladders[i].x_hat, feed_dict=feed_dict)
+#         x_hats.append(x_hat)
+#     return np.concatenate(x_hats, axis=0)
 
 
 
@@ -193,4 +188,4 @@ with tf.Session(config=config) as sess:
 
             img_tile = plotting.img_tile(sample_x[:100], aspect_ratio=1.0, border_color=1.0, stretch=True)
             img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
-            plotting.plt.savefig(os.path.join(args.save_dir,'%s_lvae_sample%d.png' % (args.data_set, epoch)))
+            plotting.plt.savefig(os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)))
