@@ -171,7 +171,8 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
     saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
-    data = next(test_data)
+    data = test_data.next(32*10)
+    print(data.shape)
     sample_x = latent_traversal(sess, data, use_image_id=0)
     test_data.reset()
 
