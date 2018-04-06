@@ -3,18 +3,10 @@ import os
 import time
 import tensorflow as tf
 
-from divergence import compute_mmd
+from cond_pixel_cnn import cond_pixel_cnn
+
+x = tf.placeholder(tf.float32, shape=(8, 64, 64, 3))
+sh = tf.placeholder(tf.float32, shape=(8, 64, 64, 32))
 
 
-x = tf.random_normal((100, 10))
-y = tf.random_uniform((100, 10))
-
-mmd = compute_mmd(x, y) * 100
-
-initializer = tf.global_variables_initializer()
-
-config = tf.ConfigProto()
-config.gpu_options.allow_growth = True
-with tf.Session(config=config) as sess:
-
-    print(sess.run(mmd))
+out = cond_pixel_cnn(x, sh=sh)
