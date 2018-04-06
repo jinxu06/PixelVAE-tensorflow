@@ -84,7 +84,7 @@ model_opt = {
     "kernel_regularizer": None,
     "nr_resnet": 1,
     "nr_filters": 100,
-    "nr_logistic_mix": 1,
+    "nr_logistic_mix": 5,
 }
 model = tf.make_template('PVAE', ConvPixelVAE.build_graph)
 
