@@ -132,7 +132,7 @@ def generate_samples(sess, data):
         z_log_sigma_sq = sess.run(vaes[i].z_log_sigma_sq, feed_dict=feed_dict)
         z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
         z = np.random.normal(loc=z_mu, scale=z_sigma)
-        z[:, 0] = np.linspace(start=-5., stop=5., num=z.shape[1])
+        z[:, 0] = np.linspace(start=-5., stop=5., num=z.shape[0])
         feed_dict.update({vaes[i].z:z})
         x_hat = sess.run(vaes[i].x_hat, feed_dict=feed_dict)
         x_hats.append(x_hat)
