@@ -3,10 +3,20 @@ import os
 import time
 import tensorflow as tf
 
-from cond_pixel_cnn import cond_pixel_cnn
+from vae.cond_pixel_vae import ConvPixelVAE
 
 x = tf.placeholder(tf.float32, shape=(8, 64, 64, 3))
-sh = tf.placeholder(tf.float32, shape=(8, 64, 64, 32))
+# sh = tf.placeholder(tf.float32, shape=(8, 64, 64, 32))
 
 
-out = cond_pixel_cnn(x, sh=sh)
+x = tf.placeholder(tf.float32, shape=(8, 64, 64, 3))
+is_trainings = tf.placeholder(tf.bool, shape=())
+
+pvae = ConvPixelVAE(counters={})
+model_opt = {
+    "z_dim": 32,
+    "reg": "mmd",
+}
+model = tf.make_template('PVAE', ConvPixelVAE.build_graph)
+
+model(pvae, x,  is_training, **model_opt)

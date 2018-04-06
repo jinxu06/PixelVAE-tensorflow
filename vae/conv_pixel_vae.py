@@ -5,8 +5,10 @@ from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
 flatten = tf.contrib.layers.flatten
 from layers import conv2d_layer, deconv2d_layer, dense_layer
 from layers import int_shape, get_name, compute_mmd, compute_tc
+from cond_pixel_cnn import cond_pixel_cnn
 
-class ConvVAE(object):
+
+class ConvPixelVAE(object):
 
     def __init__(self, counters={}):
         self.counters = counters
@@ -28,23 +30,24 @@ class ConvVAE(object):
         print("******   Building Graph   ******")
         self.x = x
         self.is_training = is_training
-        encoder = conv_encoder_64_block
-        decoder = conv_decoder_64_block
+        conv_block = conv_encoder_64_block
+        deconv_block = deconv_64_block
         with arg_scope([encoder, decoder], nonlinearity=self.nonlinearity, bn=self.bn, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
-            self.z_mu, self.z_log_sigma_sq = encoder(x, self.z_dim)
+            self.z_mu, self.z_log_sigma_sq = conv_block(x, self.z_dim)
             sigma = tf.exp(self.z_log_sigma_sq / 2.)
             if self.use_mode=='train':
                 self.z = z_sampler(self.z_mu, sigma)
             elif self.use_mode=='test':
                 self.z = tf.placeholder(tf.float32, shape=int_shape(self.z_mu))
             print("use mode:{0}".format(self.use_mode))
-            self.x_hat = decoder(self.z)
+            self.decoded_features = deconv_block(self.z)
+            self.mix_logistic_params = cond_pixel_cnn(self.x, self.decoded_features)
+            self.x_hat = mix_logistic_sampler(self.mix_logistic_params, sample_range=100.)
 
 
     def __loss(self, reg):
         print("******   Compute Loss   ******")
-        self.loss_ae = tf.reduce_mean(tf.reduce_sum(tf.square(flatten(self.x)-flatten(self.x_hat)), 1))
-        # self.loss_ae = tf.reduce_mean(tf.square(flatten(self.x)-flatten(self.x_hat)))
+        self.loss_ae = mix_logistic_loss(x, self.mix_logistic_params)
         if reg is None:
             self.loss_reg = 0
         elif reg=='kld':
@@ -99,6 +102,22 @@ def conv_decoder_64_block(inputs, is_training, nonlinearity=None, bn=True, kerne
             outputs = deconv2d_layer(outputs, 3, 1, 1, "SAME", nonlinearity=tf.sigmoid, bn=True)
             outputs = 2. * outputs - 1.
             return outputs
+
+@add_arg_scope
+def deconv_64_block(inputs, is_training, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
+    name = get_name("deconv_64_block", counters)
+    print("construct", name, "...")
+    with tf.variable_scope(name):
+        with arg_scope([deconv2d_layer, dense_layer], nonlinearity=nonlinearity, bn=bn, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
+            outputs = dense_layer(inputs, 1024)
+            outputs = tf.reshape(outputs, [-1, 1, 1, 1024])
+            outputs = deconv2d_layer(outputs, 512, 4, 1, "VALID")
+            outputs = deconv2d_layer(outputs, 256, 4, 2, "SAME")
+            outputs = deconv2d_layer(outputs, 128, 4, 2, "SAME")
+            outputs = deconv2d_layer(outputs, 64, 4, 2, "SAME")
+            outputs = deconv2d_layer(outputs, 32, 4, 2, "SAME")
+            return outputs
+
 
 @add_arg_scope
 def z_sampler(loc, scale, counters={}):
