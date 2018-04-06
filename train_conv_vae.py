@@ -15,7 +15,7 @@ cfg = {
     "img_size": 64,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/convvae-celeba64",
+    "save_dir": "/data/ziz/jxu/models/vae-test",
     "data_set": "celeba64",
     "batch_size": 128,
     "nr_gpu": 4,
@@ -24,7 +24,7 @@ cfg = {
     "beta": 250.0,
     "lam": 0.5,
     "save_interval": 10,
-    "reg": "kld",
+    "reg": "tc",
     "use_mode": "train",
 }
 

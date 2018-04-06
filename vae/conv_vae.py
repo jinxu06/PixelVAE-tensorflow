@@ -54,9 +54,9 @@ class ConvVAE(object):
             self.loss_reg = compute_mmd(tf.random_normal(int_shape(self.z)), self.z)
             self.loss_reg = self.beta * tf.maximum(self.lam, self.loss_reg)
         elif reg=='tc':
-            tc = compute_negative_entropy(self.z, self.z_mu, self.z_log_sigma_sq)
-            print(int_shape(tc))
-            quit()
+            tc = compute_entropy(self.z, self.z_mu, self.z_log_sigma_sq)
+            for k in range(self.z_dim):
+                tc -= compute_entropy(self.z[:, k:k+1], self.z_mu[:, k:k+1], self.z_log_sigma_sq[:, k:k+1])
 
         #self.loss_ae *= 100
         #self.loss_reg *= 100

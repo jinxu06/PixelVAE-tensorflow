@@ -73,7 +73,7 @@ def compute_mmd(x, y, sigma_sqr=1.0):
     mmd = tf.reduce_mean(x_kernel) + tf.reduce_mean(y_kernel) - 2 * tf.reduce_mean(xy_kernel)
     return mmd
 
-def compute_negative_entropy(z, z_mu, z_log_sigma_sq):
+def compute_entropy(z, z_mu, z_log_sigma_sq):
     z_sigma = tf.sqrt(tf.exp(z_log_sigma_sq))
     log_probs = []
     batch_size, z_dim = int_shape(z_mu)
@@ -82,10 +82,8 @@ def compute_negative_entropy(z, z_mu, z_log_sigma_sq):
         dist = tf.distributions.Normal(loc=mu, scale=sigma)
         log_probs.append(tf.reduce_sum(dist.log_prob(z), 1))
     log_probs = tf.stack(log_probs, axis=0)
-    print(int_shape(log_probs))
     lse = log_sum_exp(log_probs, axis=0)
-    print(int_shape(lse))
-    return tf.reduce_mean(lse)
+    return -tf.reduce_mean(lse)
 
 
 def visualize_samples(images, name="results/test.png", layout=[5,5], vrange=[-1, 1]):
