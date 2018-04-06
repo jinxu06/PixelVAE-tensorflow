@@ -1,5 +1,7 @@
 import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
+from PIL import Image
+import utils.mfunc import uf
 
 @add_arg_scope
 def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, is_training=False):
@@ -62,3 +64,9 @@ def compute_mmd(x, y, sigma_sqr=1.0):
     xy_kernel = compute_kernel(x, y)
     mmd = tf.reduce_mean(x_kernel) + tf.reduce_mean(y_kernel) - 2 * tf.reduce_mean(xy_kernel)
     return mmd
+
+def visualize_samples(images, name="results/test.png", layout=[5,5], vrange=[-1, 1]):
+    images = (images + vrange[0]) / (vrange[1]-vrange[0]) * 255.
+    images = np.rint(images).astype(np.uint8)
+    view = Image.fromarray(uf.tile_images(images), size=layout, 'RGB')
+    view.save(name)

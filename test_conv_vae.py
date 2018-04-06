@@ -8,6 +8,7 @@ import numpy as np
 import tensorflow as tf
 from utils import plotting
 from vae.conv_vae import ConvVAE
+from layers import visualize_samples
 
 parser = argparse.ArgumentParser()
 
@@ -130,7 +131,7 @@ def generate_samples(sess, data):
     z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
-    z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
+    #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
     z = np.split(z, args.nr_gpu)
     feed_dict.update({vaes[i].z:z[i] for i in range(args.nr_gpu)})
     x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
@@ -172,6 +173,4 @@ with tf.Session(config=config) as sess:
     sample_x = generate_samples(sess, data)
     test_data.reset()
 
-    img_tile = plotting.img_tile(sample_x[:100], aspect_ratio=1.0, border_color=1.0, stretch=True)
-    img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
-    plotting.plt.savefig(os.path.join("results",'%s_vae_generate_sample.png' % (args.data_set)))
+    visualize_samples(sample_x)
