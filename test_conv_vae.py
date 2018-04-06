@@ -132,7 +132,7 @@ def generate_samples(sess, data):
         z_log_sigma_sq = sess.run(vaes[i].z_log_sigma_sq, feed_dict=feed_dict)
         z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
         z = np.random.normal(loc=z_mu, scale=z_sigma)
-        z[:, 0] = np.linspace(start=-5., stop=5., num=z.shape[0])
+        z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
         feed_dict.update({vaes[i].z:z})
         x_hat = sess.run(vaes[i].x_hat, feed_dict=feed_dict)
         x_hats.append(x_hat)
@@ -153,8 +153,8 @@ with tf.Session(config=config) as sess:
 
     saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
     data = next(test_data)
-    for i in range(data.shape[0]//4):
-        data[4*i:4*i+4] = data[0:4].copy()
+    for i in range(data.shape[0]//5):
+        data[5*i:5*i+5] = data[0:5].copy()
     sample_x = generate_samples(sess, data)
     test_data.reset()
 
