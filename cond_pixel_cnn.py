@@ -8,7 +8,7 @@ from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
 import pixelcnn.nn_for_cond as nn
 
 @add_arg_scope
-def cond_pixel_cnn(x, gh=None, sh=None, nonlinearity=tf.nn.elu, dropout_p=0.5, nr_resnet=5, nr_filters=160, nr_logistic_mix=10, counters={}):
+def cond_pixel_cnn(x, gh=None, sh=None, nonlinearity=tf.nn.elu, dropout_p=0.0, nr_resnet=5, nr_filters=160, nr_logistic_mix=10, counters={}):
     name = nn.get_name("conv_pixel_cnn", counters)
     print("construct", name, "...")
     with tf.variable_scope(name):
@@ -28,3 +28,16 @@ def cond_pixel_cnn(x, gh=None, sh=None, nonlinearity=tf.nn.elu, dropout_p=0.5, n
                 x_out = nn.nin(tf.nn.elu(ul_list[-1]), 10*nr_logistic_mix)
                 print("    * receptive_field", receptive_field)
                 return x_out
+
+@add_arg_scope
+def logistic_mix_sampler(params, nr_logistic_mix, sample_range=3.):
+    name = nn.get_name("logistic_mix_sampler", counters)
+    print("construct", name, "...")
+    epsilon = 1. / ( tf.exp(sample_range)+1. )
+    x = nn.sample_from_discretized_mix_logistic(params, nr_logistic_mix, epsilon)
+    return x
+
+@add_arg_scope
+def logistic_mix_loss(x, params, masks=None):
+    l = discretized_mix_logistic_loss(x, params, sum_all=True, masks=masks)
+    return l
