@@ -20,11 +20,11 @@ cfg = {
     "batch_size": 16,
     "nr_gpu": 4,
     #"gpus": "4,5,6,7",
-    "learning_rate": 0.001,
-    "beta": 15.0,
+    "learning_rate": 0.0001,
+    "beta": 1.0,
     "lam": 0.5,
     "save_interval": 10,
-    "reg": "tc",
+    "reg": "kld",
     "use_mode": "train",
 }
 
