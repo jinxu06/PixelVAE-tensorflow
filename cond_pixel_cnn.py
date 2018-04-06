@@ -39,5 +39,5 @@ def mix_logistic_sampler(params, nr_logistic_mix=10, sample_range=3., counters={
 
 @add_arg_scope
 def mix_logistic_loss(x, params, masks=None):
-    l = discretized_mix_logistic_loss(x, params, sum_all=True, masks=masks)
+    l = nn.discretized_mix_logistic_loss(x, params, sum_all=True, masks=masks)
     return l
