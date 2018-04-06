@@ -336,7 +336,6 @@ def gated_resnet(x, a=None, gh=None, sh=None, nonlinearity=concat_elu, conv=conv
 
     a, b = tf.split(c2, 2, 3)
     c3 = a * tf.nn.sigmoid(b)
-    print("    + gated_resnet", int_shape(x), int_shape(x + c3))
     return x + c3
 
 @add_arg_scope
