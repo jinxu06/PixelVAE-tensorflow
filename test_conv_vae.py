@@ -153,8 +153,8 @@ with tf.Session(config=config) as sess:
 
     saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
     data = next(test_data)
-    for i in range(data.shape[0]):
-        data[i] = data[1].copy()
+    for i in range(data.shape[0]//4):
+        data[4*i:4*i+4] = data[0:4].copy()
     sample_x = generate_samples(sess, data)
     test_data.reset()
 
