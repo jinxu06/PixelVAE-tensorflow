@@ -20,7 +20,7 @@ cfg = {
     "batch_size": 256,
     "nr_gpu": 4,
     #"gpus": "4,5,6,7",
-    "learning_rate": 0.0001,
+    "learning_rate": 0.001,
     "beta": 15.0,
     "lam": 0.5,
     "save_interval": 10,
@@ -78,7 +78,7 @@ model_opt = {
     "beta": args.beta,
     "lam": args.lam,
     "nonlinearity": tf.nn.elu,
-    "bn": False,
+    "bn": True,
     "kernel_initializer": None,
     "kernel_regularizer": None,
 }
