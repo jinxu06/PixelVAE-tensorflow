@@ -68,5 +68,5 @@ def compute_mmd(x, y, sigma_sqr=1.0):
 def visualize_samples(images, name="results/test.png", layout=[5,5], vrange=[-1, 1]):
     images = (images + vrange[0]) / (vrange[1]-vrange[0]) * 255.
     images = np.rint(images).astype(np.uint8)
-    view = Image.fromarray(uf.tile_images(images), size=layout, 'RGB')
+    view = Image.fromarray(uf.tile_images(images, size=layout), 'RGB')
     view.save(name)
