@@ -30,7 +30,7 @@ def cond_pixel_cnn(x, gh=None, sh=None, nonlinearity=tf.nn.elu, dropout_p=0.0, n
                 return x_out
 
 @add_arg_scope
-def mix_logistic_sampler(params, nr_logistic_mix=10, sample_range=3.):
+def mix_logistic_sampler(params, nr_logistic_mix=10, sample_range=3., counters={}):
     name = nn.get_name("logistic_mix_sampler", counters)
     print("construct", name, "...")
     epsilon = 1. / ( tf.exp(sample_range)+1. )
