@@ -56,8 +56,8 @@ class ConvVAE(object):
         elif reg=='tc':
             tc = compute_tc(self.z, self.z_mu, self.z_log_sigma_sq)
             kld = tf.reduce_mean(- 0.5 * tf.reduce_sum(1 + self.z_log_sigma_sq - tf.square(self.z_mu) - tf.exp(self.z_log_sigma_sq), axis=-1))
-            # self.loss_reg = kld + (self.beta-1.) * tc
-            self.loss_reg = (self.beta-1.) * tc
+            self.loss_reg = kld + (self.beta-1.) * tc
+            # self.loss_reg = (self.beta-1.) * tc
 
         #self.loss_ae *= 100
         #self.loss_reg *= 100
