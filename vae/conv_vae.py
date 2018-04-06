@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
 flatten = tf.contrib.layers.flatten
 from layers import conv2d_layer, deconv2d_layer, dense_layer
-from layers import int_shape, get_name, compute_mmd, compute_negative_entropy
+from layers import int_shape, get_name, compute_mmd, compute_entropy
 
 class ConvVAE(object):
 
