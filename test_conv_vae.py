@@ -138,7 +138,9 @@ def generate_samples(sess, data):
     return np.concatenate(x_hats, axis=0)
 
 
-def latent_traversal(sess, data):
+def latent_traversal(sess, data, use_image_id=0):
+    for i in range(data.shape[0]):
+        data[i] = data[use_image_id].copy()
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
@@ -147,13 +149,14 @@ def latent_traversal(sess, data):
     z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
-    for i in range(10):
-        z[i*10:i*10+10, i] = np.linspace(start=-5., stop=5., num=10)
+    num_features = 32
+    num_traversal_step = 10
+    for i in range(num_features):
+        z[i*num_traversal_step:(i+1)*num_traversal_step, i] = np.linspace(start=-5., stop=5., num=num_traversal_step)
     z = np.split(z, args.nr_gpu)
     feed_dict.update({vaes[i].z:z[i] for i in range(args.nr_gpu)})
     x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
     return np.concatenate(x_hats, axis=0)
-
 
 
 initializer = tf.global_variables_initializer()
@@ -169,9 +172,7 @@ with tf.Session(config=config) as sess:
 
     saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
     data = next(test_data)
-    for i in range(data.shape[0]):
-        data[i] = data[0].copy()
-    sample_x = latent_traversal(sess, data)
+    sample_x = latent_traversal(sess, data, use_image_id=0)
     test_data.reset()
 
-    visualize_samples(sample_x, "results/conv_vae_samples.png", layout=(10, 10))
+    visualize_samples(sample_x, "results/conv_vae_samples.png", layout=(32, 10))
