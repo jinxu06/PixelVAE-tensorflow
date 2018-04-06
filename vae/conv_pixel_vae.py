@@ -26,15 +26,15 @@ class ConvPixelVAE(object):
         self.nr_resnet = nr_resnet
         self.nr_filters = nr_filters
         self.nr_logistic_mix = nr_logistic_mix
-        self.dropout_p = dropout_p
-        self.__model(x, is_training)
+        self.__model(x, is_training, dropout_p)
         self.__loss(self.reg)
 
 
-    def __model(self, x, is_training):
+    def __model(self, x, is_training, dropout_p):
         print("******   Building Graph   ******")
         self.x = x
         self.is_training = is_training
+        self.dropout_p = dropout_p
         conv_block = conv_encoder_64_block
         deconv_block = deconv_64_block
         with arg_scope([conv_block, deconv_block], nonlinearity=self.nonlinearity, bn=self.bn, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
