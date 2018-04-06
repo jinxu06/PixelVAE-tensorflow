@@ -11,6 +11,9 @@ import pixelcnn.nn_for_cond as nn
 def cond_pixel_cnn(x, gh=None, sh=None, nonlinearity=tf.nn.elu, dropout_p=0.0, nr_resnet=5, nr_filters=160, nr_logistic_mix=10, counters={}):
     name = nn.get_name("conv_pixel_cnn", counters)
     print("construct", name, "...")
+    print("    * nr_resnet: ", nr_resnet)
+    print("    * nr_filters: ", nr_filters)
+    print("    * nr_logistic_mix: ", nr_logistic_mix)
     with tf.variable_scope(name):
         with arg_scope([nn.conv2d, nn.deconv2d, nn.gated_resnet, nn.dense], counters=counters, dropout_p=dropout_p):
             with arg_scope([nn.gated_resnet], nonlinearity=nonlinearity, gh=gh, sh=sh):

@@ -13,7 +13,7 @@ class ConvPixelVAE(object):
     def __init__(self, counters={}):
         self.counters = counters
 
-    def build_graph(self, x, is_training, z_dim, use_mode="test", reg='mmd', beta=1., lam=0., nonlinearity=tf.nn.elu, bn=True, kernel_initializer=None, kernel_regularizer=None):
+    def build_graph(self, x, is_training, z_dim, dropout_p=0.0, use_mode="test", reg='mmd', beta=1., lam=0., nonlinearity=tf.nn.elu, bn=True, kernel_initializer=None, kernel_regularizer=None, nr_resnet=1, nr_filters=100, nr_logistic_mix=10):
         self.z_dim = z_dim
         self.use_mode = use_mode
         self.nonlinearity = nonlinearity
@@ -23,8 +23,13 @@ class ConvPixelVAE(object):
         self.reg = reg
         self.beta = beta
         self.lam = lam
+        self.nr_resnet = nr_resnet
+        self.nr_filters = nr_filters
+        self.nr_logistic_mix = nr_logistic_mix
+        self.dropout_p = dropout_p
         self.__model(x, is_training)
         self.__loss(self.reg)
+
 
     def __model(self, x, is_training):
         print("******   Building Graph   ******")
@@ -41,7 +46,7 @@ class ConvPixelVAE(object):
                 self.z = tf.placeholder(tf.float32, shape=int_shape(self.z_mu))
             print("use mode:{0}".format(self.use_mode))
             self.decoded_features = deconv_block(self.z)
-            self.mix_logistic_params = cond_pixel_cnn(self.x, sh=self.decoded_features)
+            self.mix_logistic_params = cond_pixel_cnn(self.x, sh=self.decoded_features, nonlinearity=self.nonlinearity, dropout_p=self.dropout_p, nr_resnet=self.nr_resnet, nr_filters=self.nr_filters, nr_logistic_mix, self.nr_logistic_mix, counters=self.counters)
             self.x_hat = mix_logistic_sampler(self.mix_logistic_params, sample_range=100., counters=self.counters)
 
 
