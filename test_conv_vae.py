@@ -173,7 +173,7 @@ with tf.Session(config=config) as sess:
     saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
     data = test_data.next(32*10)
     print(data.shape)
-    sample_x = latent_traversal(sess, data, use_image_id=0)
+    sample_x = latent_traversal(sess, data, use_image_id=1)
     test_data.reset()
 
-    visualize_samples(sample_x, "results/conv_vae_samples.png", layout=(32, 10))
+    visualize_samples(sample_x, "results/conv_vae_samples_1.png", layout=(32, 10))
