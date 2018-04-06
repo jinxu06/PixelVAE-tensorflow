@@ -79,7 +79,7 @@ model_opt = {
     "lam": args.lam,
     "nonlinearity": tf.nn.elu,
     "bn": True,
-    "kernel_initializer": None,
+    "kernel_initializer": tf.contrib.layers.xavier_initializer(),
     "kernel_regularizer": None,
 }
 model = tf.make_template('VAE', ConvVAE.build_graph)
