@@ -71,7 +71,7 @@ xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 dropout_ps = [tf.placeholder(tf.float32, shape=()) for i in range(args.nr_gpu)]
 
-vaes = [ConvPixelVAE(counters={}) for i in range(args.nr_gpu)]
+pvaes = [ConvPixelVAE(counters={}) for i in range(args.nr_gpu)]
 model_opt = {
     "use_mode": args.use_mode,
     "z_dim": args.z_dim,
@@ -86,34 +86,35 @@ model_opt = {
     "nr_filters": 100,
     "nr_logistic_mix": 1,
 }
-model = tf.make_template('VAE', ConvVAE.build_graph)
+model = tf.make_template('PVAE', ConvPixelVAE.build_graph)
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        model(vaes[i], xs[i],  is_trainings[i], **model_opt)
+        model(pvaes[i], xs[i],  is_trainings[i], dropout_ps[i], **model_opt)
 
 if args.use_mode == 'train':
     all_params = tf.trainable_variables()
     grads = []
     for i in range(args.nr_gpu):
         with tf.device('/gpu:%d' % i):
-            grads.append(tf.gradients(vaes[i].loss, all_params, colocate_gradients_with_ops=True))
+            grads.append(tf.gradients(pvaes[i].loss, all_params, colocate_gradients_with_ops=True))
     with tf.device('/gpu:0'):
         for i in range(1, args.nr_gpu):
             for j in range(len(grads[0])):
                 grads[0][j] += grads[i][j]
 
-        loss = tf.add_n([v.loss for v in vaes]) / args.nr_gpu
-        loss_ae = tf.add_n([v.loss_ae for v in vaes]) / args.nr_gpu
-        loss_reg = tf.add_n([v.loss_reg for v in vaes]) / args.nr_gpu
+        loss = tf.add_n([v.loss for v in pvaes]) / args.nr_gpu
+        loss_ae = tf.add_n([v.loss_ae for v in pvaes]) / args.nr_gpu
+        loss_reg = tf.add_n([v.loss_reg for v in pvaes]) / args.nr_gpu
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
 
 
-def make_feed_dict(data, is_training=True):
+def make_feed_dict(data, is_training=True, dropout_p=0.5):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]: is_training for i in range(args.nr_gpu)}
+    feed_dict.update({dropout_ps[i]: dropout_p for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     return feed_dict
 
@@ -121,23 +122,25 @@ def sample_from_model(sess, data):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]: False for i in range(args.nr_gpu)}
+    feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
-    x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+    x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
     return np.concatenate(x_hats, axis=0)
 
 def generate_samples(sess, data):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
+    feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
-    z_mu = np.concatenate(sess.run([vaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
-    z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
     #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
     z = np.split(z, args.nr_gpu)
-    feed_dict.update({vaes[i].z:z[i] for i in range(args.nr_gpu)})
-    x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+    feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
+    x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
     return np.concatenate(x_hats, axis=0)
 
 
@@ -147,9 +150,10 @@ def latent_traversal(sess, data, use_image_id=0):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
+    feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
-    z_mu = np.concatenate(sess.run([vaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
-    z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
     num_features = 32
@@ -157,8 +161,8 @@ def latent_traversal(sess, data, use_image_id=0):
     for i in range(num_features):
         z[i*num_traversal_step:(i+1)*num_traversal_step, i] = np.linspace(start=-5., stop=5., num=num_traversal_step)
     z = np.split(z, args.nr_gpu)
-    feed_dict.update({vaes[i].z:z[i] for i in range(args.nr_gpu)})
-    x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+    feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
+    x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
     return np.concatenate(x_hats, axis=0)
 
 
@@ -182,7 +186,7 @@ with tf.Session(config=config) as sess:
         tt = time.time()
         loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
         for data in train_data:
-            feed_dict = make_feed_dict(data, is_training=True)
+            feed_dict = make_feed_dict(data, is_training=True, dropout_p=0.5)
             _, l, la, lr = sess.run([train_step, loss, loss_ae, loss_reg], feed_dict=feed_dict)
             loss_arr.append(l)
             loss_ae_arr.append(la)
@@ -191,7 +195,7 @@ with tf.Session(config=config) as sess:
 
         loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
         for data in test_data:
-            feed_dict = make_feed_dict(data, is_training=False)
+            feed_dict = make_feed_dict(data, is_training=False, dropout_p=0.)
             l, la, lr = sess.run([loss, loss_ae, loss_reg], feed_dict=feed_dict)
             loss_arr.append(l)
             loss_ae_arr.append(la)
