@@ -80,15 +80,10 @@ def compute_entropy(z, z_mu, z_log_sigma_sq):
     z = tf.stack([z for i in range(batch_size)], axis=0)
     z_mu = tf.stack([z_mu for i in range(batch_size)], axis=1)
     z_sigma = tf.stack([z_sigma for i in range(batch_size)], axis=1)
-    print(int_shape(z))
-    print(int_shape(z_mu))
-    quit()
     z_norm = (z-z_mu) / z_sigma
 
-
-    dist = tf.distributions.Normal(loc=z_mu, scale=z_sigma)
-    dist.batch_shape_tensor
-    log_probs = dist.log_prob(z)
+    dist = tf.distributions.Normal(loc=0., scale=1.)
+    log_probs = dist.log_prob(z_norm)
     print(int_shape(log_probs))
     quit()
 
