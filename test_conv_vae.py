@@ -171,7 +171,7 @@ with tf.Session(config=config) as sess:
     data = next(test_data)
     for i in range(data.shape[0]):
         data[i] = data[0].copy()
-    sample_x = generate_samples(sess, data)
+    sample_x = latent_traversal(sess, data)
     test_data.reset()
 
     visualize_samples(sample_x, "results/conv_vae_samples.png", layout=(10, 10))
