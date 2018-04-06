@@ -3,7 +3,7 @@ import os
 import time
 import tensorflow as tf
 
-from vae.cond_pixel_vae import ConvPixelVAE
+from vae.conv_pixel_vae import ConvPixelVAE
 
 x = tf.placeholder(tf.float32, shape=(8, 64, 64, 3))
 # sh = tf.placeholder(tf.float32, shape=(8, 64, 64, 32))
