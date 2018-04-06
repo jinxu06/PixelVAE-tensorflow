@@ -32,7 +32,7 @@ class ConvPixelVAE(object):
         self.is_training = is_training
         conv_block = conv_encoder_64_block
         deconv_block = deconv_64_block
-        with arg_scope([encoder, decoder], nonlinearity=self.nonlinearity, bn=self.bn, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
+        with arg_scope([conv_block, deconv_block], nonlinearity=self.nonlinearity, bn=self.bn, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
             self.z_mu, self.z_log_sigma_sq = conv_block(x, self.z_dim)
             sigma = tf.exp(self.z_log_sigma_sq / 2.)
             if self.use_mode=='train':
