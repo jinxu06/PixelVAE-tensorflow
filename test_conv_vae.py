@@ -44,7 +44,7 @@ cfg = {
     "lam": 0.5,
     "save_interval": 10,
     "reg": "tc",
-    "use_mode": "test,
+    "use_mode": "test",
 }
 
 
