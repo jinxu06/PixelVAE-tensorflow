@@ -1,4 +1,4 @@
-import numpy as np 
+import numpy as np
 import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
 from PIL import Image
@@ -42,6 +42,13 @@ def dense_layer(inputs, num_outputs, nonlinearity=None, bn=True, kernel_initiali
 def int_shape(x):
     return list(map(int, x.get_shape()))
 
+def log_sum_exp(x):
+    """ numerically stable log_sum_exp implementation that prevents overflow """
+    axis = len(x.get_shape())-1
+    m = tf.reduce_max(x, axis)
+    m2 = tf.reduce_max(x, axis, keep_dims=True)
+    return m + tf.log(tf.reduce_sum(tf.exp(x-m2), axis))
+
 def get_name(layer_name, counters):
     ''' utlity for keeping track of layer names '''
     if not layer_name in counters:
@@ -65,6 +72,18 @@ def compute_mmd(x, y, sigma_sqr=1.0):
     xy_kernel = compute_kernel(x, y)
     mmd = tf.reduce_mean(x_kernel) + tf.reduce_mean(y_kernel) - 2 * tf.reduce_mean(xy_kernel)
     return mmd
+
+def compute_negative_entropy(z, z_mu, z_log_sigma_sq):
+    z_sigma = tf.sqrt(tf.exp(z_log_sigma_sq))
+    log_probs = []
+    batch_size, z_dim = int_shape(z_mu)
+    for b in range(batch_size):
+        mu, sigma = z_mu[b], z_log_sigma_sq[b]
+        dist = tf.distributions.Normal(loc=mu, scale=sigma)
+        log_probs.append(dist.log_prob(z))
+    log_probs = tf.stack(log_probs, axis=0)
+    return log_probs 
+
 
 def visualize_samples(images, name="results/test.png", layout=[5,5], vrange=[-1, 1]):
     images = (images + vrange[0]) / (vrange[1]-vrange[0]) * 255.

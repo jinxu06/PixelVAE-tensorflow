@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
 flatten = tf.contrib.layers.flatten
 from layers import conv2d_layer, deconv2d_layer, dense_layer
-from layers import int_shape, get_name, compute_mmd
+from layers import int_shape, get_name, compute_mmd, compute_negative_entropy
 
 class ConvVAE(object):
 
@@ -49,13 +49,19 @@ class ConvVAE(object):
             self.loss_reg = 0
         elif reg=='kld':
             self.loss_reg = tf.reduce_mean(- 0.5 * tf.reduce_sum(1 + self.z_log_sigma_sq - tf.square(self.z_mu) - tf.exp(self.z_log_sigma_sq), axis=-1))
+            self.loss_reg = self.beta * tf.maximum(self.lam, self.loss_reg)
         elif reg=='mmd':
             self.loss_reg = compute_mmd(tf.random_normal(int_shape(self.z)), self.z)
+            self.loss_reg = self.beta * tf.maximum(self.lam, self.loss_reg)
+        elif reg=='tc':
+            tc = compute_negative_entropy(self.z, self.z_mu, self.z_log_sigma_sq)
+            print(int_shape(tc))
+            quit()
 
         #self.loss_ae *= 100
         #self.loss_reg *= 100
         print("reg:{0}, beta:{1}, lam:{2}".format(self.reg, self.beta, self.lam))
-        self.loss = self.loss_ae + self.beta * tf.maximum(self.lam, self.loss_reg)
+        self.loss = self.loss_ae + self.loss_reg
 
 
 @add_arg_scope

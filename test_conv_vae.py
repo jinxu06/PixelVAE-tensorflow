@@ -25,7 +25,8 @@ cfg = {
     "beta": 5.0,
     "lam": 0.5,
     "save_interval": 10,
-    "reg": "kld",
+    #"reg": "kld",
+    "reg": "tc",
     "use_mode": "test",
 }
 
