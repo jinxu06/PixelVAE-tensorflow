@@ -124,18 +124,32 @@ def sample_from_model(sess, data):
 def generate_samples(sess, data):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
-    x_hats = []
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
-    for i in range(args.nr_gpu):
-        feed_dict.update({xs[i]: ds[i]})
-        z_mu = sess.run(vaes[i].z_mu, feed_dict=feed_dict)
-        z_log_sigma_sq = sess.run(vaes[i].z_log_sigma_sq, feed_dict=feed_dict)
-        z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
-        z = np.random.normal(loc=z_mu, scale=z_sigma)
-        z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
-        feed_dict.update({vaes[i].z:z})
-        x_hat = sess.run(vaes[i].x_hat, feed_dict=feed_dict)
-        x_hats.append(x_hat)
+    feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
+    z_mu = np.concatenate(sess.run([vaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
+    z = np.random.normal(loc=z_mu, scale=z_sigma)
+    z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
+    z = np.split(z, args.nr_gpu)
+    feed_dict.update({vaes[i].z:z for i in range(args.nr_gpu)})
+    x_hats = sess.run(vaes[i].x_hat, feed_dict=feed_dict)
+    return np.concatenate(x_hats, axis=0)
+
+
+def latent_traversal(sess, data):
+    data = np.cast[np.float32]((data - 127.5) / 127.5)
+    ds = np.split(data, args.nr_gpu)
+    feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
+    feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
+    z_mu = np.concatenate(sess.run([vaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
+    z = np.random.normal(loc=z_mu, scale=z_sigma)
+    z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
+    z = np.split(z, args.nr_gpu)
+    feed_dict.update({vaes[i].z:z for i in range(args.nr_gpu)})
+    x_hats = sess.run(vaes[i].x_hat, feed_dict=feed_dict)
     return np.concatenate(x_hats, axis=0)
 
 
@@ -153,8 +167,8 @@ with tf.Session(config=config) as sess:
 
     saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
     data = next(test_data)
-    for i in range(data.shape[0]//5):
-        data[5*i:5*i+5] = data[0:5].copy()
+    # for i in range(data.shape[0]//5):
+    #     data[5*i:5*i+5] = data[0:5].copy()
     sample_x = generate_samples(sess, data)
     test_data.reset()
 
