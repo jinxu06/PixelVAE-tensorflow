@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
 from PIL import Image
-import utils.mfunc import uf
+import utils.mfunc as uf
 
 @add_arg_scope
 def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, is_training=False):
