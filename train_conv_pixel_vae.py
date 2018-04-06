@@ -17,7 +17,7 @@ cfg = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/vae_test",
     "data_set": "celeba64",
-    "batch_size": 256,
+    "batch_size": 16,
     "nr_gpu": 4,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.001,
