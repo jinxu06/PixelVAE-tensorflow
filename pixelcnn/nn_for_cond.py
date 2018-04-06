@@ -327,7 +327,8 @@ def gated_resnet(x, a=None, gh=None, sh=None, nonlinearity=concat_elu, conv=conv
     # add projection of h vector if included: conditional generation
     if sh is not None:
         # c2 += conv2d_1x1(nonlinearity(sh), 2 * num_filters, init=init)
-        c2 += conv(sh, 2*num_filters, filter_size=[1,1], strides=[1,1], pad='SAME', nonlinearity=nonlinearity, init=init)
+        # c2 += conv(sh, 2*num_filters, filter_size=[1,1], strides=[1,1], pad='SAME', nonlinearity=nonlinearity, init=init)
+        c2 += nin(sh, 2*num_filters, nonlinearity=nonlinearity)
     if gh is not None: # haven't finished this part
         with tf.variable_scope(get_name('conditional_weights', counters)):
             hw = get_var_maybe_avg('hw', ema, shape=[int_shape(gh)[-1], 2 * num_filters], dtype=tf.float32,
