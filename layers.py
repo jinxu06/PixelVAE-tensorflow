@@ -42,9 +42,9 @@ def dense_layer(inputs, num_outputs, nonlinearity=None, bn=True, kernel_initiali
 def int_shape(x):
     return list(map(int, x.get_shape()))
 
-def log_sum_exp(x):
+def log_sum_exp(x, axis):
     """ numerically stable log_sum_exp implementation that prevents overflow """
-    axis = len(x.get_shape())-1
+    #axis = len(x.get_shape())-1
     m = tf.reduce_max(x, axis)
     m2 = tf.reduce_max(x, axis, keep_dims=True)
     return m + tf.log(tf.reduce_sum(tf.exp(x-m2), axis))
@@ -80,9 +80,12 @@ def compute_negative_entropy(z, z_mu, z_log_sigma_sq):
     for b in range(batch_size):
         mu, sigma = z_mu[b], z_log_sigma_sq[b]
         dist = tf.distributions.Normal(loc=mu, scale=sigma)
-        log_probs.append(dist.log_prob(z))
+        log_probs.append(tf.reduce_sum(dist.log_prob(z), 1))
     log_probs = tf.stack(log_probs, axis=0)
-    return log_probs 
+    print(int_shape(log_probs))
+    lse = log_sum_exp(log_probs, axis=0)
+    print(int_shape(lse))
+    return tf.reduce_mean(lse)
 
 
 def visualize_samples(images, name="results/test.png", layout=[5,5], vrange=[-1, 1]):
