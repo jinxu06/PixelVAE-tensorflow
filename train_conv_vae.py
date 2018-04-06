@@ -195,8 +195,8 @@ with tf.Session(config=config) as sess:
         test_loss, test_loss_ae, test_loss_reg = np.mean(loss_arr), np.mean(loss_ae_arr), np.mean(loss_reg_arr)
 
         print("epoch {0} --------------------- Time {1:.2f}s".format(epoch, time.time()-tt))
-        print("train loss:{0:.3f}, train ae loss:{1:.3f}, train reg loss:{2:.6f}".format(train_loss, train_loss_ae, train_loss_reg))
-        print("test loss:{0:.3f}, test ae loss:{1:.3f}, test reg loss:{2:.6f}".format(test_loss, test_loss_ae, test_loss_reg))
+        print("train loss:{0:.3f}, train ae loss:{1:.3f}, train reg loss:{2:.3f}".format(train_loss, train_loss_ae, train_loss_reg))
+        print("test loss:{0:.3f}, test ae loss:{1:.3f}, test reg loss:{2:.3f}".format(test_loss, test_loss_ae, test_loss_reg))
         sys.stdout.flush()
 
         if epoch % args.save_interval == 0:
