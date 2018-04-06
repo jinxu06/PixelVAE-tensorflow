@@ -47,7 +47,7 @@ class ConvPixelVAE(object):
 
     def __loss(self, reg):
         print("******   Compute Loss   ******")
-        self.loss_ae = mix_logistic_loss(x, self.mix_logistic_params)
+        self.loss_ae = mix_logistic_loss(self.x, self.mix_logistic_params)
         if reg is None:
             self.loss_reg = 0
         elif reg=='kld':
