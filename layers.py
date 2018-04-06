@@ -73,7 +73,7 @@ def compute_mmd(x, y, sigma_sqr=1.0):
     mmd = tf.reduce_mean(x_kernel) + tf.reduce_mean(y_kernel) - 2 * tf.reduce_mean(xy_kernel)
     return mmd
 
-def compute_entropy(z, z_mu, z_log_sigma_sq):
+def compute_tc(z, z_mu, z_log_sigma_sq):
     z_sigma = tf.sqrt(tf.exp(z_log_sigma_sq))
     log_probs = []
     batch_size, z_dim = int_shape(z_mu)
@@ -84,17 +84,9 @@ def compute_entropy(z, z_mu, z_log_sigma_sq):
 
     dist = tf.distributions.Normal(loc=0., scale=1.)
     log_probs = dist.log_prob(z_norm)
-    print(int_shape(log_probs))
-    quit()
-
-
-    for b in range(batch_size):
-        mu, sigma = z_mu[b], z_log_sigma_sq[b]
-        dist = tf.distributions.Normal(loc=mu, scale=sigma)
-        log_probs.append(tf.reduce_sum(dist.log_prob(z), 1))
-    log_probs = tf.stack(log_probs, axis=0)
-    lse = log_sum_exp(log_probs, axis=0)
-    return -tf.reduce_mean(lse)
+    lse_sum = log_sum_exp(tf.reduce_sum(log_probs, axis=-1), axis=1)
+    sum_lse = tf.reduce_sum(log_sum_exp(log_probs, axis=1), axis=-1)
+    return lse_sum - sum_lse
 
 
 def visualize_samples(images, name="results/test.png", layout=[5,5], vrange=[-1, 1]):
