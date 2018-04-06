@@ -319,8 +319,9 @@ def gated_resnet(x, a=None, gh=None, sh=None, nonlinearity=concat_elu, conv=conv
     if a is not None: # add short-cut connection if auxiliary input 'a' is given
         c1 += nin(nonlinearity(a), num_filters)
     c1 = nonlinearity(c1)
-    if dropout_p > 0:
-        c1 = tf.nn.dropout(c1, keep_prob=1. - dropout_p)
+    #if dropout_p > 0:
+    #    c1 = tf.nn.dropout(c1, keep_prob=1. - dropout_p)
+    c1 = tf.nn.dropout(c1, keep_prob=1. - dropout_p)
     c2 = conv(c1, num_filters * 2, init_scale=0.1)
 
     # add projection of h vector if included: conditional generation
