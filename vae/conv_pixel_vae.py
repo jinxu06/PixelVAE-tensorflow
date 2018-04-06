@@ -41,7 +41,7 @@ class ConvPixelVAE(object):
                 self.z = tf.placeholder(tf.float32, shape=int_shape(self.z_mu))
             print("use mode:{0}".format(self.use_mode))
             self.decoded_features = deconv_block(self.z)
-            self.mix_logistic_params = cond_pixel_cnn(self.x, self.decoded_features)
+            self.mix_logistic_params = cond_pixel_cnn(self.x, sh=self.decoded_features)
             self.x_hat = mix_logistic_sampler(self.mix_logistic_params, sample_range=100.)
 
 
