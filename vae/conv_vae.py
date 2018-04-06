@@ -32,7 +32,7 @@ class ConvVAE(object):
         decoder = conv_decoder_64_block
         with arg_scope([encoder, decoder], nonlinearity=self.nonlinearity, bn=True, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
             self.z_mu, self.z_log_sigma_sq = encoder(x, self.z_dim)
-            sigma = tf.sqrt(tf.exp(self.z_log_sigma_sq))
+            sigma = tf.exp(self.z_log_sigma_sq / 2.)
             if self.use_mode=='train':
                 self.z = z_sampler(self.z_mu, sigma)
             elif self.use_mode=='test':
@@ -78,8 +78,8 @@ def conv_encoder_64_block(inputs, z_dim, is_training, nonlinearity=None, bn=True
             outputs = conv2d_layer(outputs, 512, 4, 2, "SAME")
             outputs = conv2d_layer(outputs, 1024, 4, 1, "VALID")
             outputs = tf.reshape(outputs, [-1, 1024])
-            z_mu = dense_layer(outputs, z_dim, nonlinearity=None, bn=False)
-            z_log_sigma_sq = dense_layer(outputs, z_dim, nonlinearity=None, bn=False)
+            z_mu = dense_layer(outputs, z_dim, nonlinearity=None, bn=True)
+            z_log_sigma_sq = dense_layer(outputs, z_dim, nonlinearity=None, bn=True)
             return z_mu, z_log_sigma_sq
 
 
@@ -96,7 +96,7 @@ def conv_decoder_64_block(inputs, is_training, nonlinearity=None, bn=True, kerne
             outputs = deconv2d_layer(outputs, 128, 4, 2, "SAME")
             outputs = deconv2d_layer(outputs, 64, 4, 2, "SAME")
             outputs = deconv2d_layer(outputs, 32, 4, 2, "SAME")
-            outputs = deconv2d_layer(outputs, 3, 1, 1, "SAME", nonlinearity=tf.sigmoid, bn=False)
+            outputs = deconv2d_layer(outputs, 3, 1, 1, "SAME", nonlinearity=tf.sigmoid, bn=True)
             outputs = 2. * outputs - 1.
             return outputs
 
