@@ -132,7 +132,7 @@ def generate_samples(sess, data):
     z = np.random.normal(loc=z_mu, scale=z_sigma)
     z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
     z = np.split(z, args.nr_gpu)
-    feed_dict.update({vaes[i].z:z for i in range(args.nr_gpu)})
+    feed_dict.update({vaes[i].z:z[i] for i in range(args.nr_gpu)})
     x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
     return np.concatenate(x_hats, axis=0)
 
@@ -148,7 +148,7 @@ def latent_traversal(sess, data):
     z = np.random.normal(loc=z_mu, scale=z_sigma)
     z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
     z = np.split(z, args.nr_gpu)
-    feed_dict.update({vaes[i].z:z for i in range(args.nr_gpu)})
+    feed_dict.update({vaes[i].z:z[i] for i in range(args.nr_gpu)})
     x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
     return np.concatenate(x_hats, axis=0)
 
