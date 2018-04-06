@@ -10,7 +10,7 @@ x = tf.placeholder(tf.float32, shape=(8, 64, 64, 3))
 
 
 x = tf.placeholder(tf.float32, shape=(8, 64, 64, 3))
-is_trainings = tf.placeholder(tf.bool, shape=())
+is_training = tf.placeholder(tf.bool, shape=())
 
 pvae = ConvPixelVAE(counters={})
 model_opt = {
