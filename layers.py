@@ -76,7 +76,13 @@ def compute_mmd(x, y, sigma_sqr=1.0):
 def compute_entropy(z, z_mu, z_log_sigma_sq):
     z_sigma = tf.sqrt(tf.exp(z_log_sigma_sq))
     log_probs = []
-    batch_size, z_dim = int_shape(z_mu)
+    # batch_size, z_dim = int_shape(z_mu)
+    dist = tf.distributions.Normal(loc=z_mu, scale=z_sigma)
+    log_probs = dist.log_prob(z)
+    print(int_shape(log_probs))
+    quit()
+
+
     for b in range(batch_size):
         mu, sigma = z_mu[b], z_log_sigma_sq[b]
         dist = tf.distributions.Normal(loc=mu, scale=sigma)
