@@ -13,7 +13,7 @@ def cond_pixel_cnn(x, gh=None, sh=None, nonlinearity=tf.nn.elu, dropout_p=0.5, n
     print("construct", name, "...")
     with tf.variable_scope(name):
         with arg_scope([nn.conv2d, nn.conv2d_1x1, nn.deconv2d, nn.gated_resnet, nn.dense], counters=counters, dropout_p=dropout_p):
-            with arg_scope([nn.gated_resnet], nonlinearity=resnet_nonlinearity, gh=gh, sh=sh):
+            with arg_scope([nn.gated_resnet], nonlinearity=nonlinearity, gh=gh, sh=sh):
 
                 xs = nn.int_shape(x)
                 x_pad = tf.concat([x,tf.ones(xs[:-1]+[1])],3) # add channel of ones to distinguish image from padding later on
