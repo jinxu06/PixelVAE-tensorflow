@@ -89,10 +89,11 @@ def compute_tc(z, z_mu, z_log_sigma_sq):
     return lse_sum - sum_lse
 
 
-def visualize_samples(images, name="results/test.png", layout=[5,5], vrange=[-1, 1]):
+def visualize_samples(images, name="results/test.png", layout=[5,5], vrange=[-1., 1.]):
     images = (images + vrange[0]) / (vrange[1]-vrange[0]) * 255.
     images = np.rint(images).astype(np.uint8)
-    view = Image.fromarray(uf.tile_images(images, size=layout), 'RGB')
+    view = uf.tile_images(images, size=layout)
     if name is None:
         return view
+    view = Image.fromarray(view, 'RGB')
     view.save(name)

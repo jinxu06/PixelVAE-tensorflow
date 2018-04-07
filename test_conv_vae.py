@@ -63,7 +63,7 @@ cfg_60 = {
     "use_mode": "test",
 }
 
-cfg = cfg_15
+cfg = cfg_30
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -216,9 +216,11 @@ with tf.Session(config=config) as sess:
         view = visualize_samples(sample_x, None, layout=(32, 10))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
+    print(img)
     from PIL import Image
+    img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("results/conv_vae_samples_id_beta15.png")
+    img.save("results/conv_vae_samples_id_beta30.png")
 
 
     # data = next(test_data)
