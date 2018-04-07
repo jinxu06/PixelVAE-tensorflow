@@ -149,8 +149,16 @@ def generate_samples(sess, data):
     #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
-    x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
-    return np.concatenate(x_hats, axis=0)
+
+
+    x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
+    for yi in range(args.img_size):
+        for xi in range(args.img_size):
+            feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
+            x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+            for i in range(args.nr_gpu):
+                x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
+    return np.concatenate(x_gen, axis=0)
 
 
 def latent_traversal(sess, data, use_image_id=0):
@@ -191,5 +199,5 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
     data = next(test_data)
-    sample_x = sample_from_model(sess, data)
+    sample_x = generate_samples(sess, data)
     visualize_samples(sample_x, "results/conv_pixel_vae_test.png", layout=(8,8))
