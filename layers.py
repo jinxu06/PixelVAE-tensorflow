@@ -45,23 +45,23 @@ def right_shift(x):
     return tf.concat([tf.zeros([xs[0],xs[1],1,xs[3]]), x[:,:,:xs[2]-1,:]],2)
 
 @add_arg_scope
-def down_shifted_conv2d(x, num_filters, filter_size=[2,3], stride=[1,1], **kwargs):
+def down_shifted_conv2d(x, num_filters, filter_size=[2,3], strides=[1,1], **kwargs):
     x = tf.pad(x, [[0,0],[filter_size[0]-1,0], [int((filter_size[1]-1)/2),int((filter_size[1]-1)/2)],[0,0]])
     return conv2d_layer(x, num_filters, kernel_size=filter_size, strides=strides, padding='VALID', **kwargs)
 
 @add_arg_scope
-def down_shifted_deconv2d(x, num_filters, filter_size=[2,3], stride=[1,1], **kwargs):
+def down_shifted_deconv2d(x, num_filters, filter_size=[2,3], strides=[1,1], **kwargs):
     x = deconv2d_layer(x, num_filters, kernel_size=filter_size, strides=strides, padding='VALID', **kwargs)
     xs = int_shape(x)
     return x[:,:(xs[1]-filter_size[0]+1),int((filter_size[1]-1)/2):(xs[2]-int((filter_size[1]-1)/2)),:]
 
 @add_arg_scope
-def down_right_shifted_conv2d(x, num_filters, filter_size=[2,2], stride=[1,1], **kwargs):
+def down_right_shifted_conv2d(x, num_filters, filter_size=[2,2], strides=[1,1], **kwargs):
     x = tf.pad(x, [[0,0],[filter_size[0]-1, 0], [filter_size[1]-1, 0],[0,0]])
     return conv2d_layer(x, num_filters, kernel_size=filter_size, strides=strides, padding='VALID', **kwargs)
 
 @add_arg_scope
-def down_right_shifted_deconv2d(x, num_filters, filter_size=[2,2], stride=[1,1], **kwargs):
+def down_right_shifted_deconv2d(x, num_filters, filter_size=[2,2], strides=[1,1], **kwargs):
     x = deconv2d_layer(x, num_filters, kernel_size=filter_size, strides=strides, padding='VALID', **kwargs)
     xs = int_shape(x)
     return x[:,:(xs[1]-filter_size[0]+1):,:(xs[2]-filter_size[1]+1),:]
