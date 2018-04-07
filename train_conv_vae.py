@@ -62,7 +62,7 @@ cfg_60 = {
     "use_mode": "train",
 }
 
-cfg = cfg_15
+cfg = cfg_30
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
