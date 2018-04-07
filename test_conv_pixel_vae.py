@@ -91,7 +91,7 @@ model = tf.make_template('PVAE', ConvPixelVAE.build_graph)
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        model(pvaes[i], xs[i],  is_trainings[i], dropout_ps[i], **model_opt)
+        model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], **model_opt)
 
 if args.use_mode == 'train':
     all_params = tf.trainable_variables()
