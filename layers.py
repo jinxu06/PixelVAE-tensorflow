@@ -84,7 +84,7 @@ def gated_resnet(x, a=None, gh=None, sh=None, nonlinearity=tf.nn.elu, conv=conv2
     if a is not None: # add short-cut connection if auxiliary input 'a' is given
         c1 += nin(nonlinearity(a), num_filters)
     c1 = nonlinearity(c1)
-    c2 = conv(c1, num_filters * 2, init_scale=0.1)
+    c2 = conv(c1, num_filters * 2)
     # add projection of h vector if included: conditional generation
     if sh is not None:
         c2 += nin(sh, 2*num_filters, nonlinearity=nonlinearity)
