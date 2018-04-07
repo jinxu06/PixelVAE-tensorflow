@@ -8,6 +8,7 @@ import numpy as np
 import tensorflow as tf
 from utils import plotting
 from vae.conv_pixel_vae import ConvPixelVAE
+from layers import visualize_samples
 
 parser = argparse.ArgumentParser()
 
