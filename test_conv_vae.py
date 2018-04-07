@@ -12,40 +12,58 @@ from layers import visualize_samples
 
 parser = argparse.ArgumentParser()
 
-cfg = {
+cfg_15 = {
     "img_size": 64,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/convvae-celeba64",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta15",
     "data_set": "celeba64",
-    "batch_size": 80,
-    "nr_gpu": 4,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0001,
-    "beta": 5.0,
-    "lam": 0.5,
-    "save_interval": 10,
-    #"reg": "kld",
-    "reg": "tc",
-    "use_mode": "test",
-}
-
-cfg = {
-    "img_size": 64,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc",
-    "data_set": "celeba64",
-    "batch_size": 80,
-    "nr_gpu": 4,
+    "batch_size": 512,
+    "nr_gpu": 2,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.001,
     "beta": 15.0,
-    "lam": 0.5,
+    "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
-    "use_mode": "test",
+    "use_mode": "train",
 }
+
+cfg_30 = {
+    "img_size": 64,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta30",
+    "data_set": "celeba64",
+    "batch_size": 512,
+    "nr_gpu": 2,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.001,
+    "beta": 30.0,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "tc",
+    "use_mode": "train",
+}
+
+cfg_60 = {
+    "img_size": 64,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta60",
+    "data_set": "celeba64",
+    "batch_size": 512,
+    "nr_gpu": 2,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.001,
+    "beta": 60.0,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "tc",
+    "use_mode": "train",
+}
+
+cfg = cfg_15
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
