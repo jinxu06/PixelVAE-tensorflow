@@ -194,9 +194,10 @@ with tf.Session(config=config) as sess:
     img = []
     for i in range(3):
         sample_x = latent_traversal(sess, data, use_image_id=i)
-        img.append(np.array(visualize_samples(sample_x, None, layout=(32, 10))))
-    img = np.concatenate(img, axis=2)
-    from PIL import Image 
+        view = np.array(visualize_samples(sample_x, None, layout=(32, 10)))
+        img.append(view)
+    img = np.concatenate(view, axis=2)
+    from PIL import Image
     img = Image.fromarray(img, 'RGB')
     img.save("results/conv_vae_samples_id.png")
 
