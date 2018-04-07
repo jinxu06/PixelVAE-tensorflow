@@ -11,22 +11,41 @@ from vae.conv_vae import ConvVAE
 
 parser = argparse.ArgumentParser()
 
-cfg = {
+cfg_15 = {
     "img_size": 64,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta15",
     "data_set": "celeba64",
     "batch_size": 1024,
-    "nr_gpu": 1,
+    "nr_gpu": 2,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.001,
     "beta": 15.0,
-    "lam": 0.5,
+    "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
     "use_mode": "train",
 }
+
+cfg_60 = {
+    "img_size": 64,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta60",
+    "data_set": "celeba64",
+    "batch_size": 1024,
+    "nr_gpu": 2,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.001,
+    "beta": 60.0,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "tc",
+    "use_mode": "train",
+}
+
+cfg = cfg_15 
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -175,7 +194,7 @@ with tf.Session(config=config) as sess:
         print('restoring parameters from', ckpt_file)
         saver.restore(sess, ckpt_file)
 
-    max_num_epoch = 100
+    max_num_epoch = 200
     for epoch in range(max_num_epoch+1):
         tt = time.time()
         loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
