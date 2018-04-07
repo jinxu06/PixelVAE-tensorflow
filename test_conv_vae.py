@@ -151,8 +151,6 @@ def generate_samples(sess, data):
     # z = np.random.normal(loc=z_mu, scale=z_sigma)
     z = np.random.normal(loc=np.zeros_like(z_mu), scale=np.ones_like(z_sigma))
 
-
-
     #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
     z = np.split(z, args.nr_gpu)
     feed_dict.update({vaes[i].z:z[i] for i in range(args.nr_gpu)})
@@ -161,6 +159,7 @@ def generate_samples(sess, data):
 
 
 def latent_traversal(sess, data, use_image_id=0):
+    data = data.copy()
     for i in range(data.shape[0]):
         data[i] = data[use_image_id].copy()
     data = np.cast[np.float32]((data - 127.5) / 127.5)
@@ -192,24 +191,24 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    # saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
-    # data = test_data.next(32*10)
-    # test_data.reset()
-    # img = []
-    # for i in range(3):
-    #     sample_x = latent_traversal(sess, data, use_image_id=i)
-    #     view = visualize_samples(sample_x, None, layout=(32, 10))
-    #     img.append(view.copy())
-    # img = np.concatenate(img, axis=1)
-    # from PIL import Image
-    # img = Image.fromarray(img, 'RGB')
-    # img.save("results/conv_vae_samples_id.png")
-
-
-    data = next(test_data)
-    sample_x = generate_samples(sess, data)
+    saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
+    data = test_data.next(32*10)
     test_data.reset()
+    img = []
+    for i in range(3):
+        sample_x = latent_traversal(sess, data, use_image_id=i)
+        view = visualize_samples(sample_x, None, layout=(32, 10))
+        img.append(view.copy())
+    img = np.concatenate(img, axis=1)
+    from PIL import Image
+    img = Image.fromarray(img, 'RGB')
+    img.save("results/conv_vae_samples_id.png")
 
-    visualize_samples(sample_x, "results/conv_vae_test.png", layout=(10, 10))
+
+    # data = next(test_data)
+    # sample_x = generate_samples(sess, data)
+    # test_data.reset()
+    #
+    # visualize_samples(sample_x, "results/conv_vae_test.png", layout=(10, 10))
 
     # visualize_samples(sample_x, "results/conv_vae_samples_id_{0}.png".format(i), layout=(32, 10))
