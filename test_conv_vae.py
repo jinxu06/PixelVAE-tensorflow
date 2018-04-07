@@ -12,7 +12,7 @@ from layers import visualize_samples
 
 parser = argparse.ArgumentParser()
 
-cfg_15 = {
+cfg = {
     "img_size": 64,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
@@ -28,42 +28,6 @@ cfg_15 = {
     "reg": "tc",
     "use_mode": "test",
 }
-
-cfg_30 = {
-    "img_size": 64,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta30",
-    "data_set": "celeba64",
-    "batch_size": 80,
-    "nr_gpu": 2,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.001,
-    "beta": 30.0,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc",
-    "use_mode": "test",
-}
-
-cfg_60 = {
-    "img_size": 64,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta60",
-    "data_set": "celeba64",
-    "batch_size": 80,
-    "nr_gpu": 2,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.001,
-    "beta": 60.0,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc",
-    "use_mode": "test",
-}
-
-cfg = cfg_60
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -219,13 +183,11 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("results/conv_vae_samples_id_beta60.png")
-
+    img.save("results/conv_vae_samples_id_beta15.png")
 
     # data = next(test_data)
     # sample_x = generate_samples(sess, data)
     # test_data.reset()
     #
     # visualize_samples(sample_x, "results/conv_vae_test.png", layout=(10, 10))
-
     # visualize_samples(sample_x, "results/conv_vae_samples_id_{0}.png".format(i), layout=(32, 10))
