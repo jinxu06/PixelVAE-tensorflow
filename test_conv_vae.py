@@ -190,8 +190,14 @@ with tf.Session(config=config) as sess:
 
     saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
     data = test_data.next(32*10)
-    sample_x = latent_traversal(sess, data, use_image_id=0)
-    #sample_x = generate_samples(sess, data)
     test_data.reset()
+    img = []
+    for i in range(3):
+        sample_x = latent_traversal(sess, data, use_image_id=i)
+        img.append(np.array(visualize_samples(sample_x, None, layout=(32, 10))))
+    img = np.concatenate(img, axis=2)
+    img = Image.fromarray(img, 'RGB')
+    img.save("results/conv_vae_samples_id.png")
 
-    visualize_samples(sample_x, "results/conv_vae_samples_id_0.png", layout=(32, 10))
+
+    # visualize_samples(sample_x, "results/conv_vae_samples_id_{0}.png".format(i), layout=(32, 10))
