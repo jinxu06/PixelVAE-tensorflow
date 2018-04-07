@@ -201,8 +201,4 @@ with tf.Session(config=config) as sess:
 
     data = next(test_data)
     sample_x = generate_samples(sess, data)
-    # visualize_samples(sample_x, "results/conv_pixel_vae_test.png", layout=(8,8))
-
-    img_tile = plotting.img_tile(sample_x[:64], aspect_ratio=1.0, border_color=1.0, stretch=True)
-    img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
-    plotting.plt.savefig(os.path.join("results",'conv_pixel_vae_test.png'))
+    visualize_samples(sample_x, "results/conv_pixel_vae_test.png", layout=(8,8))
