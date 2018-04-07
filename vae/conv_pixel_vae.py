@@ -13,7 +13,7 @@ class ConvPixelVAE(object):
     def __init__(self, counters={}):
         self.counters = counters
 
-    def build_graph(self, x, is_training, dropout_p, z_dim, use_mode="test", reg='mmd', beta=1., lam=0., nonlinearity=tf.nn.elu, bn=True, kernel_initializer=None, kernel_regularizer=None, nr_resnet=1, nr_filters=100, nr_logistic_mix=10):
+    def build_graph(self, x, x_bar, is_training, dropout_p, z_dim, use_mode="test", reg='mmd', beta=1., lam=0., nonlinearity=tf.nn.elu, bn=True, kernel_initializer=None, kernel_regularizer=None, nr_resnet=1, nr_filters=100, nr_logistic_mix=10):
         self.z_dim = z_dim
         self.use_mode = use_mode
         self.nonlinearity = nonlinearity
@@ -26,7 +26,7 @@ class ConvPixelVAE(object):
         self.nr_resnet = nr_resnet
         self.nr_filters = nr_filters
         self.nr_logistic_mix = nr_logistic_mix
-        self.__model(x, is_training, dropout_p)
+        self.__model(x, x_bar, is_training, dropout_p)
         self.__loss(self.reg)
 
 
