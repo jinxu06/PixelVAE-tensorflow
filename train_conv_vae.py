@@ -17,7 +17,7 @@ cfg_15 = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta15",
     "data_set": "celeba64",
-    "batch_size": 1024,
+    "batch_size": 512,
     "nr_gpu": 2,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.001,
@@ -34,7 +34,7 @@ cfg_30 = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta30",
     "data_set": "celeba64",
-    "batch_size": 1024,
+    "batch_size": 512,
     "nr_gpu": 2,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.001,
@@ -51,7 +51,7 @@ cfg_60 = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta60",
     "data_set": "celeba64",
-    "batch_size": 1024,
+    "batch_size": 512,
     "nr_gpu": 2,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.001,
@@ -62,7 +62,7 @@ cfg_60 = {
     "use_mode": "train",
 }
 
-cfg = cfg_30
+cfg = cfg_60
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
