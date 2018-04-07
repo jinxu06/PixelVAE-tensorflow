@@ -75,7 +75,7 @@ def nin(x, num_units, **kwargs):
     return tf.reshape(x, s[:-1]+[num_units])
 
 @add_arg_scope
-def gated_resnet(x, a=None, gh=None, sh=None, nonlinearity=concat_elu, conv=conv2d, dropout_p=0., counters={}):
+def gated_resnet(x, a=None, gh=None, sh=None, nonlinearity=tf.nn.elu, conv=conv2d, dropout_p=0., counters={}):
     name = nn.get_name("gated_resnet", counters)
     print("construct", name, "...")
     xs = int_shape(x)
