@@ -148,9 +148,12 @@ def generate_samples(sess, data):
     z_mu = np.concatenate(sess.run([vaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
-    z = np.random.normal(loc=z_mu, scale=z_sigma)
-    print(z_sigma)
-    z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
+    # z = np.random.normal(loc=z_mu, scale=z_sigma)
+    z = np.random.normal(loc=np.zeros_like(z_mu), scale=np.ones_like(z_sigma))
+
+
+
+    #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
     z = np.split(z, args.nr_gpu)
     feed_dict.update({vaes[i].z:z[i] for i in range(args.nr_gpu)})
     x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
