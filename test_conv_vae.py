@@ -26,7 +26,7 @@ cfg_15 = {
     "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
-    "use_mode": "train",
+    "use_mode": "test",
 }
 
 cfg_30 = {
@@ -43,7 +43,7 @@ cfg_30 = {
     "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
-    "use_mode": "train",
+    "use_mode": "test",
 }
 
 cfg_60 = {
@@ -60,7 +60,7 @@ cfg_60 = {
     "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
-    "use_mode": "train",
+    "use_mode": "test",
 }
 
 cfg = cfg_15
