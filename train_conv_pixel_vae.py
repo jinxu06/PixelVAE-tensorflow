@@ -84,9 +84,9 @@ model_opt = {
     "bn": True,
     "kernel_initializer": tf.contrib.layers.xavier_initializer(),
     "kernel_regularizer": None,
-    "nr_resnet": 1,
+    "nr_resnet": 3,
     "nr_filters": 100,
-    "nr_logistic_mix": 5,
+    "nr_logistic_mix": 10,
 }
 model = tf.make_template('PVAE', ConvPixelVAE.build_graph)
 
