@@ -68,6 +68,7 @@ test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shu
 
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
+x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 dropout_ps = [tf.placeholder(tf.float32, shape=()) for i in range(args.nr_gpu)]
 
@@ -116,6 +117,7 @@ def make_feed_dict(data, is_training=True, dropout_p=0.5):
     feed_dict = {is_trainings[i]: is_training for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: dropout_p for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
+    feed_dict.update({ x_bars[i]:ds[i] for i in range(args.nr_gpu) })
     return feed_dict
 
 def sample_from_model(sess, data):
@@ -124,8 +126,15 @@ def sample_from_model(sess, data):
     feed_dict = {is_trainings[i]: False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
-    x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
-    return np.concatenate(x_hats, axis=0)
+
+    x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
+    for yi in range(args.img_size):
+        for xi in range(args.img_size):
+            feed_dict.update({x_bars[i]:x_gen for i in range(args.nr_gpu)})
+            x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+            for i in range(args.nr_gpu):
+                x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
+    return np.concatenate(x_gen, axis=0)
 
 def generate_samples(sess, data):
     data = np.cast[np.float32]((data - 127.5) / 127.5)

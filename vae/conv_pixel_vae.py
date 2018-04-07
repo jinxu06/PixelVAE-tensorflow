@@ -30,9 +30,10 @@ class ConvPixelVAE(object):
         self.__loss(self.reg)
 
 
-    def __model(self, x, is_training, dropout_p):
+    def __model(self, x, x_bar, is_training, dropout_p):
         print("******   Building Graph   ******")
         self.x = x
+        self.x_bar = x_bar
         self.is_training = is_training
         self.dropout_p = dropout_p
         conv_block = conv_encoder_64_block
@@ -46,7 +47,7 @@ class ConvPixelVAE(object):
                 self.z = tf.placeholder(tf.float32, shape=int_shape(self.z_mu))
             print("use mode:{0}".format(self.use_mode))
             self.decoded_features = deconv_block(self.z)
-            self.mix_logistic_params = cond_pixel_cnn(self.x, sh=self.decoded_features, nonlinearity=self.nonlinearity, dropout_p=self.dropout_p, nr_resnet=self.nr_resnet, nr_filters=self.nr_filters, nr_logistic_mix=self.nr_logistic_mix, counters=self.counters)
+            self.mix_logistic_params = cond_pixel_cnn(self.x_bar, sh=self.decoded_features, nonlinearity=self.nonlinearity, dropout_p=self.dropout_p, nr_resnet=self.nr_resnet, nr_filters=self.nr_filters, nr_logistic_mix=self.nr_logistic_mix, counters=self.counters)
             self.x_hat = mix_logistic_sampler(self.mix_logistic_params, nr_logistic_mix=self.nr_logistic_mix, sample_range=1., counters=self.counters)
 
 

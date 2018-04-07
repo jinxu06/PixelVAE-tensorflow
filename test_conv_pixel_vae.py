@@ -8,7 +8,6 @@ import numpy as np
 import tensorflow as tf
 from utils import plotting
 from vae.conv_pixel_vae import ConvPixelVAE
-from layers import visualize_samples
 
 parser = argparse.ArgumentParser()
 
@@ -26,7 +25,7 @@ cfg = {
     "lam": 0.5,
     "save_interval": 10,
     "reg": "kld",
-    "use_mode": "test",
+    "use_mode": "train",
 }
 
 
@@ -69,6 +68,7 @@ test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shu
 
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
+x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 dropout_ps = [tf.placeholder(tf.float32, shape=()) for i in range(args.nr_gpu)]
 
@@ -117,6 +117,7 @@ def make_feed_dict(data, is_training=True, dropout_p=0.5):
     feed_dict = {is_trainings[i]: is_training for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: dropout_p for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
+    feed_dict.update({ x_bars[i]:ds[i] for i in range(args.nr_gpu) })
     return feed_dict
 
 def sample_from_model(sess, data):
@@ -125,8 +126,16 @@ def sample_from_model(sess, data):
     feed_dict = {is_trainings[i]: False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
-    x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
-    return np.concatenate(x_hats, axis=0)
+
+    x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
+    for yi in range(args.img_size):
+        for xi in range(args.img_size):
+            print(yi, xi)
+            feed_dict.update({x_bars[i]:x_gen for i in range(args.nr_gpu)})
+            x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+            for i in range(args.nr_gpu):
+                x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
+    return np.concatenate(x_gen, axis=0)
 
 def generate_samples(sess, data):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
@@ -137,8 +146,8 @@ def generate_samples(sess, data):
     z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
-    #z = np.random.normal(loc=z_mu, scale=z_sigma)
-    z = np.random.normal(loc=np.zeros_like(z_mu), scale=np.ones_like(z_sigma))
+    z = np.random.normal(loc=z_mu, scale=z_sigma)
+    #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
     x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
@@ -168,6 +177,9 @@ def latent_traversal(sess, data, use_image_id=0):
 
 
 
+
+
+
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
 
@@ -180,5 +192,5 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
     data = next(test_data)
-    sample_x = generate_samples(sess, data)
+    sample_x = sample_from_model(sess, data)
     visualize_samples(sample_x, "results/conv_pixel_vae_test.png", layout=(8,8))
