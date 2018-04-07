@@ -188,18 +188,24 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
-    data = test_data.next(32*10)
-    test_data.reset()
-    img = []
-    for i in range(3):
-        sample_x = latent_traversal(sess, data, use_image_id=i)
-        view = visualize_samples(sample_x, None, layout=(32, 10))
-        img.append(view.copy())
-    img = np.concatenate(img, axis=1)
-    from PIL import Image
-    img = Image.fromarray(img, 'RGB')
-    img.save("results/conv_vae_samples_id.png")
+    # saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
+    # data = test_data.next(32*10)
+    # test_data.reset()
+    # img = []
+    # for i in range(3):
+    #     sample_x = latent_traversal(sess, data, use_image_id=i)
+    #     view = visualize_samples(sample_x, None, layout=(32, 10))
+    #     img.append(view.copy())
+    # img = np.concatenate(img, axis=1)
+    # from PIL import Image
+    # img = Image.fromarray(img, 'RGB')
+    # img.save("results/conv_vae_samples_id.png")
 
+
+    data = next(test_data)
+    sample_x = generate_samples(sess, data)
+    test_data.reset()
+
+    visualize_samples(sample_x, "results/conv_vae_test.png", layout=(10, 10))
 
     # visualize_samples(sample_x, "results/conv_vae_samples_id_{0}.png".format(i), layout=(32, 10))
