@@ -15,13 +15,13 @@ cfg = {
     "img_size": 64,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta15",
     "data_set": "celeba64",
     "batch_size": 1024,
     "nr_gpu": 1,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.001,
-    "beta": 30.0,
+    "beta": 15.0,
     "lam": 0.5,
     "save_interval": 10,
     "reg": "tc",
@@ -121,6 +121,7 @@ def sample_from_model(sess, data):
     x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
     return np.concatenate(x_hats, axis=0)
 
+
 def generate_samples(sess, data):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
@@ -138,6 +139,7 @@ def generate_samples(sess, data):
 
 
 def latent_traversal(sess, data, use_image_id=0):
+    data = data.copy()
     for i in range(data.shape[0]):
         data[i] = data[use_image_id].copy()
     data = np.cast[np.float32]((data - 127.5) / 127.5)
@@ -173,8 +175,8 @@ with tf.Session(config=config) as sess:
         print('restoring parameters from', ckpt_file)
         saver.restore(sess, ckpt_file)
 
-    max_num_epoch = 200
-    for epoch in range(max_num_epoch):
+    max_num_epoch = 100
+    for epoch in range(max_num_epoch+1):
         tt = time.time()
         loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
         for data in train_data:

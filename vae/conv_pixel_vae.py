@@ -86,8 +86,8 @@ def conv_encoder_64_block(inputs, z_dim, is_training, nonlinearity=None, bn=True
             outputs = conv2d_layer(outputs, 512, 4, 2, "SAME")
             outputs = conv2d_layer(outputs, 1024, 4, 1, "VALID")
             outputs = tf.reshape(outputs, [-1, 1024])
-            z_mu = dense_layer(outputs, z_dim, nonlinearity=None, bn=True)
-            z_log_sigma_sq = dense_layer(outputs, z_dim, nonlinearity=None, bn=True)
+            z_mu = dense_layer(outputs, z_dim, nonlinearity=None, bn=False)
+            z_log_sigma_sq = dense_layer(outputs, z_dim, nonlinearity=None, bn=False)
             return z_mu, z_log_sigma_sq
 
 
@@ -104,7 +104,7 @@ def conv_decoder_64_block(inputs, is_training, nonlinearity=None, bn=True, kerne
             outputs = deconv2d_layer(outputs, 128, 4, 2, "SAME")
             outputs = deconv2d_layer(outputs, 64, 4, 2, "SAME")
             outputs = deconv2d_layer(outputs, 32, 4, 2, "SAME")
-            outputs = deconv2d_layer(outputs, 3, 1, 1, "SAME", nonlinearity=tf.sigmoid, bn=True)
+            outputs = deconv2d_layer(outputs, 3, 1, 1, "SAME", nonlinearity=tf.sigmoid, bn=False)
             outputs = 2. * outputs - 1.
             return outputs
 
