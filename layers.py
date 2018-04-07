@@ -76,7 +76,7 @@ def nin(x, num_units, **kwargs):
 
 @add_arg_scope
 def gated_resnet(x, a=None, gh=None, sh=None, nonlinearity=tf.nn.elu, conv=conv2d_layer, dropout_p=0., counters={}):
-    name = nn.get_name("gated_resnet", counters)
+    name = get_name("gated_resnet", counters)
     print("construct", name, "...")
     xs = int_shape(x)
     num_filters = xs[-1]
