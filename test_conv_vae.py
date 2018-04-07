@@ -196,7 +196,7 @@ with tf.Session(config=config) as sess:
     test_data.reset()
     img = []
     for i in range(3):
-        sample_x = latent_traversal(sess, data, use_image_id=i)
+        sample_x = latent_traversal(sess, data, use_image_id=17+i)
         view = visualize_samples(sample_x, None, layout=(32, 10))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
