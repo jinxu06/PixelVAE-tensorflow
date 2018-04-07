@@ -36,6 +36,63 @@ def dense_layer(inputs, num_outputs, nonlinearity=None, bn=True, kernel_initiali
     print("    + dense_layer", int_shape(inputs), int_shape(outputs))
     return outputs
 
+def down_shift(x):
+    xs = int_shape(x)
+    return tf.concat([tf.zeros([xs[0],1,xs[2],xs[3]]), x[:,:xs[1]-1,:,:]],1)
+
+def right_shift(x):
+    xs = int_shape(x)
+    return tf.concat([tf.zeros([xs[0],xs[1],1,xs[3]]), x[:,:,:xs[2]-1,:]],2)
+
+@add_arg_scope
+def down_shifted_conv2d(x, num_filters, filter_size=[2,3], stride=[1,1], **kwargs):
+    x = tf.pad(x, [[0,0],[filter_size[0]-1,0], [int((filter_size[1]-1)/2),int((filter_size[1]-1)/2)],[0,0]])
+    return conv2d_layer(x, num_filters, kernel_size=filter_size, strides=strides, padding='VALID', **kwargs)
+
+@add_arg_scope
+def down_shifted_deconv2d(x, num_filters, filter_size=[2,3], stride=[1,1], **kwargs):
+    x = deconv2d_layer(x, num_filters, kernel_size=filter_size, strides=strides, padding='VALID', **kwargs)
+    xs = int_shape(x)
+    return x[:,:(xs[1]-filter_size[0]+1),int((filter_size[1]-1)/2):(xs[2]-int((filter_size[1]-1)/2)),:]
+
+@add_arg_scope
+def down_right_shifted_conv2d(x, num_filters, filter_size=[2,2], stride=[1,1], **kwargs):
+    x = tf.pad(x, [[0,0],[filter_size[0]-1, 0], [filter_size[1]-1, 0],[0,0]])
+    return conv2d_layer(x, num_filters, kernel_size=filter_size, strides=strides, padding='VALID', **kwargs)
+
+@add_arg_scope
+def down_right_shifted_deconv2d(x, num_filters, filter_size=[2,2], stride=[1,1], **kwargs):
+    x = deconv2d_layer(x, num_filters, kernel_size=filter_size, strides=strides, padding='VALID', **kwargs)
+    xs = int_shape(x)
+    return x[:,:(xs[1]-filter_size[0]+1):,:(xs[2]-filter_size[1]+1),:]
+
+@add_arg_scope
+def nin(x, num_units, **kwargs):
+    """ a network in network layer (1x1 CONV) """
+    s = int_shape(x)
+    x = tf.reshape(x, [np.prod(s[:-1]),s[-1]])
+    x = dense_layer(x, num_units, **kwargs)
+    return tf.reshape(x, s[:-1]+[num_units])
+
+@add_arg_scope
+def gated_resnet(x, a=None, gh=None, sh=None, nonlinearity=concat_elu, conv=conv2d, dropout_p=0., counters={}):
+    name = nn.get_name("gated_resnet", counters)
+    print("construct", name, "...")
+    xs = int_shape(x)
+    num_filters = xs[-1]
+    c1 = conv(nonlinearity(x), num_filters)
+    if a is not None: # add short-cut connection if auxiliary input 'a' is given
+        c1 += nin(nonlinearity(a), num_filters)
+    c1 = nonlinearity(c1)
+    c2 = conv(c1, num_filters * 2, init_scale=0.1)
+    # add projection of h vector if included: conditional generation
+    if sh is not None:
+        c2 += nin(sh, 2*num_filters, nonlinearity=nonlinearity)
+    if gh is not None: # haven't finished this part
+        pass
+    a, b = tf.split(c2, 2, 3)
+    c3 = a * tf.nn.sigmoid(b)
+    return x + c3
 
 
 
