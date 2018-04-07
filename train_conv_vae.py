@@ -28,6 +28,23 @@ cfg_15 = {
     "use_mode": "train",
 }
 
+cfg_30 = {
+    "img_size": 64,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta30",
+    "data_set": "celeba64",
+    "batch_size": 1024,
+    "nr_gpu": 2,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.001,
+    "beta": 30.0,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "tc",
+    "use_mode": "train",
+}
+
 cfg_60 = {
     "img_size": 64,
     "z_dim": 32,
@@ -45,7 +62,7 @@ cfg_60 = {
     "use_mode": "train",
 }
 
-cfg = cfg_60
+cfg = cfg_30
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
