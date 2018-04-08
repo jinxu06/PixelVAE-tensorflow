@@ -155,6 +155,8 @@ def generate_samples(sess, data):
     for yi in range(args.img_size):
         for xi in range(args.img_size):
             print(yi, xi)
+            print(x_gen[0][0, yi, xi, :])
+            print(x_gen[0][0, yi, xi, :] * 127.5+127.5)
             feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
             x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
             for i in range(args.nr_gpu):
