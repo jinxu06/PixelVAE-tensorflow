@@ -84,9 +84,9 @@ model_opt = {
     "bn": True,
     "kernel_initializer": tf.contrib.layers.xavier_initializer(),
     "kernel_regularizer": None,
-    "nr_resnet": 1,
+    "nr_resnet": 3,
     "nr_filters": 100,
-    "nr_logistic_mix": 5,
+    "nr_logistic_mix": 10,
 }
 model = tf.make_template('PVAE', ConvPixelVAE.build_graph)
 
@@ -225,7 +225,7 @@ with tf.Session(config=config) as sess:
         print("test loss:{0:.3f}, test ae loss:{1:.3f}, test reg loss:{2:.3f}".format(test_loss, test_loss_ae, test_loss_reg))
         sys.stdout.flush()
 
-        if False: #epoch % args.save_interval == 0:
+        if epoch % args.save_interval == 0:
 
             saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
             data = next(test_data)
