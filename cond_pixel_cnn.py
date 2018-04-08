@@ -37,7 +37,7 @@ def cond_pixel_cnn(x, gh=None, sh=None, nonlinearity=tf.nn.elu, nr_resnet=5, nr_
 def mix_logistic_sampler(params, nr_logistic_mix=10, sample_range=3., counters={}):
     name = nn.get_name("logistic_mix_sampler", counters)
     print("construct", name, "...")
-    epsilon = 1. / ( tf.exp(sample_range)+1. )
+    epsilon = 1. / ( tf.exp(float(sample_range))+1. )
     x = nn.sample_from_discretized_mix_logistic(params, nr_logistic_mix, epsilon)
     return x
 
