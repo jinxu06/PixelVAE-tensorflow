@@ -6,7 +6,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
 import pixelcnn.nn_for_cond as nn
-from layers import down_shifted_conv2d, down_right_shifted_conv2d, down_shift, right_shift, gated_resnet, nin
+from layers import down_shifted_conv2d, down_right_shifted_conv2d, down_shifted_deconv2d, down_right_shifted_deconv2d, down_shift, right_shift, gated_resnet, nin
 
 @add_arg_scope
 def cond_pixel_cnn(x, gh=None, sh=None, nonlinearity=tf.nn.elu, nr_resnet=5, nr_filters=160, nr_logistic_mix=10, bn=True, kernel_initializer=None, kernel_regularizer=None, is_training=False, counters={}):
