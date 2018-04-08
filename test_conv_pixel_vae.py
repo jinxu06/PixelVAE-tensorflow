@@ -12,13 +12,11 @@ from layers import visualize_samples
 
 parser = argparse.ArgumentParser()
 
-
 cfg = {
     "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd",
-    #"save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc-dwkld",
     "data_set": "celeba32",
     "batch_size": 32,
     "nr_gpu": 4,
@@ -86,9 +84,9 @@ model_opt = {
     "bn": True,
     "kernel_initializer": tf.contrib.layers.xavier_initializer(),
     "kernel_regularizer": None,
-    "nr_resnet": 1,
+    "nr_resnet": 3,
     "nr_filters": 100,
-    "nr_logistic_mix": 5,
+    "nr_logistic_mix": 10,
 }
 model = tf.make_template('PVAE', ConvPixelVAE.build_graph)
 
@@ -184,7 +182,6 @@ def latent_traversal(sess, data, use_image_id=0):
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
     x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
     return np.concatenate(x_hats, axis=0)
-
 
 
 
