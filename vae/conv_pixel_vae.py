@@ -35,7 +35,7 @@ class ConvPixelVAE(object):
         self.x = x
         self.x_bar = x_bar
         self.is_training = is_training
-        # self.dropout_p = dropout_p
+        self.dropout_p = dropout_p
         if int_shape(x)[1]==64:
             conv_block = conv_encoder_64_block
             deconv_block = deconv_64_block
@@ -51,7 +51,7 @@ class ConvPixelVAE(object):
                 self.z = tf.placeholder(tf.float32, shape=int_shape(self.z_mu))
             print("use mode:{0}".format(self.use_mode))
             self.decoded_features = deconv_block(self.z)
-            self.mix_logistic_params = cond_pixel_cnn(self.x_bar, sh=self.decoded_features, nonlinearity=self.nonlinearity, nr_resnet=self.nr_resnet, nr_filters=self.nr_filters, nr_logistic_mix=self.nr_logistic_mix, bn=self.bn, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters)
+            self.mix_logistic_params = cond_pixel_cnn(self.x_bar, sh=self.decoded_features, nonlinearity=self.nonlinearity, nr_resnet=self.nr_resnet, nr_filters=self.nr_filters, nr_logistic_mix=self.nr_logistic_mix, bn=self.bn, dropout_p=self.dropout_p, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters)
             self.x_hat = mix_logistic_sampler(self.mix_logistic_params, nr_logistic_mix=self.nr_logistic_mix, sample_range=1, counters=self.counters)
 
 

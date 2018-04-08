@@ -75,7 +75,7 @@ def nin(x, num_units, **kwargs):
     return tf.reshape(x, s[:-1]+[num_units])
 
 @add_arg_scope
-def gated_resnet(x, a=None, gh=None, sh=None, nonlinearity=tf.nn.elu, conv=conv2d_layer, counters={}, **kwargs):
+def gated_resnet(x, a=None, gh=None, sh=None, nonlinearity=tf.nn.elu, conv=conv2d_layer, dropout_p=0.0, counters={}, **kwargs):
     name = get_name("gated_resnet", counters)
     print("construct", name, "...")
     xs = int_shape(x)
@@ -85,6 +85,7 @@ def gated_resnet(x, a=None, gh=None, sh=None, nonlinearity=tf.nn.elu, conv=conv2
         if a is not None: # add short-cut connection if auxiliary input 'a' is given
             c1 += nin(nonlinearity(a), num_filters)
         c1 = nonlinearity(c1)
+        c1 = tf.nn.dropout(c1, keep_prob=1. - dropout_p)
         c2 = conv(c1, num_filters * 2)
         # add projection of h vector if included: conditional generation
         if sh is not None:

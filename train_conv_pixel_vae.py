@@ -84,7 +84,7 @@ model_opt = {
     "bn": True,
     "kernel_initializer": tf.contrib.layers.xavier_initializer(),
     "kernel_regularizer": None,
-    "nr_resnet": 3,
+    "nr_resnet": 5,
     "nr_filters": 100,
     "nr_logistic_mix": 10,
 }
