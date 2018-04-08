@@ -75,24 +75,25 @@ def nin(x, num_units, **kwargs):
     return tf.reshape(x, s[:-1]+[num_units])
 
 @add_arg_scope
-def gated_resnet(x, a=None, gh=None, sh=None, nonlinearity=tf.nn.elu, conv=conv2d_layer, dropout_p=0., counters={}):
+def gated_resnet(x, a=None, gh=None, sh=None, nonlinearity=tf.nn.elu, counters={}, **kwargs):
     name = get_name("gated_resnet", counters)
     print("construct", name, "...")
     xs = int_shape(x)
     num_filters = xs[-1]
-    c1 = conv(nonlinearity(x), num_filters)
-    if a is not None: # add short-cut connection if auxiliary input 'a' is given
-        c1 += nin(nonlinearity(a), num_filters)
-    c1 = nonlinearity(c1)
-    c2 = conv(c1, num_filters * 2)
-    # add projection of h vector if included: conditional generation
-    if sh is not None:
-        c2 += nin(sh, 2*num_filters, nonlinearity=nonlinearity)
-    if gh is not None: # haven't finished this part
-        pass
-    a, b = tf.split(c2, 2, 3)
-    c3 = a * tf.nn.sigmoid(b)
-    return x + c3
+    with arg_scope([conv2d_layer], **kwargs):
+        c1 = conv(nonlinearity(x), num_filters)
+        if a is not None: # add short-cut connection if auxiliary input 'a' is given
+            c1 += nin(nonlinearity(a), num_filters)
+        c1 = nonlinearity(c1)
+        c2 = conv(c1, num_filters * 2)
+        # add projection of h vector if included: conditional generation
+        if sh is not None:
+            c2 += nin(sh, 2*num_filters, nonlinearity=nonlinearity)
+        if gh is not None: # haven't finished this part
+            pass
+        a, b = tf.split(c2, 2, 3)
+        c3 = a * tf.nn.sigmoid(b)
+        return x + c3
 
 
 
