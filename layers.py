@@ -146,6 +146,9 @@ def compute_dwkld(z, z_mu, z_log_sigma_sq):
     sum_lse = tf.reduce_sum(log_sum_exp(log_probs, axis=1), axis=-1)
 
     dist_prior = tf.distributions.Normal(loc=0., scale=1.)
+    print(int_shape(sum_lse))
+    print(int_shape(dist_prior.log_prob(z)))
+    quit()
     nll_prior = -tf.reduce_sum(dist_prior.log_prob(z))
     return sum_lse + nll_prior
 
