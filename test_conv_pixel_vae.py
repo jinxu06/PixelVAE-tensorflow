@@ -28,7 +28,7 @@ cfg = {
     "lam": 0.0,
     "save_interval": 10,
     "reg": "mmd",
-    "use_mode": "train",
+    "use_mode": "test",
 }
 
 
