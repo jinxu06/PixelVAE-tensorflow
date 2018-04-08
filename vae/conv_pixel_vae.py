@@ -78,6 +78,9 @@ class ConvPixelVAE(object):
         #self.loss_ae *= 100
         #self.loss_reg *= 100
         print("reg:{0}, beta:{1}, lam:{2}".format(self.reg, self.beta, self.lam))
+        print(int_shape(self.loss_ae))
+        print(int_shape(self.loss_reg))
+        quit()
         self.loss = self.loss_ae + self.loss_reg
 
 
