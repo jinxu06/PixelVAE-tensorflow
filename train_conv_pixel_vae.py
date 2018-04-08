@@ -22,10 +22,10 @@ cfg = {
     "nr_gpu": 4,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.0001,
-    "beta": 1.0,
+    "beta": 100.0,
     "lam": 0.0,
     "save_interval": 10,
-    "reg": "tc-dwkld",
+    "reg": "mmd",
     "use_mode": "train",
 }
 
