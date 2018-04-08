@@ -13,10 +13,10 @@ from layers import visualize_samples
 parser = argparse.ArgumentParser()
 
 cfg = {
-    "img_size": 64,
+    "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba64",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32",
     "data_set": "celeba64",
     "batch_size": 32,
     "nr_gpu": 4,
@@ -25,7 +25,7 @@ cfg = {
     "beta": 1.0,
     "lam": 0.0,
     "save_interval": 10,
-    "reg": "kld",
+    "reg": "tc-dwkld",
     "use_mode": "train",
 }
 
