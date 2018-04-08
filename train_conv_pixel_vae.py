@@ -225,7 +225,7 @@ with tf.Session(config=config) as sess:
         print("test loss:{0:.3f}, test ae loss:{1:.3f}, test reg loss:{2:.3f}".format(test_loss, test_loss_ae, test_loss_reg))
         sys.stdout.flush()
 
-        if epoch % args.save_interval == 0:
+        if False: #epoch % args.save_interval == 0:
 
             saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
             data = next(test_data)
