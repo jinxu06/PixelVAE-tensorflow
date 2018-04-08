@@ -36,8 +36,12 @@ class ConvPixelVAE(object):
         self.x_bar = x_bar
         self.is_training = is_training
         # self.dropout_p = dropout_p
-        conv_block = conv_encoder_64_block
-        deconv_block = deconv_64_block
+        if int_shape(x)[1]==64:
+            conv_block = conv_encoder_64_block
+            deconv_block = deconv_64_block
+        elif int_shape(x)[1]==32:
+            conv_block = conv_encoder_32_block
+            deconv_block = deconv_32_block
         with arg_scope([conv_block, deconv_block], nonlinearity=self.nonlinearity, bn=self.bn, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
             self.z_mu, self.z_log_sigma_sq = conv_block(x, self.z_dim)
             sigma = tf.exp(self.z_log_sigma_sq / 2.)
