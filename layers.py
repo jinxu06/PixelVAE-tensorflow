@@ -165,6 +165,10 @@ def compute_tc(z, z_mu, z_log_sigma_sq):
     log_probs = dist.log_prob(z_norm)
     lse_sum = log_sum_exp(tf.reduce_sum(log_probs, axis=-1), axis=1)
     sum_lse = tf.reduce_sum(log_sum_exp(log_probs, axis=1), axis=-1)
+    print('tc')
+    print(int_shape(lse_sum))
+    print(int_shape(sum_lse))
+    quit()
     return lse_sum - sum_lse
 
 
