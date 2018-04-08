@@ -16,7 +16,7 @@ cfg = {
     "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd",
     "data_set": "celeba32",
     "batch_size": 32,
     "nr_gpu": 4,
