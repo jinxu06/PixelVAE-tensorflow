@@ -169,10 +169,9 @@ def generate_samples(sess, data):
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
-    for yi in range(args.img_size):
+    for yi in range(16, args.img_size):
         for xi in range(args.img_size):
             print(yi, xi)
-            print(x_gen[0][0, yi, xi, :] * 127.5+127.5)
             feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
             x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
             for i in range(args.nr_gpu):
