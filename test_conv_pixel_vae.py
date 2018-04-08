@@ -218,4 +218,4 @@ with tf.Session(config=config) as sess:
 
     data = next(test_data)
     sample_x = generate_samples(sess, data)
-    visualize_samples(sample_x, "results/conv_pixel_vae_test_mmd.png", layout=(8,8))
+    visualize_samples(sample_x, "results/conv_pixel_vae_test.png", layout=(8,8))
