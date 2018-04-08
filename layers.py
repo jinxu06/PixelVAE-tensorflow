@@ -135,18 +135,18 @@ def compute_dwkld(z, z_mu, z_log_sigma_sq):
     z_sigma = tf.sqrt(tf.exp(z_log_sigma_sq))
     log_probs = []
     batch_size, z_dim = int_shape(z_mu)
-    z = tf.stack([z for i in range(batch_size)], axis=0)
+    z_b = tf.stack([z for i in range(batch_size)], axis=0)
     z_mu = tf.stack([z_mu for i in range(batch_size)], axis=1)
     z_sigma = tf.stack([z_sigma for i in range(batch_size)], axis=1)
-    z_norm = (z-z_mu) / z_sigma
+    z_norm = (z_b-z_mu) / z_sigma
 
     dist = tf.distributions.Normal(loc=0., scale=1.)
     log_probs = dist.log_prob(z_norm)
     lse_sum = log_sum_exp(tf.reduce_sum(log_probs, axis=-1), axis=1)
-    sum_lse = tf.reduce_sum(log_sum_exp(log_probs, axis=1), axis=-1)
+    sum_lse = tf.reduce_mean(tf.reduce_sum(log_sum_exp(log_probs, axis=1), axis=-1))
 
     dist_prior = tf.distributions.Normal(loc=0., scale=1.)
-    nll_prior = -tf.reduce_sum(dist_prior.log_prob(z))
+    nll_prior =  tf.reduce_mean(-tf.reduce_sum(dist_prior.log_prob(z), axis=-1))
     return sum_lse + nll_prior
 
 def compute_tc(z, z_mu, z_log_sigma_sq):
@@ -160,8 +160,8 @@ def compute_tc(z, z_mu, z_log_sigma_sq):
 
     dist = tf.distributions.Normal(loc=0., scale=1.)
     log_probs = dist.log_prob(z_norm)
-    lse_sum = log_sum_exp(tf.reduce_sum(log_probs, axis=-1), axis=1)
-    sum_lse = tf.reduce_sum(log_sum_exp(log_probs, axis=1), axis=-1)
+    lse_sum = tf.reduce_mean(log_sum_exp(tf.reduce_sum(log_probs, axis=-1), axis=1))
+    sum_lse = tf.reduce_mean(tf.reduce_sum(log_sum_exp(log_probs, axis=1), axis=-1))
     return lse_sum - sum_lse
 
 
