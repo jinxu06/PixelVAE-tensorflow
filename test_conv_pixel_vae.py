@@ -12,21 +12,23 @@ from layers import visualize_samples
 
 parser = argparse.ArgumentParser()
 
+
 cfg = {
-    "img_size": 64,
+    "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/vae_test",
-    "data_set": "celeba64",
-    "batch_size": 16,
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd",
+    #"save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc-dwkld",
+    "data_set": "celeba32",
+    "batch_size": 32,
     "nr_gpu": 4,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.0001,
-    "beta": 1.0,
-    "lam": 0.5,
+    "beta": 1,
+    "lam": 0.0,
     "save_interval": 10,
-    "reg": "kld",
-    "use_mode": "test",
+    "reg": "mmd",
+    "use_mode": "train",
 }
 
 
@@ -201,4 +203,4 @@ with tf.Session(config=config) as sess:
 
     data = next(test_data)
     sample_x = generate_samples(sess, data)
-    visualize_samples(sample_x, "results/conv_pixel_vae_test.png", layout=(8,8))
+    visualize_samples(sample_x, "results/conv_pixel_vae_test_mmd.png", layout=(8,8))
