@@ -166,6 +166,19 @@ def conv_decoder_32_block(inputs, is_training, nonlinearity=None, bn=True, kerne
             outputs = 2. * outputs - 1.
             return outputs
 
+@add_arg_scope
+def deconv_32_block(inputs, is_training, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
+    name = get_name("deconv_32_block", counters)
+    print("construct", name, "...")
+    with tf.variable_scope(name):
+        with arg_scope([deconv2d_layer, dense_layer], nonlinearity=nonlinearity, bn=bn, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
+            outputs = dense_layer(inputs, 512)
+            outputs = tf.reshape(outputs, [-1, 1, 1, 512])
+            outputs = deconv2d_layer(outputs, 256, 4, 1, "VALID")
+            outputs = deconv2d_layer(outputs, 128, 4, 2, "SAME")
+            outputs = deconv2d_layer(outputs, 64, 4, 2, "SAME")
+            outputs = deconv2d_layer(outputs, 32, 4, 2, "SAME")
+            return outputs
 
 @add_arg_scope
 def z_sampler(loc, scale, counters={}):
