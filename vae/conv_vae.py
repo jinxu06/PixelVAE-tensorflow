@@ -28,8 +28,12 @@ class ConvVAE(object):
         print("******   Building Graph   ******")
         self.x = x
         self.is_training = is_training
-        encoder = conv_encoder_64_block
-        decoder = conv_decoder_64_block
+        if int_shape(x)[1]==64:
+            encoder = conv_encoder_64_block
+            decoder = conv_decoder_64_block
+        elif int_shape(x)[1]==32:
+            encoder = conv_encoder_32_block
+            decoder = conv_decoder_32_block
         with arg_scope([encoder, decoder], nonlinearity=self.nonlinearity, bn=self.bn, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
             self.z_mu, self.z_log_sigma_sq = encoder(x, self.z_dim)
             sigma = tf.exp(self.z_log_sigma_sq / 2.)
