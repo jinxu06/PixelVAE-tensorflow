@@ -35,7 +35,7 @@ cfg = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_ce-tc-dwkld_beta5",
     "data_set": "celeba32",
-    "batch_size": 64,
+    "batch_size": 32,
     "nr_gpu": 4,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.0001,
@@ -154,7 +154,7 @@ model_opt = {
     "bn": True,
     "kernel_initializer": tf.contrib.layers.xavier_initializer(),
     "kernel_regularizer": None,
-    "nr_resnet": 5,
+    "nr_resnet": 7,
     "nr_filters": 100,
     "nr_logistic_mix": 10,
 }
