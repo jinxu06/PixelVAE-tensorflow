@@ -199,6 +199,7 @@ def generate_samples(sess, data):
 
 
 def latent_traversal(sess, data, use_image_id=0):
+    data = data.copy()
     for i in range(data.shape[0]):
         data[i] = data[use_image_id].copy()
     data = np.cast[np.float32]((data - 127.5) / 127.5)
@@ -216,8 +217,16 @@ def latent_traversal(sess, data, use_image_id=0):
         z[i*num_traversal_step:(i+1)*num_traversal_step, i] = np.linspace(start=-5., stop=5., num=num_traversal_step)
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
-    x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
-    return np.concatenate(x_hats, axis=0)
+
+    x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
+    for yi in range(args.img_size):
+        for xi in range(args.img_size):
+            print(yi, xi)
+            feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
+            x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+            for i in range(args.nr_gpu):
+                x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
+    return np.concatenate(x_gen, axis=0)
 
 
 
