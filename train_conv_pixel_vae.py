@@ -29,6 +29,23 @@ cfg = {
     "use_mode": "train",
 }
 
+cfg = {
+    "img_size": 32,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_ce-tc-dwkld_beta5",
+    "data_set": "celeba32",
+    "batch_size": 64,
+    "nr_gpu": 4,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.0001,
+    "beta": 5,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "ce-tc-dwkld",
+    "use_mode": "train",
+}
+
 # cfg = {
 #     "img_size": 32,
 #     "z_dim": 32,
