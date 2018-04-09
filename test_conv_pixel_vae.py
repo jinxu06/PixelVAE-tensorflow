@@ -16,16 +16,16 @@ cfg = {
     "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc-dwkld_beta5",
     "data_set": "celeba32",
     "batch_size": 32,
     "nr_gpu": 4,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.0001,
-    "beta": 1,
+    "beta": 5,
     "lam": 0.0,
     "save_interval": 10,
-    "reg": "mmd",
+    "reg": "tc-dwkld",
     "use_mode": "test",
 }
 
@@ -33,7 +33,24 @@ cfg = {
 #     "img_size": 32,
 #     "z_dim": 32,
 #     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc-dwkld",
+#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd",
+#     "data_set": "celeba32",
+#     "batch_size": 32,
+#     "nr_gpu": 4,
+#     #"gpus": "4,5,6,7",
+#     "learning_rate": 0.0001,
+#     "beta": 1e5,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "mmd",
+#     "use_mode": "train",
+# }
+
+# cfg = {
+#     "img_size": 32,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_kld",
 #     "data_set": "celeba32",
 #     "batch_size": 32,
 #     "nr_gpu": 4,
@@ -42,9 +59,11 @@ cfg = {
 #     "beta": 1,
 #     "lam": 0.0,
 #     "save_interval": 10,
-#     "reg": "tc-dwkld",
-#     "use_mode": "test",
+#     "reg": "kld",
+#     "use_mode": "train",
 # }
+
+
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -101,7 +120,7 @@ model_opt = {
     "bn": True,
     "kernel_initializer": tf.contrib.layers.xavier_initializer(),
     "kernel_regularizer": None,
-    "nr_resnet": 3,
+    "nr_resnet": 5,
     "nr_filters": 100,
     "nr_logistic_mix": 10,
 }
@@ -164,12 +183,14 @@ def generate_samples(sess, data):
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
-    #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
+
+    z[:, 3] = np.linspace(start=-5., stop=5., num=z.shape[0])
+
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
-    for yi in range(16, args.img_size):
+    for yi in range(args.img_size):
         for xi in range(args.img_size):
             print(yi, xi)
             feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
@@ -199,7 +220,6 @@ def latent_traversal(sess, data, use_image_id=0):
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
     x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
     return np.concatenate(x_hats, axis=0)
-
 
 
 
