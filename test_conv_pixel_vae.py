@@ -12,39 +12,39 @@ from layers import visualize_samples
 
 parser = argparse.ArgumentParser()
 
-cfg = {
-    "img_size": 32,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc-dwkld",
-    "data_set": "celeba32",
-    "batch_size": 80,
-    "nr_gpu": 4,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0001,
-    "beta": 1,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc-dwkld",
-    "use_mode": "test",
-}
-
 # cfg = {
 #     "img_size": 32,
 #     "z_dim": 32,
 #     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd",
+#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc-dwkld",
 #     "data_set": "celeba32",
 #     "batch_size": 80,
 #     "nr_gpu": 4,
 #     #"gpus": "4,5,6,7",
 #     "learning_rate": 0.0001,
-#     "beta": 1e5,
+#     "beta": 1,
 #     "lam": 0.0,
 #     "save_interval": 10,
-#     "reg": "mmd",
+#     "reg": "tc-dwkld",
 #     "use_mode": "test",
 # }
+
+cfg = {
+    "img_size": 32,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd",
+    "data_set": "celeba32",
+    "batch_size": 80,
+    "nr_gpu": 4,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.0001,
+    "beta": 1e5,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "mmd",
+    "use_mode": "test",
+}
 
 # cfg = {
 #     "img_size": 32,
@@ -185,6 +185,7 @@ def generate_samples(sess, data):
     z = np.random.normal(loc=z_mu, scale=z_sigma)
     print(z_mu[0])
     print(z_sigma[0])
+    quit()
     # z[:, 3] = np.linspace(start=-5., stop=5., num=z.shape[0])
 
     z = np.split(z, args.nr_gpu)
