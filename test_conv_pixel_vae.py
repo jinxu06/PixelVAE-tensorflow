@@ -16,7 +16,7 @@ cfg = {
     "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc-dwkld",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_kld",
     "data_set": "celeba32",
     "batch_size": 80,
     "nr_gpu": 4,
@@ -25,7 +25,8 @@ cfg = {
     "beta": 1,
     "lam": 0.0,
     "save_interval": 10,
-    "reg": "tc-dwkld",
+    #"reg": "tc-dwkld",
+    "reg": "kld",
     "use_mode": "test",
 }
 
@@ -265,4 +266,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("results/conv_pixel_vae_samples_id.png")
+    img.save("results/conv_pixel_vae_samples_kld.png")
