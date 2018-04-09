@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
 flatten = tf.contrib.layers.flatten
 from layers import conv2d_layer, deconv2d_layer, dense_layer
-from layers import int_shape, get_name, compute_mmd, compute_tc, compute_dwkld
+from layers import int_shape, get_name, compute_mmd, compute_tc, compute_dwkld, compute_entropy
 from cond_pixel_cnn import cond_pixel_cnn, mix_logistic_sampler, mix_logistic_loss
 
 
@@ -73,8 +73,12 @@ class ConvPixelVAE(object):
         elif reg=='tc-dwkld':
             tc = compute_tc(self.z, self.z_mu, self.z_log_sigma_sq)
             dwkld = compute_dwkld(self.z, self.z_mu, self.z_log_sigma_sq)
-            
             self.loss_reg = self.beta * tc + dwkld
+        elif reg=='ce-tc-dwkld':
+            tc = compute_tc(self.z, self.z_mu, self.z_log_sigma_sq)
+            dwkld = compute_dwkld(self.z, self.z_mu, self.z_log_sigma_sq)
+            cond_entropy = tf.reduce_mean(compute_entropy(self.z_mu, self.z_log_sigma_sq))
+            self.loss_reg = self.beta * tc + dwkld - cond_entropy
 
         #self.loss_ae *= 100
         #self.loss_reg *= 100

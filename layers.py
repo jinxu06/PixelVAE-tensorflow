@@ -150,6 +150,11 @@ def compute_dwkld(z, z_mu, z_log_sigma_sq):
     nll_prior =  tf.reduce_mean(-tf.reduce_sum(dist_prior.log_prob(z), axis=-1))
     return sum_lse + nll_prior
 
+def compute_entropy(z_mu, z_log_sigma_sq):
+    batch_size, z_dim = int_shape(z_mu)
+    entropy = (tf.reduce_mean(z_log_sigma_sq, axis=1) + tf.log(2*np.pi*np.e)) * z_dim / 2.
+    return entropy
+
 def compute_tc(z, z_mu, z_log_sigma_sq):
     z_sigma = tf.sqrt(tf.exp(z_log_sigma_sq))
     log_probs = []

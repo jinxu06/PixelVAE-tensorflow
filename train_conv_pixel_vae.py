@@ -11,11 +11,12 @@ from vae.conv_pixel_vae import ConvPixelVAE
 from layers import visualize_samples
 
 parser = argparse.ArgumentParser()
+
 cfg = {
     "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc-dwkld",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_ce-tc-dwkld",
     "data_set": "celeba32",
     "batch_size": 32,
     "nr_gpu": 4,
@@ -24,26 +25,26 @@ cfg = {
     "beta": 1,
     "lam": 0.0,
     "save_interval": 10,
-    "reg": "tc-dwkld",
+    "reg": "ce-tc-dwkld",
     "use_mode": "train",
 }
+
 # cfg = {
 #     "img_size": 32,
 #     "z_dim": 32,
 #     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc-dwkld_beta5",
+#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc-dwkld",
 #     "data_set": "celeba32",
 #     "batch_size": 32,
 #     "nr_gpu": 4,
 #     #"gpus": "4,5,6,7",
 #     "learning_rate": 0.0001,
-#     "beta": 5,
+#     "beta": 1,
 #     "lam": 0.0,
 #     "save_interval": 10,
 #     "reg": "tc-dwkld",
 #     "use_mode": "train",
 # }
-
 
 # cfg = {
 #     "img_size": 32,
