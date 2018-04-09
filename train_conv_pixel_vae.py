@@ -12,45 +12,11 @@ from layers import visualize_samples
 
 parser = argparse.ArgumentParser()
 
-cfg = {
-    "img_size": 32,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_ce-tc-dwkld",
-    "data_set": "celeba32",
-    "batch_size": 32,
-    "nr_gpu": 4,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0001,
-    "beta": 1,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "ce-tc-dwkld",
-    "use_mode": "train",
-}
-
-cfg = {
-    "img_size": 32,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_ce-tc-dwkld_beta5",
-    "data_set": "celeba32",
-    "batch_size": 32,
-    "nr_gpu": 4,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0001,
-    "beta": 5,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "ce-tc-dwkld",
-    "use_mode": "train",
-}
-
 # cfg = {
 #     "img_size": 32,
 #     "z_dim": 32,
 #     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc-dwkld",
+#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_ce-tc-dwkld",
 #     "data_set": "celeba32",
 #     "batch_size": 32,
 #     "nr_gpu": 4,
@@ -59,9 +25,27 @@ cfg = {
 #     "beta": 1,
 #     "lam": 0.0,
 #     "save_interval": 10,
-#     "reg": "tc-dwkld",
+#     "reg": "ce-tc-dwkld",
 #     "use_mode": "train",
 # }
+
+cfg = {
+    "img_size": 32,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_ce-tc-dwkld_beta8",
+    "data_set": "celeba32",
+    "batch_size": 32,
+    "nr_gpu": 4,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.0001,
+    "beta": 8,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "ce-tc-dwkld",
+    "use_mode": "train",
+}
+
 
 # cfg = {
 #     "img_size": 32,
@@ -315,4 +299,4 @@ with tf.Session(config=config) as sess:
 
             img_tile = plotting.img_tile(sample_x[:100], aspect_ratio=1.0, border_color=1.0, stretch=True)
             img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
-            plotting.plt.savefig(os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)))
+            plotting.plt.savefig(os.path.join(args.save_dir,'%s_pixel_vae_sample%d.png' % (args.data_set, epoch)))
