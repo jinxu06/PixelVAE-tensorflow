@@ -73,7 +73,7 @@ class ConvPixelVAE(object):
         elif reg=='tc-dwkld':
             tc = compute_tc(self.z, self.z_mu, self.z_log_sigma_sq)
             dwkld = compute_dwkld(self.z, self.z_mu, self.z_log_sigma_sq)
-            self.loss_reg = self.beta * tc + dwkld
+            self.loss_reg = (self.beta * tc + dwkld) * 50.
 
         #self.loss_ae *= 100
         #self.loss_reg *= 100
