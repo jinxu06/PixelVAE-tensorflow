@@ -45,22 +45,22 @@ cfg = {
 #     "use_mode": "test",
 # }
 
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta8",
-#     "data_set": "celeba32",
-#     "batch_size": 80,
-#     "nr_gpu": 4,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "beta": 8,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "test",
-# }
+cfg = {
+    "img_size": 32,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta8",
+    "data_set": "celeba32",
+    "batch_size": 80,
+    "nr_gpu": 4,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.0001,
+    "beta": 8,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "tc",
+    "use_mode": "test",
+}
 
 # cfg = {
 #     "img_size": 32,
@@ -113,6 +113,7 @@ parser.add_argument('-lr', '--learning_rate', type=float, default=cfg['learning_
 parser.add_argument('-b', '--beta', type=float, default=cfg['beta'], help="strength of the KL divergence penalty")
 parser.add_argument('-l', '--lam', type=float, default=cfg['lam'], help="")
 parser.add_argument('-zd', '--z_dim', type=float, default=cfg['z_dim'], help="")
+parser.add_argument('-nr', '--nr_resnet', type=float, default=cfg['nr_resnet'], help="")
 parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to use')
 # new features
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
@@ -153,7 +154,7 @@ model_opt = {
     "bn": True,
     "kernel_initializer": tf.contrib.layers.xavier_initializer(),
     "kernel_regularizer": None,
-    "nr_resnet": 5,
+    "nr_resnet": args.nr_resnet,
     "nr_filters": 100,
     "nr_logistic_mix": 10,
 }
