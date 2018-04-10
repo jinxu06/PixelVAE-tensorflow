@@ -297,4 +297,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("results/conv_pixel_vae_tc_beta8.png")
+    img.save("results/conv_pixel_vae_tc_beta5_l5.png")
