@@ -49,13 +49,14 @@ cfg = {
     "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta8",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta5_l5",
     "data_set": "celeba32",
     "batch_size": 80,
     "nr_gpu": 4,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.0001,
-    "beta": 8,
+    "nr_resnet": 5,
+    "beta": 5,
     "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
@@ -217,12 +218,7 @@ def generate_samples(sess, data):
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
-
-    print(z[0])
-    print(z_sigma[0])
-    quit()
-    # z[:, 3] = np.linspace(start=-5., stop=5., num=z.shape[0])
-
+    #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
@@ -266,7 +262,6 @@ def latent_traversal(sess, data, use_image_id=0):
             for i in range(args.nr_gpu):
                 x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
-
 
 
 
