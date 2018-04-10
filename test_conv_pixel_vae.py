@@ -100,6 +100,25 @@ cfg = {
     "use_mode": "test",
 }
 
+cfg = {
+    "img_size": 32,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc-dwkld",
+    "data_set": "celeba32",
+    "batch_size": 80,
+    "nr_gpu": 4,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.0001,
+    "nr_resnet": 5,
+    "beta": 1,
+    "lam": 0.0,
+    "save_interval": 10,
+    "use_mode": "test",
+}
+
+
+
 
 
 
