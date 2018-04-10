@@ -114,6 +114,7 @@ cfg = {
     "beta": 1,
     "lam": 0.0,
     "save_interval": 10,
+    "reg": "tc-dwkld",
     "use_mode": "test",
 }
 
