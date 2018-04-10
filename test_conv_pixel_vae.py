@@ -34,7 +34,7 @@ cfg = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta8",
     "data_set": "celeba32",
-    "batch_size": 32,
+    "batch_size": 80,
     "nr_gpu": 4,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.0001,
@@ -42,7 +42,7 @@ cfg = {
     "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
-    "use_mode": "train",
+    "use_mode": "test",
 }
 
 # cfg = {
