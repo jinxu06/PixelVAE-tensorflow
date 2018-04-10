@@ -136,23 +136,43 @@ parser = argparse.ArgumentParser()
 #     "use_mode": "train",
 # }
 
+# cfg = {
+#     "img_size": 32,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta5_comp",
+#     "data_set": "celeba32",
+#     "batch_size": 32,
+#     "nr_gpu": 1,
+#     #"gpus": "4,5,6,7",
+#     "learning_rate": 0.0001,
+#     "nr_resnet": 5,
+#     "beta": 5,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "tc",
+#     "use_mode": "train",
+# }
+
 cfg = {
     "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta5_comp",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta5_l1",
     "data_set": "celeba32",
     "batch_size": 32,
-    "nr_gpu": 1,
+    "nr_gpu": 2,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.0001,
-    "nr_resnet": 5,
+    "nr_resnet": 1,
     "beta": 5,
     "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
     "use_mode": "train",
 }
+
+
 
 
 
