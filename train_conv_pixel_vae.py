@@ -83,22 +83,25 @@ parser = argparse.ArgumentParser()
 # }
 
 
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd",
-#     "data_set": "celeba32",
-#     "batch_size": 32,
-#     "nr_gpu": 4,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "beta": 1e5,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "mmd",
-#     "use_mode": "train",
-# }
+cfg = {
+    "img_size": 32,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_cp",
+    "data_set": "celeba32",
+    "batch_size": 32,
+    "nr_gpu": 4,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.0001,
+    "nr_resnet": 5,
+    "nr_filters": 100,
+    "nr_logistic_mix": 10,
+    "beta": 1e5,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "mmd",
+    "use_mode": "train",
+}
 
 # cfg = {
 #     "img_size": 32,
@@ -172,26 +175,26 @@ parser = argparse.ArgumentParser()
 #     "use_mode": "train",
 # }
 
-cfg = {
-    "img_size": 32,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta5_l0",
-    "data_set": "celeba32",
-    "batch_size": 32,
-    "nr_gpu": 2,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0001,
-    "nr_resnet": 1,
-    "beta": 5,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc",
-    "use_mode": "train",
-}
-
-cfg['nr_filters'] = 10
-cfg['nr_logistic_mix'] = 1
+# cfg = {
+#     "img_size": 32,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta5_l0",
+#     "data_set": "celeba32",
+#     "batch_size": 32,
+#     "nr_gpu": 2,
+#     #"gpus": "4,5,6,7",
+#     "learning_rate": 0.0001,
+#     "nr_resnet": 1,
+#     "beta": 5,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "tc",
+#     "use_mode": "train",
+# }
+#
+# cfg['nr_filters'] = 10
+# cfg['nr_logistic_mix'] = 1
 
 
 

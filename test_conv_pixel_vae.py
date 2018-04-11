@@ -101,21 +101,41 @@ parser = argparse.ArgumentParser()
 # }
 
 
+# cfg = {
+#     "img_size": 32,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc-dwkld",
+#     "data_set": "celeba32",
+#     "batch_size": 80,
+#     "nr_gpu": 4,
+#     #"gpus": "4,5,6,7",
+#     "learning_rate": 0.0001,
+#     "nr_resnet": 5,
+#     "beta": 1,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "tc-dwkld",
+#     "use_mode": "test",
+# }
+
 cfg = {
     "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc-dwkld",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_cp",
     "data_set": "celeba32",
     "batch_size": 80,
     "nr_gpu": 4,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.0001,
     "nr_resnet": 5,
-    "beta": 1,
+    "nr_filters": 100,
+    "nr_logistic_mix": 10,
+    "beta": 1e5,
     "lam": 0.0,
     "save_interval": 10,
-    "reg": "tc-dwkld",
+    "reg": "mmd",
     "use_mode": "test",
 }
 
@@ -325,4 +345,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("results/conv_pixel_vae_tc-dwkld.png")
+    img.save("results/conv_pixel_vae_mmd_traversal.png")
