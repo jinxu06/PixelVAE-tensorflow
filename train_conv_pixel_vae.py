@@ -211,8 +211,8 @@ parser.add_argument('-b', '--beta', type=float, default=cfg['beta'], help="stren
 parser.add_argument('-l', '--lam', type=float, default=cfg['lam'], help="")
 parser.add_argument('-zd', '--z_dim', type=float, default=cfg['z_dim'], help="")
 parser.add_argument('-nr', '--nr_resnet', type=float, default=cfg['nr_resnet'], help="")
-parser.add_argument('-nr', '--nr_filters', type=float, default=cfg['nr_filters'], help="")
-parser.add_argument('-nr', '--nr_logistic_mix', type=float, default=cfg['nr_logistic_mix'], help="")
+parser.add_argument('-nf', '--nr_filters', type=float, default=cfg['nr_filters'], help="")
+parser.add_argument('-nlm', '--nr_logistic_mix', type=float, default=cfg['nr_logistic_mix'], help="")
 parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to use')
 # new features
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
