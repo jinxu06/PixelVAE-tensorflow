@@ -154,17 +154,35 @@ parser = argparse.ArgumentParser()
 #     "use_mode": "train",
 # }
 
+# cfg = {
+#     "img_size": 32,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta5_l1",
+#     "data_set": "celeba32",
+#     "batch_size": 32,
+#     "nr_gpu": 2,
+#     #"gpus": "4,5,6,7",
+#     "learning_rate": 0.0001,
+#     "nr_resnet": 1,
+#     "beta": 5,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "tc",
+#     "use_mode": "train",
+# }
+
 cfg = {
     "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta5_l1",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta5_l0",
     "data_set": "celeba32",
     "batch_size": 32,
     "nr_gpu": 2,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.0001,
-    "nr_resnet": 1,
+    "nr_resnet": 0,
     "beta": 5,
     "lam": 0.0,
     "save_interval": 10,
@@ -172,7 +190,8 @@ cfg = {
     "use_mode": "train",
 }
 
-
+cfg['nr_filters'] = 50
+cfg['nr_logistic_mix'] = 1
 
 
 
@@ -192,6 +211,8 @@ parser.add_argument('-b', '--beta', type=float, default=cfg['beta'], help="stren
 parser.add_argument('-l', '--lam', type=float, default=cfg['lam'], help="")
 parser.add_argument('-zd', '--z_dim', type=float, default=cfg['z_dim'], help="")
 parser.add_argument('-nr', '--nr_resnet', type=float, default=cfg['nr_resnet'], help="")
+parser.add_argument('-nr', '--nr_filters', type=float, default=cfg['nr_filters'], help="")
+parser.add_argument('-nr', '--nr_logistic_mix', type=float, default=cfg['nr_logistic_mix'], help="")
 parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to use')
 # new features
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
@@ -233,8 +254,8 @@ model_opt = {
     "kernel_initializer": tf.contrib.layers.xavier_initializer(),
     "kernel_regularizer": None,
     "nr_resnet": args.nr_resnet,
-    "nr_filters": 100,
-    "nr_logistic_mix": 10,
+    "nr_filters": args.nr_filters,
+    "nr_logistic_mix": args.nr_logistic_mix,
 }
 model = tf.make_template('PVAE', ConvPixelVAE.build_graph)
 
