@@ -182,7 +182,7 @@ cfg = {
     "nr_gpu": 2,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.0001,
-    "nr_resnet": 0,
+    "nr_resnet": 1,
     "beta": 5,
     "lam": 0.0,
     "save_interval": 10,
@@ -190,7 +190,7 @@ cfg = {
     "use_mode": "train",
 }
 
-cfg['nr_filters'] = 50
+cfg['nr_filters'] = 10
 cfg['nr_logistic_mix'] = 1
 
 
