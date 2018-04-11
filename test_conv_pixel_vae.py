@@ -11,22 +11,22 @@ from vae.conv_pixel_vae import ConvPixelVAE
 from layers import visualize_samples
 
 parser = argparse.ArgumentParser()
-cfg = {
-    "img_size": 32,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_ce-tc-dwkld",
-    "data_set": "celeba32",
-    "batch_size": 80,
-    "nr_gpu": 4,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0001,
-    "beta": 1,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "ce-tc-dwkld",
-    "use_mode": "test",
-}
+# cfg = {
+#     "img_size": 32,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_ce-tc-dwkld",
+#     "data_set": "celeba32",
+#     "batch_size": 80,
+#     "nr_gpu": 4,
+#     #"gpus": "4,5,6,7",
+#     "learning_rate": 0.0001,
+#     "beta": 1,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "ce-tc-dwkld",
+#     "use_mode": "test",
+# }
 
 # cfg = {
 #     "img_size": 32,
@@ -45,60 +45,61 @@ cfg = {
 #     "use_mode": "test",
 # }
 
-cfg = {
-    "img_size": 32,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta5_l5",
-    "data_set": "celeba32",
-    "batch_size": 160,
-    "nr_gpu": 4,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0001,
-    "nr_resnet": 5,
-    "beta": 5,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc",
-    "use_mode": "test",
-}
+# cfg = {
+#     "img_size": 32,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta5_l5",
+#     "data_set": "celeba32",
+#     "batch_size": 160,
+#     "nr_gpu": 4,
+#     #"gpus": "4,5,6,7",
+#     "learning_rate": 0.0001,
+#     "nr_resnet": 5,
+#     "beta": 5,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "tc",
+#     "use_mode": "test",
+# }
+#
+# cfg = {
+#     "img_size": 32,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     #"save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd",
+#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_cp",
+#     "data_set": "celeba32",
+#     "batch_size": 80,
+#     "nr_gpu": 4,
+#     #"gpus": "4,5,6,7",
+#     "learning_rate": 0.0001,
+#     "nr_resnet": 5,
+#     "beta": 1e5,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "mmd",
+#     "use_mode": "test",
+# }
+#
+# cfg = {
+#     "img_size": 32,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_kld_cp",
+#     "data_set": "celeba32",
+#     "batch_size": 80,
+#     "nr_gpu": 4,
+#     #"gpus": "4,5,6,7",
+#     "learning_rate": 0.0001,
+#     "nr_resnet": 5,
+#     "beta": 1,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "kld",
+#     "use_mode": "test",
+# }
 
-cfg = {
-    "img_size": 32,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    #"save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_cp",
-    "data_set": "celeba32",
-    "batch_size": 80,
-    "nr_gpu": 4,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0001,
-    "nr_resnet": 5,
-    "beta": 1e5,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "mmd",
-    "use_mode": "test",
-}
-
-cfg = {
-    "img_size": 32,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_kld_cp",
-    "data_set": "celeba32",
-    "batch_size": 80,
-    "nr_gpu": 4,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0001,
-    "nr_resnet": 5,
-    "beta": 1,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "kld",
-    "use_mode": "test",
-}
 
 cfg = {
     "img_size": 32,
