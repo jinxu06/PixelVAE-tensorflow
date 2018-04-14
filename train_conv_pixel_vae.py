@@ -297,7 +297,7 @@ for i in range(args.nr_gpu):
 
 if args.use_mode == 'train':
     all_params = tf.trainable_variables()
-    all_params = [if "conv_encoder_" in p.name for p in all_params]
+    all_params = [p for p in all_params if "conv_encoder_" in p.name]
     for p in all_params:
         print(p.name)
     quit()
