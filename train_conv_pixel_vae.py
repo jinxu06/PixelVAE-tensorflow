@@ -13,196 +13,14 @@ from masks import RandomRectangleMaskGenerator, RectangleMaskGenerator
 
 parser = argparse.ArgumentParser()
 
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_ce-tc-dwkld",
-#     "data_set": "celeba32",
-#     "batch_size": 32,
-#     "nr_gpu": 4,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "beta": 1,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "ce-tc-dwkld",
-#     "use_mode": "train",
-# }
 
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_ce-tc-dwkld_beta8",
-#     "data_set": "celeba32",
-#     "batch_size": 32,
-#     "nr_gpu": 4,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "beta": 8,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "ce-tc-dwkld",
-#     "use_mode": "train",
-# }
-
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta5_l5",
-#     "data_set": "celeba32",
-#     "batch_size": 32,
-#     "nr_gpu": 4,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "nr_resnet": 5,
-#     "beta": 5,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "train",
-# }
-#
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta5_l7",
-#     "data_set": "celeba32",
-#     "batch_size": 32,
-#     "nr_gpu": 4,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "nr_resnet": 7,
-#     "beta": 5,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "train",
-# }
-
-
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_cp",
-#     "data_set": "celeba32",
-#     "batch_size": 32,
-#     "nr_gpu": 4,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "nr_resnet": 5,
-#     "nr_filters": 100,
-#     "nr_logistic_mix": 10,
-#     "beta": 1e5,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "mmd",
-#     "use_mode": "train",
-# }
-
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_kld",
-#     "data_set": "celeba32",
-#     "batch_size": 32,
-#     "nr_gpu": 4,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "beta": 1,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "kld",
-#     "use_mode": "train",
-# }
-
-
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta1_comp",
-#     "data_set": "celeba32",
-#     "batch_size": 32,
-#     "nr_gpu": 1,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "nr_resnet": 5,
-#     "beta": 1,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "train",
-# }
-
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta5_comp",
-#     "data_set": "celeba32",
-#     "batch_size": 32,
-#     "nr_gpu": 1,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "nr_resnet": 5,
-#     "beta": 5,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "train",
-# }
-
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta5_l1",
-#     "data_set": "celeba32",
-#     "batch_size": 32,
-#     "nr_gpu": 2,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "nr_resnet": 1,
-#     "beta": 5,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "train",
-# }
-
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta5_l0",
-#     "data_set": "celeba32",
-#     "batch_size": 32,
-#     "nr_gpu": 2,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "nr_resnet": 1,
-#     "beta": 5,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "train",
-# }
-#
-# cfg['nr_filters'] = 10
-# cfg['nr_logistic_mix'] = 1
 
 cfg = {
     "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    #"save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_test",
-    "save_dir": "/data/ziz/jxu/models/temp",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_conditioning",
+    #"save_dir": "/data/ziz/jxu/models/temp",
     "encoder_save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
     "data_set": "celeba32",
     "batch_size": 32,
@@ -217,7 +35,7 @@ cfg = {
     "save_interval": 10,
     "reg": "mmd",
     "use_mode": "train",
-    "mask_type": "none",
+    "mask_type": "rec",
 }
 
 
@@ -337,15 +155,18 @@ def sample_from_model(sess, data):
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     if masks[0] is not None:
-        feed_dict.update({masks[i]:np.zeros((args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)})
+        tm = test_mgen.gen(args.batch_size)
+        feed_dict.update({masks[i]:tm for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
         for xi in range(args.img_size):
-            feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
-            x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
-            for i in range(args.nr_gpu):
-                x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
+            if tm[0, yi, xi]==0:
+                print(yi, xi)
+                feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
+                x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+                for i in range(args.nr_gpu):
+                    x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
 def generate_samples(sess, data):
