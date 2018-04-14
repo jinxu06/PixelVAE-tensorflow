@@ -194,7 +194,7 @@ def deconv_32_block(inputs, is_training, nonlinearity=None, bn=True, kernel_init
 
 
 @add_arg_scope
-def encode_context_block(contexts, masks, is_training, num_filters=16, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
+def encode_context_block(contexts, masks, is_training, num_filters=32, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
     name = get_name("encode_context_block", counters)
     print("construct", name, "...")
     with tf.variable_scope(name):
