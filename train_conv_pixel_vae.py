@@ -203,6 +203,7 @@ cfg = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     #"save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_test",
     "save_dir": "/data/ziz/jxu/models/temp",
+    "encoder_save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
     "data_set": "celeba32",
     "batch_size": 32,
     "nr_gpu": 4,
@@ -225,6 +226,7 @@ parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help
 # data I/O
 parser.add_argument('-dd', '--data_dir', type=str, default=cfg['data_dir'], help='Location for the dataset')
 parser.add_argument('-sd', '--save_dir', type=str, default=cfg['save_dir'], help='Location for parameter checkpoints and samples')
+parser.add_argument('-esd', '--encoder_save_dir', type=str, default=cfg['encoder_save_dir'], help='Location for encoder parameter checkpoints and samples')
 parser.add_argument('-ds', '--data_set', type=str, default=cfg['data_set'], help='Can be either cifar|imagenet')
 parser.add_argument('-r', '--reg', type=str, default=cfg['reg'], help='regularization type')
 parser.add_argument('-si', '--save_interval', type=int, default=cfg['save_interval'], help='Every how many epochs to write checkpoint/samples?')
@@ -416,9 +418,8 @@ with tf.Session(config=config) as sess:
 
     sess.run(initializer)
 
-    encoder_save_dir = "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5"
     if args.freeze_encoder:
-        encoder_ckpt_file = encoder_save_dir + '/params_' + args.data_set + '.ckpt'
+        encoder_ckpt_file = args.encoder_save_dir + '/pretraining_params_' + args.data_set + '.ckpt'
         print('restoring encoder parameters from', encoder_ckpt_file)
         encoder_saver.restore(sess, encoder_ckpt_file)
 
