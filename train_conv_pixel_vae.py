@@ -215,6 +215,7 @@ cfg = {
     "save_interval": 10,
     "reg": "mmd",
     "use_mode": "train",
+    "mask_type": "none",
 }
 
 
@@ -240,6 +241,7 @@ parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to us
 # new features
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
 parser.add_argument('-um', '--use_mode', type=str, default=cfg['use_mode'], help='')
+parser.add_argument('-mt', '--mask_type', type=str, default=cfg['mask_type'], help='')
 
 args = parser.parse_args()
 if args.use_mode == 'test':
@@ -266,7 +268,10 @@ xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img
 x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 dropout_ps = [tf.placeholder(tf.float32, shape=()) for i in range(args.nr_gpu)]
-masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
+if args.mask_type=="none":
+    masks = [None for i in range(args.nr_gpu)]
+else:
+    masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
 
 pvaes = [ConvPixelVAE(counters={}) for i in range(args.nr_gpu)]
 model_opt = {
@@ -291,6 +296,9 @@ for i in range(args.nr_gpu):
 
 if args.use_mode == 'train':
     all_params = tf.trainable_variables()
+    for p in all_params:
+        print(p.name)
+    quit()
     grads = []
     for i in range(args.nr_gpu):
         with tf.device('/gpu:%d' % i):
@@ -314,7 +322,8 @@ def make_feed_dict(data, is_training=True, dropout_p=0.5):
     feed_dict.update({dropout_ps[i]: dropout_p for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     feed_dict.update({ x_bars[i]:ds[i] for i in range(args.nr_gpu) })
-    feed_dict.update({masks[i]:train_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+    if masks[0] is not None:
+        feed_dict.update({masks[i]:train_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
     return feed_dict
 
 def sample_from_model(sess, data):
@@ -323,7 +332,8 @@ def sample_from_model(sess, data):
     feed_dict = {is_trainings[i]: False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
-    feed_dict.update({masks[i]:np.zeros((args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)})
+    if masks[0] is not None:
+        feed_dict.update({masks[i]:np.zeros((args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
