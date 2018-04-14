@@ -300,9 +300,7 @@ if args.use_mode == 'train':
     all_params = tf.trainable_variables()
     if args.freeze_encoder:
         all_params = [p for p in all_params if "conv_encoder_" not in p.name]
-    for p in all_params:
-        print(p.name)
-    quit()
+
     grads = []
     for i in range(args.nr_gpu):
         with tf.device('/gpu:%d' % i):
