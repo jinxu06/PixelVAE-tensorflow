@@ -218,7 +218,7 @@ xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img
 x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 dropout_ps = [tf.placeholder(tf.float32, shape=()) for i in range(args.nr_gpu)]
-if args.mask_type=="none":
+if args.mask_type.lower()=="none":
     masks = [None for i in range(args.nr_gpu)]
 else:
     masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
