@@ -38,6 +38,29 @@ cfg = {
     "mask_type": "rec",
 }
 
+cfg = {
+    "img_size": 32,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_2stage",
+    #"save_dir": "/data/ziz/jxu/models/temp",
+    "encoder_save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
+    "data_set": "celeba32",
+    "batch_size": 32,
+    "nr_gpu": 4,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.0001,
+    "nr_resnet": 5,
+    "nr_filters": 100,
+    "nr_logistic_mix": 10,
+    "beta": 1e5,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "mmd",
+    "use_mode": "train",
+    "mask_type": "None",
+}
+
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
