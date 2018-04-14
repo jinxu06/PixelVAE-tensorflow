@@ -241,6 +241,7 @@ parser.add_argument('-nlm', '--nr_logistic_mix', type=float, default=cfg['nr_log
 parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to use')
 # new features
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
+parser.add_argument('-fe', '--freeze_encoder', dest='freeze_encoder', action='store_true', help='freeze parameters for the encoder?')
 parser.add_argument('-um', '--use_mode', type=str, default=cfg['use_mode'], help='')
 parser.add_argument('-mt', '--mask_type', type=str, default=cfg['mask_type'], help='')
 
@@ -297,7 +298,8 @@ for i in range(args.nr_gpu):
 
 if args.use_mode == 'train':
     all_params = tf.trainable_variables()
-    all_params = [p for p in all_params if "conv_encoder_" in p.name]
+    if args.freeze_encoder:
+        all_params = [p for p in all_params if "conv_encoder_" not in p.name]
     for p in all_params:
         print(p.name)
     quit()
