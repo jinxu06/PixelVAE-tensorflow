@@ -258,7 +258,6 @@ with tf.Session(config=config) as sess:
         ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
         print('restoring parameters from', ckpt_file)
         saver.restore(sess, ckpt_file)
-    quit()
 
     max_num_epoch = 200
     for epoch in range(max_num_epoch):
