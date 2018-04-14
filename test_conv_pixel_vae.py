@@ -304,7 +304,7 @@ def latent_traversal(sess, data, use_image_id=0, features_id=None):
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
-    for yi in range(20, args.img_size):
+    for yi in range(10, 20):#(20, args.img_size):
         for xi in range(args.img_size):
             print(yi, xi)
             feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
@@ -338,16 +338,15 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
     data = test_data.next(32*10)
-    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
-    vdata = vdata[:100]
-    visualize_samples(vdata, "results/celeba32_original.png", layout=(10, 10))
-    vdata[:, 20:, :, :] = 0.
-    visualize_samples(vdata[:100], "results/celeba32_masked.png", layout=(10, 10))
-
+    # vdata = np.cast[np.float32]((data - 127.5) / 127.5)
+    # vdata = vdata[:100]
+    # visualize_samples(vdata, "results/celeba32_original.png", layout=(10, 10))
+    # vdata[:, 20:, :, :] = 0.
+    # visualize_samples(vdata[:100], "results/celeba32_masked.png", layout=(10, 10))
 
     test_data.reset()
     img = []
-    for uid in [5,6,7,18,27,44]:
+    for uid in [5, 6]:
         sample_x = latent_traversal(sess, data, use_image_id=uid)
         view = visualize_samples(sample_x, None, layout=(32, 10))
         img.append(view.copy())
@@ -355,4 +354,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("results/conv_pixel_vae_mmd_traversal.png")
+    img.save("results/conv_pixel_vae_test.png")
