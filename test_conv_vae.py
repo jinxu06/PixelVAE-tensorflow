@@ -13,20 +13,20 @@ from layers import visualize_samples
 parser = argparse.ArgumentParser()
 
 cfg = {
-    "img_size": 64,
+    "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta15",
-    "data_set": "celeba64",
-    "batch_size": 80,
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
+    "data_set": "celeba32",
+    "batch_size": 512,
     "nr_gpu": 2,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.001,
-    "beta": 15.0,
+    "beta": 5.0,
     "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
-    "use_mode": "test",
+    "use_mode": "train",
 }
 
 
@@ -83,7 +83,7 @@ model_opt = {
     "kernel_initializer": None,
     "kernel_regularizer": None,
 }
-model = tf.make_template('VAE', ConvVAE.build_graph)
+model = tf.make_template('PVAE', ConvVAE.build_graph)
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
@@ -171,7 +171,7 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
+    # saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
     data = test_data.next(32*10)
     test_data.reset()
     img = []
