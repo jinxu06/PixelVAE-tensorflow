@@ -11,39 +11,39 @@ from vae.conv_vae import ConvVAE
 
 parser = argparse.ArgumentParser()
 
-cfg = {
-    "img_size": 32,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta1",
-    "data_set": "celeba32",
-    "batch_size": 512,
-    "nr_gpu": 2,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.001,
-    "beta": 1.0,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc",
-    "use_mode": "train",
-}
-
 # cfg = {
 #     "img_size": 32,
 #     "z_dim": 32,
 #     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta2",
+#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta1",
 #     "data_set": "celeba32",
 #     "batch_size": 512,
 #     "nr_gpu": 2,
 #     #"gpus": "4,5,6,7",
 #     "learning_rate": 0.001,
-#     "beta": 2.0,
+#     "beta": 1.0,
 #     "lam": 0.0,
 #     "save_interval": 10,
 #     "reg": "tc",
 #     "use_mode": "train",
 # }
+
+cfg = {
+    "img_size": 32,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta2",
+    "data_set": "celeba32",
+    "batch_size": 512,
+    "nr_gpu": 2,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.001,
+    "beta": 2.0,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "tc",
+    "use_mode": "train",
+}
 #
 # cfg = {
 #     "img_size": 32,
