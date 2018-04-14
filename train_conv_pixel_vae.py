@@ -406,16 +406,27 @@ def latent_traversal(sess, data, use_image_id=0):
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
 
+
+var_list = [p for p in tf.trainable_variables() if "conv_encoder_" in p.name]
+encoder_saver = tf.train.Saver(var_list=var_list)
+
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
 
     sess.run(initializer)
 
+    encoder_save_dir = "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5"
+    if args.freeze_encoder:
+        encoder_ckpt_file = encoder_save_dir + '/params_' + args.data_set + '.ckpt'
+        print('restoring encoder parameters from', encoder_ckpt_file)
+        encoder_saver.restore(sess, encoder_ckpt_file)
+
     if args.load_params:
         ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
         print('restoring parameters from', ckpt_file)
         saver.restore(sess, ckpt_file)
+    quit()
 
     max_num_epoch = 200
     for epoch in range(max_num_epoch):
