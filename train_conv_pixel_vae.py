@@ -53,10 +53,10 @@ cfg = {
     "nr_resnet": 5,
     "nr_filters": 100,
     "nr_logistic_mix": 10,
-    "beta": 1e5,
+    "beta": 1,
     "lam": 0.0,
     "save_interval": 10,
-    "reg": "mmd",
+    "reg": "kld",
     "use_mode": "train",
     "mask_type": "None",
 }
@@ -184,7 +184,8 @@ def sample_from_model(sess, data):
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
         for xi in range(args.img_size):
-            if tm[0, yi, xi]==0:
+            if masks[0] is None or tm[0, yi, xi]==0:
+                print(masks[0])
                 feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
                 x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
                 for i in range(args.nr_gpu):
