@@ -262,17 +262,16 @@ def generate_samples(sess, data):
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
-    print(z_mu)
-    print(z_sigma)
-    print(z)
-    quit()
+
     #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
-    for yi in range(args.img_size):
-        for xi in range(args.img_size):
+    #for yi in range(args.img_size):
+    for yi in range(10, 22):
+        for xi in range(10, 22):
+        #for xi in range(args.img_size):
             print(yi, xi)
             feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
             x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
@@ -324,34 +323,34 @@ config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
 
-    # ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
-    # print('restoring parameters from', ckpt_file)
-    # saver.restore(sess, ckpt_file)
-    #
-    # data = next(test_data)
-    # sample_x = generate_samples(sess, data)
-    # visualize_samples(sample_x, "results/conv_pixel_vae_test.png", layout=(8,8))
-
-
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    data = test_data.next(32*10)
-    # vdata = np.cast[np.float32]((data - 127.5) / 127.5)
-    # vdata = vdata[:100]
-    # visualize_samples(vdata, "results/celeba32_original.png", layout=(10, 10))
-    # vdata[:, 20:, :, :] = 0.
-    # visualize_samples(vdata[:100], "results/celeba32_masked.png", layout=(10, 10))
+    data = next(test_data)
+    sample_x = generate_samples(sess, data)
+    visualize_samples(sample_x, "results/conv_pixel_vae_test.png", layout=(8,8))
 
-    test_data.reset()
-    img = []
-    for uid in [5, 6]:
-        sample_x = latent_traversal(sess, data, use_image_id=uid)
-        view = visualize_samples(sample_x, None, layout=(32, 10))
-        img.append(view.copy())
-    img = np.concatenate(img, axis=1)
-    from PIL import Image
-    img = img.astype(np.uint8)
-    img = Image.fromarray(img, 'RGB')
-    img.save("results/conv_pixel_vae_test.png")
+
+    # ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
+    # print('restoring parameters from', ckpt_file)
+    # saver.restore(sess, ckpt_file)
+    #
+    # data = test_data.next(32*10)
+    # # vdata = np.cast[np.float32]((data - 127.5) / 127.5)
+    # # vdata = vdata[:100]
+    # # visualize_samples(vdata, "results/celeba32_original.png", layout=(10, 10))
+    # # vdata[:, 20:, :, :] = 0.
+    # # visualize_samples(vdata[:100], "results/celeba32_masked.png", layout=(10, 10))
+    #
+    # test_data.reset()
+    # img = []
+    # for uid in [5, 6]:
+    #     sample_x = latent_traversal(sess, data, use_image_id=uid)
+    #     view = visualize_samples(sample_x, None, layout=(32, 10))
+    #     img.append(view.copy())
+    # img = np.concatenate(img, axis=1)
+    # from PIL import Image
+    # img = img.astype(np.uint8)
+    # img = Image.fromarray(img, 'RGB')
+    # img.save("results/conv_pixel_vae_test.png")
