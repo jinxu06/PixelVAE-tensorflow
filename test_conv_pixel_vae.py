@@ -139,6 +139,29 @@ cfg = {
     "use_mode": "test",
 }
 
+cfg = {
+    "img_size": 32,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_test",
+    #"save_dir": "/data/ziz/jxu/models/temp",
+    "encoder_save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
+    "data_set": "celeba32",
+    "batch_size": 80,
+    "nr_gpu": 4,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.0001,
+    "nr_resnet": 5,
+    "nr_filters": 100,
+    "nr_logistic_mix": 10,
+    "beta": 1e5,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "mmd",
+    "use_mode": "test",
+    "mask_type": "rec",
+}
+
 
 
 
@@ -148,6 +171,7 @@ parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help
 # data I/O
 parser.add_argument('-dd', '--data_dir', type=str, default=cfg['data_dir'], help='Location for the dataset')
 parser.add_argument('-sd', '--save_dir', type=str, default=cfg['save_dir'], help='Location for parameter checkpoints and samples')
+parser.add_argument('-esd', '--encoder_save_dir', type=str, default=cfg['encoder_save_dir'], help='Location for encoder parameter checkpoints and samples')
 parser.add_argument('-ds', '--data_set', type=str, default=cfg['data_set'], help='Can be either cifar|imagenet')
 parser.add_argument('-r', '--reg', type=str, default=cfg['reg'], help='regularization type')
 parser.add_argument('-si', '--save_interval', type=int, default=cfg['save_interval'], help='Every how many epochs to write checkpoint/samples?')
@@ -159,10 +183,14 @@ parser.add_argument('-b', '--beta', type=float, default=cfg['beta'], help="stren
 parser.add_argument('-l', '--lam', type=float, default=cfg['lam'], help="")
 parser.add_argument('-zd', '--z_dim', type=float, default=cfg['z_dim'], help="")
 parser.add_argument('-nr', '--nr_resnet', type=float, default=cfg['nr_resnet'], help="")
+parser.add_argument('-nf', '--nr_filters', type=float, default=cfg['nr_filters'], help="")
+parser.add_argument('-nlm', '--nr_logistic_mix', type=float, default=cfg['nr_logistic_mix'], help="")
 parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to use')
 # new features
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
+parser.add_argument('-fe', '--freeze_encoder', dest='freeze_encoder', action='store_true', help='freeze parameters for the encoder?')
 parser.add_argument('-um', '--use_mode', type=str, default=cfg['use_mode'], help='')
+parser.add_argument('-mt', '--mask_type', type=str, default=cfg['mask_type'], help='')
 
 args = parser.parse_args()
 if args.use_mode == 'test':
@@ -182,11 +210,17 @@ else:
     train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu, rng=rng, shuffle=True, size=args.img_size)
 test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shuffle=False, size=args.img_size)
 
+train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.25, max_ratio=1.0)
+test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(12, 30, 20, 2))
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 dropout_ps = [tf.placeholder(tf.float32, shape=()) for i in range(args.nr_gpu)]
+if args.mask_type=="none":
+    masks = [None for i in range(args.nr_gpu)]
+else:
+    masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
 
 pvaes = [ConvPixelVAE(counters={}) for i in range(args.nr_gpu)]
 model_opt = {
@@ -200,17 +234,20 @@ model_opt = {
     "kernel_initializer": tf.contrib.layers.xavier_initializer(),
     "kernel_regularizer": None,
     "nr_resnet": args.nr_resnet,
-    "nr_filters": 100,
-    "nr_logistic_mix": 10,
+    "nr_filters": args.nr_filters,
+    "nr_logistic_mix": args.nr_logistic_mix,
 }
 model = tf.make_template('PVAE', ConvPixelVAE.build_graph)
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], **model_opt)
+        model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], **model_opt)
 
 if args.use_mode == 'train':
     all_params = tf.trainable_variables()
+    if args.freeze_encoder:
+        all_params = [p for p in all_params if "conv_encoder_" not in p.name]
+
     grads = []
     for i in range(args.nr_gpu):
         with tf.device('/gpu:%d' % i):
@@ -234,6 +271,8 @@ def make_feed_dict(data, is_training=True, dropout_p=0.5):
     feed_dict.update({dropout_ps[i]: dropout_p for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     feed_dict.update({ x_bars[i]:ds[i] for i in range(args.nr_gpu) })
+    if masks[0] is not None:
+        feed_dict.update({masks[i]:train_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
     return feed_dict
 
 def sample_from_model(sess, data):
@@ -242,6 +281,8 @@ def sample_from_model(sess, data):
     feed_dict = {is_trainings[i]: False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
+    if masks[0] is not None:
+        feed_dict.update({masks[i]:np.zeros((args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
@@ -262,25 +303,26 @@ def generate_samples(sess, data):
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
-
     #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
+    if masks[0] is not None:
+        tm = test_mgen.gen(args.batch_size)
+        feed_dict.update({masks[i]:tm for i in range(args.nr_gpu)})
+
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
-    #for yi in range(args.img_size):
-    for yi in range(14, 20):
+    for yi in range(args.img_size):
         for xi in range(args.img_size):
-            print(yi, xi)
-            feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
-            x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
-            for i in range(args.nr_gpu):
-                x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
+            if tm[0, yi, xi]==0:
+                print(yi, xi)
+                feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
+                x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+                for i in range(args.nr_gpu):
+                    x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
-
-def latent_traversal(sess, data, use_image_id=0, features_id=None):
-
+def latent_traversal(sess, data, use_image_id=0):
     data = data.copy()
     for i in range(data.shape[0]):
         data[i] = data[use_image_id].copy()
@@ -293,7 +335,6 @@ def latent_traversal(sess, data, use_image_id=0, features_id=None):
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
-
     num_features = 32
     num_traversal_step = 10
     for i in range(num_features):
@@ -302,7 +343,7 @@ def latent_traversal(sess, data, use_image_id=0, features_id=None):
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
-    for yi in range(10, 20):#(20, args.img_size):
+    for yi in range(args.img_size):
         for xi in range(args.img_size):
             print(yi, xi)
             feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
@@ -310,7 +351,6 @@ def latent_traversal(sess, data, use_image_id=0, features_id=None):
             for i in range(args.nr_gpu):
                 x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
-
 
 
 

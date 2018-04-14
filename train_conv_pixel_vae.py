@@ -266,7 +266,7 @@ else:
 test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shuffle=False, size=args.img_size)
 
 train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.25, max_ratio=1.0)
-test_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.25, max_ratio=1.0)
+test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(12, 30, 20, 2))
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -362,14 +362,19 @@ def generate_samples(sess, data):
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
+    if masks[0] is not None:
+        tm = test_mgen.gen(args.batch_size)
+        feed_dict.update({masks[i]:tm for i in range(args.nr_gpu)})
+
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
         for xi in range(args.img_size):
-            print(yi, xi)
-            feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
-            x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
-            for i in range(args.nr_gpu):
-                x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
+            if tm[0, yi, xi]==0:
+                print(yi, xi)
+                feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
+                x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+                for i in range(args.nr_gpu):
+                    x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
 
