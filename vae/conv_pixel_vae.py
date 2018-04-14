@@ -44,7 +44,7 @@ class ConvPixelVAE(object):
         elif int_shape(x)[1]==32:
             conv_block = conv_encoder_32_block
             deconv_block = deconv_32_block
-        with arg_scope([conv_block, deconv_block, context_conditioning_block], nonlinearity=self.nonlinearity, bn=self.bn, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
+        with arg_scope([conv_block, deconv_block, encode_context_block], nonlinearity=self.nonlinearity, bn=self.bn, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
             self.z_mu, self.z_log_sigma_sq = conv_block(x, self.z_dim)
             sigma = tf.exp(self.z_log_sigma_sq / 2.)
             if self.use_mode=='train':
@@ -57,7 +57,7 @@ class ConvPixelVAE(object):
                 sh = self.decoded_features
             else:
                 self.encoded_context = encode_context_block(self.x, self.masks)
-                sh = tf.concat([self.decoded_features, self.encoded_context], axis=-1) 
+                sh = tf.concat([self.decoded_features, self.encoded_context], axis=-1)
             self.mix_logistic_params = cond_pixel_cnn(self.x_bar, sh=sh, nonlinearity=self.nonlinearity, nr_resnet=self.nr_resnet, nr_filters=self.nr_filters, nr_logistic_mix=self.nr_logistic_mix, bn=self.bn, dropout_p=self.dropout_p, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters)
             self.x_hat = mix_logistic_sampler(self.mix_logistic_params, nr_logistic_mix=self.nr_logistic_mix, sample_range=1, counters=self.counters)
 
