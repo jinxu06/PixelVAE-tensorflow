@@ -185,7 +185,6 @@ def sample_from_model(sess, data):
     for yi in range(args.img_size):
         for xi in range(args.img_size):
             if masks[0] is None or tm[0, yi, xi]==0:
-                print(masks[0])
                 feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
                 x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
                 for i in range(args.nr_gpu):
@@ -213,7 +212,7 @@ def generate_samples(sess, data):
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
         for xi in range(args.img_size):
-            if tm[0, yi, xi]==0:
+            if masks[0] is None or tm[0, yi, xi]==0:
                 print(yi, xi)
                 feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
                 x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)

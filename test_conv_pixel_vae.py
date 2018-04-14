@@ -283,15 +283,17 @@ def sample_from_model(sess, data):
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     if masks[0] is not None:
-        feed_dict.update({masks[i]:np.zeros((args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)})
+        tm = test_mgen.gen(args.batch_size)
+        feed_dict.update({masks[i]:tm for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
         for xi in range(args.img_size):
-            feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
-            x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
-            for i in range(args.nr_gpu):
-                x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
+            if masks[0] is None or tm[0, yi, xi]==0:
+                feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
+                x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+                for i in range(args.nr_gpu):
+                    x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
 def generate_samples(sess, data):
@@ -315,7 +317,7 @@ def generate_samples(sess, data):
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
         for xi in range(args.img_size):
-            if tm[0, yi, xi]==0:
+            if masks[0] is None or tm[0, yi, xi]==0:
                 print(yi, xi)
                 feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
                 x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
