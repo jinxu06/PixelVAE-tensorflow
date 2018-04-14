@@ -179,3 +179,10 @@ def visualize_samples(images, name="results/test.png", layout=[5,5], vrange=[-1.
         return view
     view = Image.fromarray(view, 'RGB')
     view.save(name)
+
+def broadcast_masks_tf(masks, num_channels=None, batch_size=None):
+    if num_channels is not None:
+        masks = tf.stack([masks for i in range(num_channels)], axis=-1)
+    if batch_size is not None:
+        masks = tf.stack([masks for i in range(batch_size)], axis=0)
+    return masks

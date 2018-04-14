@@ -9,6 +9,7 @@ import tensorflow as tf
 from utils import plotting
 from vae.conv_pixel_vae import ConvPixelVAE
 from layers import visualize_samples
+from masks import RandomRectangleMaskGenerator, RectangleMaskGenerator
 
 parser = argparse.ArgumentParser()
 
@@ -83,25 +84,25 @@ parser = argparse.ArgumentParser()
 # }
 
 
-cfg = {
-    "img_size": 32,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_cp",
-    "data_set": "celeba32",
-    "batch_size": 32,
-    "nr_gpu": 4,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0001,
-    "nr_resnet": 5,
-    "nr_filters": 100,
-    "nr_logistic_mix": 10,
-    "beta": 1e5,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "mmd",
-    "use_mode": "train",
-}
+# cfg = {
+#     "img_size": 32,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_cp",
+#     "data_set": "celeba32",
+#     "batch_size": 32,
+#     "nr_gpu": 4,
+#     #"gpus": "4,5,6,7",
+#     "learning_rate": 0.0001,
+#     "nr_resnet": 5,
+#     "nr_filters": 100,
+#     "nr_logistic_mix": 10,
+#     "beta": 1e5,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "mmd",
+#     "use_mode": "train",
+# }
 
 # cfg = {
 #     "img_size": 32,
@@ -196,6 +197,25 @@ cfg = {
 # cfg['nr_filters'] = 10
 # cfg['nr_logistic_mix'] = 1
 
+cfg = {
+    "img_size": 32,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_test",
+    "data_set": "celeba32",
+    "batch_size": 32,
+    "nr_gpu": 4,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.0001,
+    "nr_resnet": 5,
+    "nr_filters": 100,
+    "nr_logistic_mix": 10,
+    "beta": 1e5,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "mmd",
+    "use_mode": "train",
+}
 
 
 
@@ -239,11 +259,14 @@ else:
     train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu, rng=rng, shuffle=True, size=args.img_size)
 test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shuffle=False, size=args.img_size)
 
+train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.25, max_ratio=1.0)
+test_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.25, max_ratio=1.0)
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 dropout_ps = [tf.placeholder(tf.float32, shape=()) for i in range(args.nr_gpu)]
+masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
 
 pvaes = [ConvPixelVAE(counters={}) for i in range(args.nr_gpu)]
 model_opt = {
@@ -264,7 +287,7 @@ model = tf.make_template('PVAE', ConvPixelVAE.build_graph)
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], **model_opt)
+        model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks[i], **model_opt)
 
 if args.use_mode == 'train':
     all_params = tf.trainable_variables()
@@ -291,6 +314,7 @@ def make_feed_dict(data, is_training=True, dropout_p=0.5):
     feed_dict.update({dropout_ps[i]: dropout_p for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     feed_dict.update({ x_bars[i]:ds[i] for i in range(args.nr_gpu) })
+    feed_dict.update({masks[i]:train_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
     return feed_dict
 
 def sample_from_model(sess, data):
@@ -299,6 +323,7 @@ def sample_from_model(sess, data):
     feed_dict = {is_trainings[i]: False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
+    feed_dict.update({masks[i]:test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
