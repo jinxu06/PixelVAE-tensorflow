@@ -101,6 +101,8 @@ parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to us
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
 parser.add_argument('-um', '--use_mode', type=str, default=cfg['use_mode'], help='')
 
+parser.add_argument('-ipp', '--is_pvae_pretraining', dest='is_pvae_pretraining', action='store_true', help='')
+
 args = parser.parse_args()
 if args.use_mode == 'test':
     args.debug = True
@@ -135,7 +137,11 @@ model_opt = {
     "kernel_initializer": tf.contrib.layers.xavier_initializer(),
     "kernel_regularizer": None,
 }
-model = tf.make_template('PVAE', ConvVAE.build_graph)
+
+if args.is_pvae_pretraining:
+    model = tf.make_template('PVAE', ConvVAE.build_graph)
+else:
+    model = tf.make_template('VAE', ConvVAE.build_graph)
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
@@ -255,8 +261,11 @@ with tf.Session(config=config) as sess:
         sys.stdout.flush()
 
         if epoch % args.save_interval == 0:
+            if args.is_pvae_pretraining:
+                saver.save(sess, args.save_dir + '/pretraining_params_' + args.data_set + '.ckpt')
+            else:
+                saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
 
-            saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
             data = next(test_data)
             sample_x = sample_from_model(sess, data)
             test_data.reset()
