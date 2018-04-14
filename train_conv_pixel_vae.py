@@ -323,7 +323,7 @@ def sample_from_model(sess, data):
     feed_dict = {is_trainings[i]: False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
-    feed_dict.update({masks[i]:test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+    feed_dict.update({masks[i]:np.zeros((args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
