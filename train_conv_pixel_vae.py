@@ -292,7 +292,7 @@ model_opt = {
     "nr_filters": args.nr_filters,
     "nr_logistic_mix": args.nr_logistic_mix,
 }
-model = tf.make_template('PVAE', ConvPixelVAE.build_graph)
+model = tf.make_template('model', ConvPixelVAE.build_graph)
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
@@ -398,14 +398,19 @@ def latent_traversal(sess, data, use_image_id=0):
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
+    if masks[0] is not None:
+        tm = test_mgen.gen(args.batch_size)
+        feed_dict.update({masks[i]:tm for i in range(args.nr_gpu)})
+
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
         for xi in range(args.img_size):
-            print(yi, xi)
-            feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
-            x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
-            for i in range(args.nr_gpu):
-                x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
+            if tm[0, yi, xi]==0:
+                print(yi, xi)
+                feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
+                x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+                for i in range(args.nr_gpu):
+                    x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
 

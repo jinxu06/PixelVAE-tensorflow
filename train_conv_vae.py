@@ -11,75 +11,90 @@ from vae.conv_vae import ConvVAE
 
 parser = argparse.ArgumentParser()
 
-# cfg_15 = {
-#     "img_size": 64,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta15",
-#     "data_set": "celeba64",
-#     "batch_size": 512,
-#     "nr_gpu": 2,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.001,
-#     "beta": 15.0,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "train",
-# }
-#
-# cfg_30 = {
-#     "img_size": 64,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta30",
-#     "data_set": "celeba64",
-#     "batch_size": 512,
-#     "nr_gpu": 2,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.001,
-#     "beta": 30.0,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "train",
-# }
-#
-# cfg_60 = {
-#     "img_size": 64,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta60",
-#     "data_set": "celeba64",
-#     "batch_size": 512,
-#     "nr_gpu": 2,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.001,
-#     "beta": 60.0,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "train",
-# }
-#
-# cfg = cfg_30
-
 cfg = {
     "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta1",
     "data_set": "celeba32",
     "batch_size": 512,
     "nr_gpu": 2,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.001,
-    "beta": 5.0,
+    "beta": 1.0,
     "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
     "use_mode": "train",
 }
+
+# cfg = {
+#     "img_size": 32,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta2",
+#     "data_set": "celeba32",
+#     "batch_size": 512,
+#     "nr_gpu": 2,
+#     #"gpus": "4,5,6,7",
+#     "learning_rate": 0.001,
+#     "beta": 2.0,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "tc",
+#     "use_mode": "train",
+# }
+#
+# cfg = {
+#     "img_size": 32,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
+#     "data_set": "celeba32",
+#     "batch_size": 512,
+#     "nr_gpu": 2,
+#     #"gpus": "4,5,6,7",
+#     "learning_rate": 0.001,
+#     "beta": 5.0,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "tc",
+#     "use_mode": "train",
+# }
+#
+# cfg = {
+#     "img_size": 32,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta10",
+#     "data_set": "celeba32",
+#     "batch_size": 512,
+#     "nr_gpu": 2,
+#     #"gpus": "4,5,6,7",
+#     "learning_rate": 0.001,
+#     "beta": 10.0,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "tc",
+#     "use_mode": "train",
+# }
+#
+# cfg = {
+#     "img_size": 32,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta20",
+#     "data_set": "celeba32",
+#     "batch_size": 512,
+#     "nr_gpu": 2,
+#     #"gpus": "4,5,6,7",
+#     "learning_rate": 0.001,
+#     "beta": 20.0,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "tc",
+#     "use_mode": "train",
+# }
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -101,7 +116,7 @@ parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to us
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
 parser.add_argument('-um', '--use_mode', type=str, default=cfg['use_mode'], help='')
 
-parser.add_argument('-ipp', '--is_pvae_pretraining', dest='is_pvae_pretraining', action='store_true', help='')
+# parser.add_argument('-ipp', '--is_pvae_pretraining', dest='is_pvae_pretraining', action='store_true', help='')
 
 args = parser.parse_args()
 if args.use_mode == 'test':
@@ -138,10 +153,8 @@ model_opt = {
     "kernel_regularizer": None,
 }
 
-if args.is_pvae_pretraining:
-    model = tf.make_template('PVAE', ConvVAE.build_graph)
-else:
-    model = tf.make_template('VAE', ConvVAE.build_graph)
+
+model = tf.make_template('model', ConvVAE.build_graph)
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
