@@ -272,7 +272,7 @@ with tf.Session(config=config) as sess:
     sess.run(initializer)
 
     if args.freeze_encoder:
-        encoder_ckpt_file = args.encoder_save_dir + '/pretraining_params_' + args.data_set + '.ckpt'
+        encoder_ckpt_file = args.encoder_save_dir + '/params_' + args.data_set + '.ckpt'
         print('restoring encoder parameters from', encoder_ckpt_file)
         encoder_saver.restore(sess, encoder_ckpt_file)
 
