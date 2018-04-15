@@ -398,8 +398,14 @@ with tf.Session(config=config) as sess:
 
     data = next(test_data)
     data = next(test_data)
-    # vdata = np.cast[np.float32]((data - 127.5) / 127.5)
-    # visualize_samples(vdata, "results/conv_pixel_vae_celeba32_mmd_no_conditioning_original.png", layout=(10, 10))
+
+    tm = test_mgen.gen(data.shape[0])
+    tm = np.stack([tm for i in range(3)], axis=-1)
+    data = data * tm
+
+    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
+
+    visualize_samples(vdata, "results/conv_pixel_vae_celeba32_mmd_no_conditioning_original.png", layout=(10, 10))
     sample_x = generate_samples(sess, data)
     visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_conditioning.png", layout=(10, 10))
 
