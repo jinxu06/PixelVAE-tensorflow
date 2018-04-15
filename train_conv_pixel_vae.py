@@ -255,6 +255,12 @@ def latent_traversal(sess, data, use_image_id=0):
     return np.concatenate(x_gen, axis=0)
 
 
+from utils import get_trainable_variables
+vlist = get_trainable_variables(["pixe_cnn"])
+for v in vlist:
+    print(v)
+quit()
+
 
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
