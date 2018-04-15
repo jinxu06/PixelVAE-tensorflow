@@ -202,7 +202,7 @@ def encode_context_block(contexts, masks, is_training, nonlinearity=None, bn=Tru
         with arg_scope([conv2d_layer, deconv2d_layer], nonlinearity=nonlinearity, bn=bn, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
             outputs = contexts * broadcast_masks_tf(masks, num_channels=3)
             outputs = tf.concat([outputs, broadcast_masks_tf(masks, num_channels=1)], axis=-1)
-            outputs = conv2d_layer(outputs, 32, 1, 1, "SAME")
+            outputs = conv2d_layer(outputs, 32, 4, 1, "SAME")
             res1 = outputs
             outputs = conv2d_layer(outputs, 64, 3, 2, "SAME")
             res2 = outputs
@@ -213,7 +213,7 @@ def encode_context_block(contexts, masks, is_training, nonlinearity=None, bn=Tru
             outputs = deconv2d_layer(outputs, 64, 3, 2, "SAME", nonlinearity=None)
             outputs = nonlinearity(outputs + res2)
             outputs = deconv2d_layer(outputs, 32, 3, 2, "SAME", nonlinearity=None)
-            outputs = nonlinearity(outputs + res1)  
+            outputs = nonlinearity(outputs + res1)
             return outputs
 
 
