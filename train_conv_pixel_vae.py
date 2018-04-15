@@ -144,10 +144,6 @@ for i in range(args.nr_gpu):
 if args.use_mode == 'train':
     #all_params = tf.trainable_variables()
     all_params = get_trainable_variables(["encode_context"], "not in")
-    for p in all_params:
-        print(p.name)
-    quit()
-
 
     if args.freeze_encoder:
         all_params = [p for p in all_params if "conv_encoder_" not in p.name]
