@@ -9,7 +9,7 @@ import tensorflow as tf
 from utils import plotting
 from vae.conv_pixel_vae import ConvPixelVAE
 from layers import visualize_samples
-from masks import RandomRectangleMaskGenerator, RectangleMaskGenerator
+from masks import RandomRectangleMaskGenerator, RectangleMaskGenerator, CenterMaskGenerator
 from utils.utils import get_trainable_variables
 
 parser = argparse.ArgumentParser()
