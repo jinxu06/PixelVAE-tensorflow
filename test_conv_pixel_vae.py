@@ -164,6 +164,29 @@ cfg = {
     "mask_type": "rec",
 }
 
+cfg = {
+    "img_size": 32,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd",
+    #"save_dir": "/data/ziz/jxu/models/temp",
+    "encoder_save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
+    "data_set": "celeba32",
+    "batch_size": 80,
+    "nr_gpu": 4,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.0001,
+    "nr_resnet": 5,
+    "nr_filters": 100,
+    "nr_logistic_mix": 10,
+    "beta": 1e5,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "mmd",
+    "use_mode": "test",
+    "mask_type": "none",
+}
+
 
 
 
@@ -284,14 +307,14 @@ def sample_from_model(sess, data):
     feed_dict = {is_trainings[i]: False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
+    tm = test_mgen.gen(args.batch_size)
     if masks[0] is not None:
-        tm = test_mgen.gen(args.batch_size)
         feed_dict.update({masks[i]:tm for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
         for xi in range(args.img_size):
-            if masks[0] is None or tm[0, yi, xi]==0:
+            if tm[0, yi, xi]==0:
                 feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
                 x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
                 for i in range(args.nr_gpu):
@@ -312,14 +335,14 @@ def generate_samples(sess, data):
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
+    tm = test_mgen.gen(args.batch_size)
     if masks[0] is not None:
-        tm = test_mgen.gen(args.batch_size)
         feed_dict.update({masks[i]:tm for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
         for xi in range(args.img_size):
-            if masks[0] is None or tm[0, yi, xi]==0:
+            if tm[0, yi, xi]==0:
                 print(yi, xi)
                 feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
                 x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
