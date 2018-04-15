@@ -10,6 +10,7 @@ from utils import plotting
 from vae.conv_pixel_vae import ConvPixelVAE
 from layers import visualize_samples
 from masks import RandomRectangleMaskGenerator, RectangleMaskGenerator
+from utils.utils import get_trainable_variables
 
 parser = argparse.ArgumentParser()
 
@@ -106,7 +107,8 @@ else:
     train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu, rng=rng, shuffle=True, size=args.img_size)
 test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shuffle=False, size=args.img_size)
 
-train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.25, max_ratio=1.0)
+train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
+#train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.25, max_ratio=1.0)
 test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(0, 32, 20, 0))
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -140,7 +142,13 @@ for i in range(args.nr_gpu):
         model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], **model_opt)
 
 if args.use_mode == 'train':
-    all_params = tf.trainable_variables()
+    #all_params = tf.trainable_variables()
+    all_params = get_trainable_variables(["encode_context"])
+    for p in all_params:
+        print(p.name)
+    quit()
+
+
     if args.freeze_encoder:
         all_params = [p for p in all_params if "conv_encoder_" not in p.name]
 
@@ -255,18 +263,13 @@ def latent_traversal(sess, data, use_image_id=0):
     return np.concatenate(x_gen, axis=0)
 
 
-from utils.utils import get_trainable_variables
-vlist = get_trainable_variables(["pixel_cnn", "deconv"])
-for v in vlist:
-    print(v)
-quit()
 
 
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
 
 
-var_list = [p for p in tf.trainable_variables() if "conv_encoder_" in p.name]
+var_list = get_trainable_variables(["conv_encoder"])
 encoder_saver = tf.train.Saver(var_list=var_list)
 
 config = tf.ConfigProto()
