@@ -236,8 +236,8 @@ else:
 test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shuffle=False, size=args.img_size)
 
 train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.25, max_ratio=1.0)
-test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(8, 32, 18, 0)) # eye
-#test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(10, 22, 22, 10))
+#test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(8, 32, 18, 0)) # eye
+test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(10, 22, 22, 10))
 #test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(12, 32, 18, 0))
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
