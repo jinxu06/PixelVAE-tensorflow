@@ -396,8 +396,9 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
     data = next(test_data)
+    data = next(test_data)
     sample_x = generate_samples(sess, data)
-    visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_no_conditioning.png", layout=(8,8))
+    visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_no_conditioning.png", layout=(10, 10))
 
 
     # ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
