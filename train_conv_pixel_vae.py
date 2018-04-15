@@ -256,7 +256,7 @@ def latent_traversal(sess, data, use_image_id=0):
 
 
 from utils.utils import get_trainable_variables
-vlist = get_trainable_variables(["pixe_cnn"])
+vlist = get_trainable_variables(["pixel_cnn", "deconv"])
 for v in vlist:
     print(v)
 quit()
