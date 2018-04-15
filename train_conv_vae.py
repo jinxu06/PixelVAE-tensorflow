@@ -28,39 +28,39 @@ parser = argparse.ArgumentParser()
 #     "use_mode": "train",
 # }
 
-cfg = {
-    "img_size": 64,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta5",
-    "data_set": "celeba64",
-    "batch_size": 512,
-    "nr_gpu": 2,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.001,
-    "beta": 5.0,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc",
-    "use_mode": "train",
-}
-#
 # cfg = {
 #     "img_size": 64,
 #     "z_dim": 32,
 #     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta10",
+#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta5",
 #     "data_set": "celeba64",
 #     "batch_size": 512,
 #     "nr_gpu": 2,
 #     #"gpus": "4,5,6,7",
 #     "learning_rate": 0.001,
-#     "beta": 10.0,
+#     "beta": 5.0,
 #     "lam": 0.0,
 #     "save_interval": 10,
 #     "reg": "tc",
 #     "use_mode": "train",
 # }
+#
+cfg = {
+    "img_size": 64,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta10",
+    "data_set": "celeba64",
+    "batch_size": 512,
+    "nr_gpu": 2,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.001,
+    "beta": 10.0,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "tc",
+    "use_mode": "train",
+}
 #
 # cfg = {
 #     "img_size": 64,
