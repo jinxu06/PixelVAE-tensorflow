@@ -341,6 +341,7 @@ def generate_samples(sess, data):
         feed_dict.update({masks[i]:tm for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
+    x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
         for xi in range(args.img_size):
             if tm[0, yi, xi]==0:
@@ -397,6 +398,8 @@ with tf.Session(config=config) as sess:
 
     data = next(test_data)
     data = next(test_data)
+    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
+    visualize_samples(vdata, "results/conv_pixel_vae_celeba32_mmd_no_conditioning_original.png", layout=(10, 10))
     sample_x = generate_samples(sess, data)
     visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_no_conditioning.png", layout=(10, 10))
 
