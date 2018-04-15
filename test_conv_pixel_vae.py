@@ -238,7 +238,7 @@ test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shu
 train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.25, max_ratio=1.0)
 # test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(12, 30, 20, 2)) # eye
 # test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(10, 22, 22, 10))
-test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(0, 32, 20, 0))
+test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(12, 32, 18, 0))
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -405,7 +405,7 @@ with tf.Session(config=config) as sess:
     #sample_x = generate_samples(sess, data)
     #visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_no_conditioning_original.png", layout=(10, 10))
     sample_x = generate_samples(sess, data)
-    visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_non_conditioning.png", layout=(10, 10))
+    visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_non_conditioning_1.png", layout=(10, 10))
 
 
     # ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
