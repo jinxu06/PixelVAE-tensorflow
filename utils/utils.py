@@ -11,3 +11,4 @@ def get_trainable_variables(flist, filter_type="in"):
         vs = all_vs
         for s in flist:
             vs = [p for p in vs if s not in p.name]
+    return vs
