@@ -168,7 +168,7 @@ cfg = {
     "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_cp",
     #"save_dir": "/data/ziz/jxu/models/temp",
     "encoder_save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
     "data_set": "celeba32",
