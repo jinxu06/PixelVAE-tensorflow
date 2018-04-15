@@ -140,11 +140,12 @@ cfg = {
     "use_mode": "test",
 }
 
+
 cfg = {
     "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_test",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_conditioning",
     #"save_dir": "/data/ziz/jxu/models/temp",
     "encoder_save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
     "data_set": "celeba32",
@@ -237,6 +238,7 @@ model_opt = {
     "nr_resnet": args.nr_resnet,
     "nr_filters": args.nr_filters,
     "nr_logistic_mix": args.nr_logistic_mix,
+    "sample_range": 3.0,
 }
 model = tf.make_template('model', ConvPixelVAE.build_graph)
 
@@ -371,7 +373,7 @@ with tf.Session(config=config) as sess:
 
     data = next(test_data)
     sample_x = generate_samples(sess, data)
-    visualize_samples(sample_x, "results/conv_pixel_vae_test.png", layout=(8,8))
+    visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_conditioning.png", layout=(8,8))
 
 
     # ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
