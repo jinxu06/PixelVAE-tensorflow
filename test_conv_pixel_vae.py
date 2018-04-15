@@ -263,7 +263,7 @@ model_opt = {
     "nr_logistic_mix": args.nr_logistic_mix,
     "sample_range": 3.0,
 }
-model = tf.make_template('model', ConvPixelVAE.build_graph)
+model = tf.make_template('PVAE', ConvPixelVAE.build_graph)
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
