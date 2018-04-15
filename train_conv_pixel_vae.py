@@ -38,28 +38,28 @@ cfg = {
     "mask_type": "rec",
 }
 
-cfg = {
-    "img_size": 32,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_2stage",
-    #"save_dir": "/data/ziz/jxu/models/temp",
-    "encoder_save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
-    "data_set": "celeba32",
-    "batch_size": 32,
-    "nr_gpu": 4,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0001,
-    "nr_resnet": 5,
-    "nr_filters": 100,
-    "nr_logistic_mix": 10,
-    "beta": 1,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "kld",
-    "use_mode": "train",
-    "mask_type": "none",
-}
+# cfg = {
+#     "img_size": 32,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_2stage",
+#     #"save_dir": "/data/ziz/jxu/models/temp",
+#     "encoder_save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
+#     "data_set": "celeba32",
+#     "batch_size": 32,
+#     "nr_gpu": 4,
+#     #"gpus": "4,5,6,7",
+#     "learning_rate": 0.0001,
+#     "nr_resnet": 5,
+#     "nr_filters": 100,
+#     "nr_logistic_mix": 10,
+#     "beta": 1,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "kld",
+#     "use_mode": "train",
+#     "mask_type": "none",
+# }
 
 
 
@@ -107,7 +107,7 @@ else:
 test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shuffle=False, size=args.img_size)
 
 train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.25, max_ratio=1.0)
-test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(12, 30, 20, 2))
+test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(0, 32, 20, 0))
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -177,14 +177,15 @@ def sample_from_model(sess, data):
     feed_dict = {is_trainings[i]: False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
+    tm = test_mgen.gen(args.batch_size)
     if masks[0] is not None:
-        tm = test_mgen.gen(args.batch_size)
         feed_dict.update({masks[i]:tm for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
+    x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
         for xi in range(args.img_size):
-            if masks[0] is None or tm[0, yi, xi]==0:
+            if tm[0, yi, xi]==0:
                 feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
                 x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
                 for i in range(args.nr_gpu):
@@ -205,21 +206,23 @@ def generate_samples(sess, data):
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
+    tm = test_mgen.gen(args.batch_size)
     if masks[0] is not None:
-        tm = test_mgen.gen(args.batch_size)
         feed_dict.update({masks[i]:tm for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
+    x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
+    #return np.concatenate(x_gen, axis=0)
+
     for yi in range(args.img_size):
         for xi in range(args.img_size):
-            if masks[0] is None or tm[0, yi, xi]==0:
+            if tm[0, yi, xi]==0:
                 print(yi, xi)
                 feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
                 x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
                 for i in range(args.nr_gpu):
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
-
 
 def latent_traversal(sess, data, use_image_id=0):
     data = data.copy()
@@ -241,19 +244,14 @@ def latent_traversal(sess, data, use_image_id=0):
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
-    if masks[0] is not None:
-        tm = test_mgen.gen(args.batch_size)
-        feed_dict.update({masks[i]:tm for i in range(args.nr_gpu)})
-
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
         for xi in range(args.img_size):
-            if tm[0, yi, xi]==0:
-                print(yi, xi)
-                feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
-                x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
-                for i in range(args.nr_gpu):
-                    x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
+            print(yi, xi)
+            feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
+            x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+            for i in range(args.nr_gpu):
+                x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
 

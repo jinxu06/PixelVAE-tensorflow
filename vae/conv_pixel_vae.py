@@ -195,15 +195,25 @@ def deconv_32_block(inputs, is_training, nonlinearity=None, bn=True, kernel_init
 
 
 @add_arg_scope
-def encode_context_block(contexts, masks, is_training, num_filters=32, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
+def encode_context_block(contexts, masks, is_training, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
     name = get_name("encode_context_block", counters)
     print("construct", name, "...")
     with tf.variable_scope(name):
-        with arg_scope([conv2d_layer], nonlinearity=nonlinearity, bn=bn, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
+        with arg_scope([conv2d_layer, deconv2d_layer], nonlinearity=nonlinearity, bn=bn, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
             outputs = contexts * broadcast_masks_tf(masks, num_channels=3)
             outputs = tf.concat([outputs, broadcast_masks_tf(masks, num_channels=1)], axis=-1)
-            outputs = conv2d_layer(outputs, num_filters, 4, 1, "SAME")
-            outputs = conv2d_layer(outputs, num_filters, 4, 1, "SAME")
+            outputs = conv2d_layer(outputs, 32, 1, 1, "SAME")
+            res1 = outputs
+            outputs = conv2d_layer(outputs, 64, 3, 2, "SAME")
+            res2 = outputs
+            outputs = conv2d_layer(outputs, 128, 3, 2, "SAME")
+            res3 = outputs
+            outputs = conv2d_layer(outputs, 128, 3, 1, "SAME", nonlinearity=None)
+            outputs = nonlinearity(outputs + res3)
+            outputs = deconv2d_layer(outputs, 64, 3, 2, "SAME", nonlinearity=None)
+            outputs = nonlinearity(outputs + res2)
+            outputs = deconv2d_layer(outputs, 32, 3, 2, "SAME", nonlinearity=None)
+            outputs = nonlinearity(outputs + res1)  
             return outputs
 
 

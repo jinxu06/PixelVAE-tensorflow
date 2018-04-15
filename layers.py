@@ -98,6 +98,7 @@ def gated_resnet(x, a=None, gh=None, sh=None, nonlinearity=tf.nn.elu, conv=conv2
 
 
 
+
 def int_shape(x):
     return list(map(int, x.get_shape()))
 
