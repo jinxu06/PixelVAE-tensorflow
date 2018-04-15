@@ -164,28 +164,28 @@ cfg = {
     "mask_type": "rec",
 }
 
-cfg = {
-    "img_size": 32,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_cp",
-    #"save_dir": "/data/ziz/jxu/models/temp",
-    "encoder_save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
-    "data_set": "celeba32",
-    "batch_size": 80,
-    "nr_gpu": 4,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0001,
-    "nr_resnet": 5,
-    "nr_filters": 100,
-    "nr_logistic_mix": 10,
-    "beta": 1e5,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "mmd",
-    "use_mode": "test",
-    "mask_type": "none",
-}
+# cfg = {
+#     "img_size": 32,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_cp",
+#     #"save_dir": "/data/ziz/jxu/models/temp",
+#     "encoder_save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
+#     "data_set": "celeba32",
+#     "batch_size": 80,
+#     "nr_gpu": 4,
+#     #"gpus": "4,5,6,7",
+#     "learning_rate": 0.0001,
+#     "nr_resnet": 5,
+#     "nr_filters": 100,
+#     "nr_logistic_mix": 10,
+#     "beta": 1e5,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "mmd",
+#     "use_mode": "test",
+#     "mask_type": "none",
+# }
 
 
 
@@ -265,7 +265,7 @@ model_opt = {
     "nr_logistic_mix": args.nr_logistic_mix,
     "sample_range": 3.0,
 }
-model = tf.make_template('PVAE', ConvPixelVAE.build_graph)
+model = tf.make_template('model', ConvPixelVAE.build_graph)
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
@@ -406,7 +406,7 @@ with tf.Session(config=config) as sess:
     #visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_no_conditioning_original.png", layout=(10, 10))
     sample_x = generate_samples(sess, data)
     #visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_no_conditioning_original.png", layout=(10, 10))
-    visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_non_conditioning_2.png", layout=(10, 10))
+    visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_conditioning_2.png", layout=(10, 10))
 
 
     # ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
