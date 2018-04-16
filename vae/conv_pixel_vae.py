@@ -7,6 +7,7 @@ from layers import conv2d_layer, deconv2d_layer, dense_layer
 from layers import compute_mmd, compute_tc, compute_dwkld, compute_entropy, compute_mi
 from layers import int_shape, get_name, broadcast_masks_tf
 from cond_pixel_cnn import cond_pixel_cnn, mix_logistic_sampler, mix_logistic_loss
+from layers import up_shifted_conv2d, up_left_shifted_conv2d, up_shift, left_shift, nin
 
 
 class ConvPixelVAE(object):
@@ -57,7 +58,7 @@ class ConvPixelVAE(object):
             if self.masks is None:
                 sh = self.decoded_features
             else:
-                self.encoded_context = encode_context_block(self.x, self.masks, bn=True)
+                self.encoded_context = encode_context_block(self.x, self.masks)
                 sh = tf.concat([self.decoded_features, self.encoded_context], axis=-1)
             self.mix_logistic_params = cond_pixel_cnn(self.x_bar, sh=sh, nonlinearity=self.nonlinearity, nr_resnet=self.nr_resnet, nr_filters=self.nr_filters, nr_logistic_mix=self.nr_logistic_mix, bn=self.bn, dropout_p=self.dropout_p, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters)
             self.x_hat = mix_logistic_sampler(self.mix_logistic_params, nr_logistic_mix=self.nr_logistic_mix, sample_range=self.sample_range, counters=self.counters)
@@ -199,27 +200,31 @@ def deconv_32_block(inputs, is_training, nonlinearity=None, bn=True, kernel_init
 
 
 @add_arg_scope
-def encode_context_block(contexts, masks, is_training, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
+def encode_context_block(contexts, masks, is_training, nr_resnet=5, nr_filters=32, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
     name = get_name("encode_context_block", counters)
     print("construct", name, "...")
+    x = contexts * broadcast_masks_tf(masks, num_channels=3)
+    x = tf.concat([x, broadcast_masks_tf(masks, num_channels=1)], axis=-1)
     with tf.variable_scope(name):
-        with arg_scope([conv2d_layer, deconv2d_layer], nonlinearity=nonlinearity, bn=bn, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
-            outputs = contexts * broadcast_masks_tf(masks, num_channels=3)
-            outputs = tf.concat([outputs, broadcast_masks_tf(masks, num_channels=1)], axis=-1)
-            outputs = conv2d_layer(outputs, 32, 3, 1, "SAME")
-            outputs = conv2d_layer(outputs, 32, 3, 1, "SAME")
-            res1 = outputs
-            outputs = conv2d_layer(outputs, 64, 3, 2, "SAME")
-            res2 = outputs
-            outputs = conv2d_layer(outputs, 128, 3, 2, "SAME")
-            res3 = outputs
-            outputs = conv2d_layer(outputs, 128, 3, 1, "SAME", nonlinearity=None)
-            outputs = nonlinearity(outputs + res3)
-            outputs = deconv2d_layer(outputs, 64, 3, 2, "SAME", nonlinearity=None)
-            outputs = nonlinearity(outputs + res2)
-            outputs = deconv2d_layer(outputs, 32, 3, 2, "SAME", nonlinearity=None)
-            outputs = nonlinearity(outputs + res1)
-            return outputs
+        with arg_scope([gated_resnet], nonlinearity=nonlinearity, counters=counters):
+            with arg_scope([gated_resnet, up_shifted_conv2d, up_left_shifted_conv2d, up_shifted_deconv2d, up_left_shifted_deconv2d], bn=False, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
+                xs = nn.int_shape(x)
+                x_pad = tf.concat([x,tf.ones(xs[:-1]+[1])],3) # add channel of ones to distinguish image from padding later on
+
+                u_list = [up_shift(up_shifted_conv2d(x_pad, num_filters=nr_filters, filter_size=[2, 3]))] # stream for pixels above
+                ul_list = [up_shift(up_shifted_conv2d(x_pad, num_filters=nr_filters, filter_size=[1,3])) + \
+                        left_shift(up_left_shifted_conv2d(x_pad, num_filters=nr_filters, filter_size=[2,1]))] # stream for up and to the left
+                receptive_field = (2, 3)
+                for rep in range(nr_resnet):
+                    u_list.append(gated_resnet(u_list[-1], conv=up_shifted_conv2d))
+                    ul_list.append(gated_resnet(ul_list[-1], u_list[-1], conv=up_left_shifted_conv2d))
+                    receptive_field = (receptive_field[0]+1, receptive_field[1]+2)
+                x_out = nin(tf.nn.elu(ul_list[-1]), nr_filters)
+                print("    * receptive_field", receptive_field)
+                print(x_out)
+                quit()
+                return x_out
+
 
 
 

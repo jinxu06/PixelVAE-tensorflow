@@ -34,6 +34,8 @@ def cond_pixel_cnn(x, gh=None, sh=None, nonlinearity=tf.nn.elu, nr_resnet=5, nr_
                 print("    * receptive_field", receptive_field)
                 return x_out
 
+
+
 @add_arg_scope
 def mix_logistic_sampler(params, nr_logistic_mix=10, sample_range=3., counters={}):
     name = nn.get_name("logistic_mix_sampler", counters)
