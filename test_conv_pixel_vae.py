@@ -18,8 +18,8 @@ cfg = {
     "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_nocontext",
-    #"save_dir": "/data/ziz/jxu/models/temp",
+    # "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_nocontext",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_conditioning",
     "encoder_save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
     "data_set": "celeba32",
     "batch_size": 80,
@@ -83,7 +83,7 @@ test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shu
 
 train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
 #train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.25, max_ratio=1.0)
-test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(8, 24, 24, 8))
+test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(8, 32, 18, 0))
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
