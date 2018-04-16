@@ -201,7 +201,7 @@ def deconv_32_block(inputs, is_training, nonlinearity=None, bn=True, kernel_init
 
 
 @add_arg_scope
-def encode_context_block(contexts, masks, is_training, nr_resnet=5, nr_filters=32, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
+def encode_context_block(contexts, masks, is_training, nr_resnet=5, nr_filters=50, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
     name = get_name("encode_context_block", counters)
     print("construct", name, "...")
     x = contexts * broadcast_masks_tf(masks, num_channels=3)
@@ -220,7 +220,7 @@ def encode_context_block(contexts, masks, is_training, nr_resnet=5, nr_filters=3
                     u_list.append(gated_resnet(u_list[-1], conv=up_shifted_conv2d))
                     ul_list.append(gated_resnet(ul_list[-1], u_list[-1], conv=up_left_shifted_conv2d))
                     receptive_field = (receptive_field[0]+1, receptive_field[1]+2)
-                x_out = nin(tf.nn.elu(ul_list[-1]), nr_filters)
+                x_out = nin(nonlinearity(ul_list[-1]), nr_filters)
                 print("    * receptive_field", receptive_field)
                 return x_out
 
