@@ -289,7 +289,7 @@ with tf.Session(config=config) as sess:
 
     ckpt_file = "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_nocontext" + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
-    saver.restore(sess, ckpt_file)
+    tf.train.Saver(var_list=get_trainable_variables(["encode_context"], "not in")).restore(sess, ckpt_file)
 
     quit()
 
