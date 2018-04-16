@@ -207,7 +207,7 @@ def encode_context_block(contexts, masks, is_training, nr_resnet=5, nr_filters=3
     x = tf.concat([x, broadcast_masks_tf(masks, num_channels=1)], axis=-1)
     with tf.variable_scope(name):
         with arg_scope([gated_resnet], nonlinearity=nonlinearity, counters=counters):
-            with arg_scope([gated_resnet, up_shifted_conv2d, up_left_shifted_conv2d, up_shifted_deconv2d, up_left_shifted_deconv2d], bn=False, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
+            with arg_scope([gated_resnet, up_shifted_conv2d, up_left_shifted_conv2d], bn=False, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
                 xs = nn.int_shape(x)
                 x_pad = tf.concat([x,tf.ones(xs[:-1]+[1])],3) # add channel of ones to distinguish image from padding later on
 
