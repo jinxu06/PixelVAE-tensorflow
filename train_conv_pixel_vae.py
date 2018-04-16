@@ -280,7 +280,7 @@ with tf.Session(config=config) as sess:
         encoder_saver.restore(sess, encoder_ckpt_file)
 
     if args.load_params:
-        ckpt_file = args.save_dir + '/pretraining_params_' + args.data_set + '.ckpt'
+        ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
         print('restoring parameters from', ckpt_file)
         saver.restore(sess, ckpt_file)
 
