@@ -89,7 +89,7 @@ cfg = {
     "nr_gpu": 2,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.001,
-    "beta": 1.0,
+    "beta": 15.0,
     "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
