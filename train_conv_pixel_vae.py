@@ -272,7 +272,10 @@ saver = tf.train.Saver()
 var_list = get_trainable_variables(["conv_encoder"])
 encoder_saver = tf.train.Saver(var_list=var_list)
 
-saver1 = tf.train.Saver(var_list=get_trainable_variables(["encode_context"], "not in"))
+var_list = get_trainable_variables(["encode_context"], "not in")
+for v in var_list:
+    print(v.name)
+saver1 = tf.train.Saver(var_list=var_list)
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
