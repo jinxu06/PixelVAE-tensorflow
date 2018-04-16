@@ -198,6 +198,8 @@ def generate_samples(sess, data):
             if tm[0, yi, xi]==0:
                 print(yi, xi)
                 feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
+                df = sess.run([pvaes[i].decoded_features[0][0] for i in range(args.nr_gpu)], feed_dict=feed_dict)
+                print("df", df)
                 x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
                 for i in range(args.nr_gpu):
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
