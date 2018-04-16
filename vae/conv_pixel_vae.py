@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
 flatten = tf.contrib.layers.flatten
 from layers import conv2d_layer, deconv2d_layer, dense_layer
-from layers import compute_mmd, compute_tc, compute_dwkld, compute_entropy
+from layers import compute_mmd, compute_tc, compute_dwkld, compute_entropy, compute_mi
 from layers import int_shape, get_name, broadcast_masks_tf
 from cond_pixel_cnn import cond_pixel_cnn, mix_logistic_sampler, mix_logistic_loss
 
