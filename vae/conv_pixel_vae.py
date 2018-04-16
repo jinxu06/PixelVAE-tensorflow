@@ -7,7 +7,7 @@ from layers import conv2d_layer, deconv2d_layer, dense_layer
 from layers import compute_mmd, compute_tc, compute_dwkld, compute_entropy, compute_mi
 from layers import int_shape, get_name, broadcast_masks_tf
 from cond_pixel_cnn import cond_pixel_cnn, mix_logistic_sampler, mix_logistic_loss
-from layers import up_shifted_conv2d, up_left_shifted_conv2d, up_shift, left_shift, nin
+from layers import up_shifted_conv2d, up_left_shifted_conv2d, up_shift, left_shift, nin, gated_resnet
 
 
 class ConvPixelVAE(object):
