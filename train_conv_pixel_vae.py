@@ -273,8 +273,6 @@ var_list = get_trainable_variables(["conv_encoder"])
 encoder_saver = tf.train.Saver(var_list=var_list)
 
 var_list = get_trainable_variables(["conv_encoder", "deconv", "pixel_cnn"])
-for v in var_list:
-    print(v.name)
 saver1 = tf.train.Saver(var_list=var_list)
 
 config = tf.ConfigProto()
@@ -296,8 +294,6 @@ with tf.Session(config=config) as sess:
     ckpt_file = "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_nocontext" + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver1.restore(sess, ckpt_file)
-
-    quit()
 
     max_num_epoch = 200
     for epoch in range(max_num_epoch):
@@ -325,15 +321,15 @@ with tf.Session(config=config) as sess:
         print("test loss:{0:.3f}, test ae loss:{1:.3f}, test reg loss:{2:.3f}".format(test_loss, test_loss_ae, test_loss_reg))
         sys.stdout.flush()
 
-        if epoch % args.save_interval == 0:
-
-            saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
-            data = next(test_data)
-            sample_x = sample_from_model(sess, data)
-            test_data.reset()
-
-            #visualize_samples(sample_x, os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)), layout=(4,4))
-
-            img_tile = plotting.img_tile(sample_x[:100], aspect_ratio=1.0, border_color=1.0, stretch=True)
-            img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
-            plotting.plt.savefig(os.path.join(args.save_dir,'%s_pixel_vae_sample%d.png' % (args.data_set, epoch)))
+        # if epoch % args.save_interval == 0:
+        #
+        #     saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
+        #     data = next(test_data)
+        #     sample_x = sample_from_model(sess, data)
+        #     test_data.reset()
+        #
+        #     #visualize_samples(sample_x, os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)), layout=(4,4))
+        #
+        #     img_tile = plotting.img_tile(sample_x[:100], aspect_ratio=1.0, border_color=1.0, stretch=True)
+        #     img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
+        #     plotting.plt.savefig(os.path.join(args.save_dir,'%s_pixel_vae_sample%d.png' % (args.data_set, epoch)))
