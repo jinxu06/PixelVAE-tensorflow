@@ -9,7 +9,8 @@ import tensorflow as tf
 from utils import plotting
 from vae.conv_pixel_vae import ConvPixelVAE
 from layers import visualize_samples
-from masks import RandomRectangleMaskGenerator, RectangleMaskGenerator
+from masks import RandomRectangleMaskGenerator, RectangleMaskGenerator, CenterMaskGenerator
+from utils.utils import get_trainable_variables
 
 parser = argparse.ArgumentParser()
 
@@ -17,7 +18,7 @@ cfg = {
     "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_conditioning",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_nocontext",
     #"save_dir": "/data/ziz/jxu/models/temp",
     "encoder_save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
     "data_set": "celeba32",
@@ -35,7 +36,6 @@ cfg = {
     "use_mode": "test",
     "mask_type": "rec",
 }
-
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
