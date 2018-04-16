@@ -12,39 +12,39 @@ from layers import visualize_samples
 
 parser = argparse.ArgumentParser()
 
-cfg = {
-    "img_size": 64,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta1",
-    "data_set": "celeba64",
-    "batch_size": 80,
-    "nr_gpu": 2,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.001,
-    "beta": 1.0,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc",
-    "use_mode": "test",
-}
-
 # cfg = {
 #     "img_size": 64,
 #     "z_dim": 32,
 #     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta5",
+#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta1",
 #     "data_set": "celeba64",
-#     "batch_size": 80
+#     "batch_size": 80,
 #     "nr_gpu": 2,
 #     #"gpus": "4,5,6,7",
 #     "learning_rate": 0.001,
-#     "beta": 5.0,
+#     "beta": 1.0,
 #     "lam": 0.0,
 #     "save_interval": 10,
 #     "reg": "tc",
 #     "use_mode": "test",
 # }
+
+cfg = {
+    "img_size": 64,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta5",
+    "data_set": "celeba64",
+    "batch_size": 80
+    "nr_gpu": 2,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.001,
+    "beta": 5.0,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "tc",
+    "use_mode": "test",
+}
 #
 # cfg = {
 #     "img_size": 64,
@@ -234,7 +234,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("results/conv_vae_samples_celeba64_beta1.png")
+    img.save("results/conv_vae_samples_celeba64_beta5.png")
 
     # data = next(test_data)
     # sample_x = generate_samples(sess, data)
