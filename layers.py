@@ -138,8 +138,8 @@ def compute_mi(z, z_mu, z_log_sigma_sq):
     log_probs = []
     batch_size, z_dim = int_shape(z_mu)
     z_b = tf.stack([z for i in range(batch_size)], axis=0)
-    z_mu = tf.stack([z_mu for i in range(batch_size)], axis=1)
-    z_sigma = tf.stack([z_sigma for i in range(batch_size)], axis=1)
+    z_mu_b = tf.stack([z_mu for i in range(batch_size)], axis=1)
+    z_sigma_b = tf.stack([z_sigma for i in range(batch_size)], axis=1)
     z_norm = (z_b-z_mu) / z_sigma
 
     dist = tf.distributions.Normal(loc=0., scale=1.)
@@ -168,7 +168,6 @@ def compute_dwkld(z, z_mu, z_log_sigma_sq):
     return sum_lse + nll_prior
 
 def compute_entropy(z_mu, z_log_sigma_sq):
-    print(int_shape(z_mu))
     batch_size, z_dim = int_shape(z_mu)
     entropy = (tf.reduce_mean(z_log_sigma_sq, axis=1) + tf.log(2*np.pi*np.e)) * z_dim / 2.
     return entropy
