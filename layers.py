@@ -168,6 +168,7 @@ def compute_dwkld(z, z_mu, z_log_sigma_sq):
     return sum_lse + nll_prior
 
 def compute_entropy(z_mu, z_log_sigma_sq):
+    print(int_shape(z_mu))
     batch_size, z_dim = int_shape(z_mu)
     entropy = (tf.reduce_mean(z_log_sigma_sq, axis=1) + tf.log(2*np.pi*np.e)) * z_dim / 2.
     return entropy
