@@ -134,6 +134,7 @@ model_opt = {
     "nr_resnet": args.nr_resnet,
     "nr_filters": args.nr_filters,
     "nr_logistic_mix": args.nr_logistic_mix,
+    "sample_range": 3.0,
 }
 model = tf.make_template('model', ConvPixelVAE.build_graph)
 

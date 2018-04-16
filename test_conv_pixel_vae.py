@@ -12,134 +12,6 @@ from layers import visualize_samples
 from masks import RandomRectangleMaskGenerator, RectangleMaskGenerator
 
 parser = argparse.ArgumentParser()
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_ce-tc-dwkld",
-#     "data_set": "celeba32",
-#     "batch_size": 80,
-#     "nr_gpu": 4,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "beta": 1,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "ce-tc-dwkld",
-#     "use_mode": "test",
-# }
-
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_ce-tc-dwkld_beta8",
-#     "data_set": "celeba32",
-#     "batch_size": 80,
-#     "nr_gpu": 4,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "beta": 8,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "ce-tc-dwkld",
-#     "use_mode": "test",
-# }
-
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc_beta5_l5",
-#     "data_set": "celeba32",
-#     "batch_size": 160,
-#     "nr_gpu": 4,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "nr_resnet": 5,
-#     "beta": 5,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "test",
-# }
-#
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     #"save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_cp",
-#     "data_set": "celeba32",
-#     "batch_size": 80,
-#     "nr_gpu": 4,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "nr_resnet": 5,
-#     "beta": 1e5,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "mmd",
-#     "use_mode": "test",
-# }
-#
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_kld_cp",
-#     "data_set": "celeba32",
-#     "batch_size": 80,
-#     "nr_gpu": 4,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "nr_resnet": 5,
-#     "beta": 1,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "kld",
-#     "use_mode": "test",
-# }
-
-
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_tc-dwkld",
-#     "data_set": "celeba32",
-#     "batch_size": 80,
-#     "nr_gpu": 4,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "nr_resnet": 5,
-#     "beta": 1,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc-dwkld",
-#     "use_mode": "test",
-# }
-
-cfg = {
-    "img_size": 32,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_cp",
-    "data_set": "celeba32",
-    "batch_size": 80,
-    "nr_gpu": 4,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0001,
-    "nr_resnet": 5,
-    "nr_filters": 100,
-    "nr_logistic_mix": 10,
-    "beta": 1e5,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "mmd",
-    "use_mode": "test",
-}
-
 
 cfg = {
     "img_size": 32,
@@ -163,32 +35,6 @@ cfg = {
     "use_mode": "test",
     "mask_type": "rec",
 }
-
-# cfg = {
-#     "img_size": 32,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_cp",
-#     #"save_dir": "/data/ziz/jxu/models/temp",
-#     "encoder_save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
-#     "data_set": "celeba32",
-#     "batch_size": 80,
-#     "nr_gpu": 4,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0001,
-#     "nr_resnet": 5,
-#     "nr_filters": 100,
-#     "nr_logistic_mix": 10,
-#     "beta": 1e5,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "mmd",
-#     "use_mode": "test",
-#     "mask_type": "none",
-# }
-
-
-
 
 
 
@@ -235,10 +81,9 @@ else:
     train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu, rng=rng, shuffle=True, size=args.img_size)
 test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shuffle=False, size=args.img_size)
 
-train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.25, max_ratio=1.0)
-#test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(8, 32, 18, 0)) # eye
-#test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(10, 22, 22, 10))
-test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(0, 32, 16, 0))
+train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
+#train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.25, max_ratio=1.0)
+test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(0, 32, 20, 0))
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -272,7 +117,9 @@ for i in range(args.nr_gpu):
         model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], **model_opt)
 
 if args.use_mode == 'train':
-    all_params = tf.trainable_variables()
+    #all_params = tf.trainable_variables()
+    all_params = get_trainable_variables(["encode_context"], "not in")
+
     if args.freeze_encoder:
         all_params = [p for p in all_params if "conv_encoder_" not in p.name]
 
@@ -314,6 +161,7 @@ def sample_from_model(sess, data):
         feed_dict.update({masks[i]:tm for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
+    x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
         for xi in range(args.img_size):
             if tm[0, yi, xi]==0:
@@ -387,7 +235,6 @@ def latent_traversal(sess, data, use_image_id=0):
 
 
 
-
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
 
@@ -406,7 +253,7 @@ with tf.Session(config=config) as sess:
     #visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_no_conditioning_original.png", layout=(10, 10))
     sample_x = generate_samples(sess, data)
     #visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_no_conditioning_original.png", layout=(10, 10))
-    visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_conditioning_2.png", layout=(10, 10))
+    visualize_samples(sample_x, "results/show_1.png", layout=(10, 10))
 
 
     # ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
