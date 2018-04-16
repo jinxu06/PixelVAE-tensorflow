@@ -108,7 +108,7 @@ else:
 test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shuffle=False, size=args.img_size)
 
 #train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
-train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.25, max_ratio=1.0)
+train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.125, max_ratio=1.0)
 test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(8, 24, 24, 8))
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
