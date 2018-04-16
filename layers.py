@@ -133,6 +133,22 @@ def compute_mmd(x, y, sigma_sqr=1.0):
     mmd = tf.reduce_mean(x_kernel) + tf.reduce_mean(y_kernel) - 2 * tf.reduce_mean(xy_kernel)
     return mmd
 
+def compute_mi(z, z_mu, z_log_sigma_sq):
+    z_sigma = tf.sqrt(tf.exp(z_log_sigma_sq))
+    log_probs = []
+    batch_size, z_dim = int_shape(z_mu)
+    z_b = tf.stack([z for i in range(batch_size)], axis=0)
+    z_mu = tf.stack([z_mu for i in range(batch_size)], axis=1)
+    z_sigma = tf.stack([z_sigma for i in range(batch_size)], axis=1)
+    z_norm = (z_b-z_mu) / z_sigma
+
+    dist = tf.distributions.Normal(loc=0., scale=1.)
+    log_probs = dist.log_prob(z_norm)
+    lse_sum = log_sum_exp(tf.reduce_sum(log_probs, axis=-1), axis=1)
+
+    cond_entropy = tf.reduce_mean(compute_entropy(z_mu, z_log_sigma_sq))
+    return -lse_sum - cond_entropy
+
 def compute_dwkld(z, z_mu, z_log_sigma_sq):
     z_sigma = tf.sqrt(tf.exp(z_log_sigma_sq))
     log_probs = []
