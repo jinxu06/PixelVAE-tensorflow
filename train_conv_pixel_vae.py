@@ -272,6 +272,8 @@ saver = tf.train.Saver()
 var_list = get_trainable_variables(["conv_encoder"])
 encoder_saver = tf.train.Saver(var_list=var_list)
 
+saver1 = tf.train.Saver(var_list=get_trainable_variables(["encode_context"], "not in"))
+
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
@@ -290,7 +292,7 @@ with tf.Session(config=config) as sess:
 
     ckpt_file = "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_nocontext" + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
-    tf.train.Saver(var_list=get_trainable_variables(["encode_context"], "not in")).restore(sess, ckpt_file)
+    saver1.restore(sess, ckpt_file)
 
     quit()
 
