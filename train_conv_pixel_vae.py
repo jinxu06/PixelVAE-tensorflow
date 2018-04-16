@@ -272,7 +272,7 @@ saver = tf.train.Saver()
 var_list = get_trainable_variables(["conv_encoder"])
 encoder_saver = tf.train.Saver(var_list=var_list)
 
-var_list = get_trainable_variables(["encode_context"], "not in")
+var_list = get_trainable_variables(["conv_encoder", "deconv", "pixel_cnn"])
 for v in var_list:
     print(v.name)
 saver1 = tf.train.Saver(var_list=var_list)
