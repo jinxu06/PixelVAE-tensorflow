@@ -107,9 +107,9 @@ else:
     train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu, rng=rng, shuffle=True, size=args.img_size)
 test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shuffle=False, size=args.img_size)
 
-train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
-#train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.25, max_ratio=1.0)
-test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(0, 32, 20, 0))
+#train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
+train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.25, max_ratio=1.0)
+test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(8, 24, 24, 8))
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -144,7 +144,9 @@ for i in range(args.nr_gpu):
 
 if args.use_mode == 'train':
     #all_params = tf.trainable_variables()
-    all_params = get_trainable_variables(["encode_context"], "not in")
+    #all_params = get_trainable_variables(["encode_context"], "not in")
+    all_params = get_trainable_variables(["encode_context", "pixel_cnn"])
+    print(all_params)
 
     if args.freeze_encoder:
         all_params = [p for p in all_params if "conv_encoder_" not in p.name]
@@ -284,6 +286,12 @@ with tf.Session(config=config) as sess:
         ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
         print('restoring parameters from', ckpt_file)
         saver.restore(sess, ckpt_file)
+
+    ckpt_file = "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_nocontext" + '/params_' + args.data_set + '.ckpt'
+    print('restoring parameters from', ckpt_file)
+    saver.restore(sess, ckpt_file)
+
+    quit()
 
     max_num_epoch = 200
     for epoch in range(max_num_epoch):
