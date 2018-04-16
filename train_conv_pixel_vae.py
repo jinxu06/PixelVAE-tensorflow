@@ -146,8 +146,6 @@ if args.use_mode == 'train':
     #all_params = tf.trainable_variables()
     #all_params = get_trainable_variables(["encode_context"], "not in")
     all_params = get_trainable_variables(["encode_context", "pixel_cnn"])
-    for p in all_params:
-        print(p.name)
 
     if args.freeze_encoder:
         all_params = [p for p in all_params if "conv_encoder_" not in p.name]
