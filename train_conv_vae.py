@@ -62,22 +62,22 @@ cfg = {
 #     "use_mode": "train",
 # }
 #
-# cfg = {
-#     "img_size": 64,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta15",
-#     "data_set": "celeba64",
-#     "batch_size": 512,
-#     "nr_gpu": 2,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.001,
-#     "beta": 15.0,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "train",
-# }
+cfg = {
+    "img_size": 64,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta30",
+    "data_set": "celeba64",
+    "batch_size": 512,
+    "nr_gpu": 2,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.001,
+    "beta": 30.0,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "tc",
+    "use_mode": "train",
+}
 #
 # cfg = {
 #     "img_size": 64,
