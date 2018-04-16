@@ -222,8 +222,6 @@ def encode_context_block(contexts, masks, is_training, nr_resnet=5, nr_filters=3
                     receptive_field = (receptive_field[0]+1, receptive_field[1]+2)
                 x_out = nin(tf.nn.elu(ul_list[-1]), nr_filters)
                 print("    * receptive_field", receptive_field)
-                print(x_out)
-                quit()
                 return x_out
 
 
