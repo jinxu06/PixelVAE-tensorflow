@@ -176,13 +176,13 @@ with tf.Session(config=config) as sess:
     img = []
     for i in range(3):
         sample_x = latent_traversal(sess, data, use_image_id=5+i)
-        view = visualize_samples(sample_x, None, layout=(32, 10))
+        view = visualize_samples(sample_x, None, layout=(args.z_dim, 10))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("results/conv_vae_samples_celeba64_kld_beta5.png")
+    img.save("results/conv_vae_samples_celeba64_sconv.png")
 
     # data = next(test_data)
     # sample_x = generate_samples(sess, data)
