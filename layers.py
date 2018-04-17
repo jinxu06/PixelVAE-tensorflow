@@ -181,7 +181,7 @@ def compute_lse_sum_and_sum_lse(z, z_mu, z_log_sigma_sq):
     z_mu_b = tf.stack([z_mu for i in range(batch_size)], axis=1)
     z_sigma_b = tf.stack([z_sigma for i in range(batch_size)], axis=1)
     z_norm = (z_b-z_mu_b) / z_sigma_b
-    return z_mu_b
+    return z_norm
 
     dist = tf.distributions.Normal(loc=0., scale=1.)
     log_probs = dist.log_prob(z_norm)
