@@ -59,7 +59,7 @@ class ConvPixelVAE(object):
             if self.masks is None:
                 sh = self.decoded_features
             else:
-                self.encoded_context = encode_context_block(-self.x, self.masks)
+                self.encoded_context = encode_context_block(np.zeros(int_shape(self.x)), self.masks)
                 sh = tf.concat([self.decoded_features, self.encoded_context], axis=-1)
             self.mix_logistic_params = cond_pixel_cnn(self.x_bar, sh=sh, nonlinearity=self.nonlinearity, nr_resnet=self.nr_resnet, nr_filters=self.nr_filters, nr_logistic_mix=self.nr_logistic_mix, bn=self.bn, dropout_p=self.dropout_p, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters)
             self.x_hat = mix_logistic_sampler(self.mix_logistic_params, nr_logistic_mix=self.nr_logistic_mix, sample_range=self.sample_range, counters=self.counters)
