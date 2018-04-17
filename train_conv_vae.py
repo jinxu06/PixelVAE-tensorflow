@@ -278,6 +278,7 @@ with tf.Session(config=config) as sess:
             loss_ae_arr.append(la)
             loss_reg_arr.append(lr)
             print(lr[:, :, 0])
+            print(lr.shape)
             quit()
         train_loss, train_loss_ae, train_loss_reg = np.mean(loss_arr), np.mean(loss_ae_arr), np.mean(loss_reg_arr)
 
