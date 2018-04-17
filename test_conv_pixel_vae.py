@@ -189,7 +189,7 @@ def generate_samples(sess, data):
 
     tm = test_mgen.gen(args.batch_size)
     if masks[0] is not None:
-        feed_dict.update({masks[i]:np.zeros_like(tm) for i in range(args.nr_gpu)})
+        feed_dict.update({masks[i]:tm for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
