@@ -12,91 +12,22 @@ from layers import visualize_samples
 
 parser = argparse.ArgumentParser()
 
-# cfg = {
-#     "img_size": 64,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta1",
-#     "data_set": "celeba64",
-#     "batch_size": 80,
-#     "nr_gpu": 2,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.001,
-#     "beta": 1.0,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "test",
-# }
-
-# cfg = {
-#     "img_size": 64,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta5",
-#     "data_set": "celeba64",
-#     "batch_size": 80,
-#     "nr_gpu": 2,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.001,
-#     "beta": 5.0,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "test",
-# }
-#
-# cfg = {
-#     "img_size": 64,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta10",
-#     "data_set": "celeba64",
-#     "batch_size": 80,
-#     "nr_gpu": 2,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.001,
-#     "beta": 10.0,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "test",
-# }
-#
 cfg = {
     "img_size": 64,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta15",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta5",
     "data_set": "celeba64",
     "batch_size": 80,
     "nr_gpu": 2,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.001,
-    "beta": 15.0,
+    "beta": 5.0,
     "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
     "use_mode": "test",
 }
-
-cfg = {
-    "img_size": 64,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_test",
-    "data_set": "celeba64",
-    "batch_size": 80,
-    "nr_gpu": 2,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.001,
-    "beta": 15.0,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc",
-    "use_mode": "test",
-}
-
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
 # data I/O
