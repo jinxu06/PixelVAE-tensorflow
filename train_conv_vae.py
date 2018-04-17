@@ -151,7 +151,7 @@ tf.set_random_seed(args.seed)
 import data.celeba_data as celeba_data
 DataLoader = celeba_data.DataLoader
 if args.debug:
-    train_data = DataLoader(args.data_dir, 'valid', args.batch_size * args.nr_gpu, rng=rng, shuffle=True, size=args.img_size)
+    train_data = DataLoader(args.data_dir, 'valid', args.batch_size * args.nr_gpu, rng=rng, shuffle=False, size=args.img_size)
 else:
     train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu, rng=rng, shuffle=True, size=args.img_size)
 test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shuffle=False, size=args.img_size)
@@ -273,7 +273,8 @@ with tf.Session(config=config) as sess:
         loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
         for data in train_data:
             feed_dict = make_feed_dict(data, is_training=True)
-            _, l, la, lr = sess.run([train_step, loss, loss_ae, loss_reg], feed_dict=feed_dict)
+            #_, l, la, lr = sess.run([train_step, loss, loss_ae, loss_reg], feed_dict=feed_dict)
+            l, la, lr = sess.run([loss, loss_ae, loss_reg], feed_dict=feed_dict)
             loss_arr.append(l)
             loss_ae_arr.append(la)
             loss_reg_arr.append(lr)
