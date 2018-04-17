@@ -19,7 +19,7 @@ cfg = {
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     # "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_nocontext",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_conditioning",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_conditioning_1",
     "encoder_save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
     "data_set": "celeba32",
     "batch_size": 80,
@@ -255,7 +255,7 @@ with tf.Session(config=config) as sess:
     #visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_no_conditioning_original.png", layout=(10, 10))
     sample_x = generate_samples(sess, data)
     #visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_no_conditioning_original.png", layout=(10, 10))
-    visualize_samples(sample_x, "results/show_8.png", layout=(10, 10))
+    visualize_samples(sample_x, "results/show_9.png", layout=(10, 10))
 
 
     # ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
