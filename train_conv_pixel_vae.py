@@ -20,7 +20,7 @@ cfg = {
     "img_size": 32,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_conditioning",
+    "save_dir": "/data/ziz/jxu/models/conv_pixel_vae_celeba32_mmd_conditioning_1",
     #"save_dir": "/data/ziz/jxu/models/temp",
     "encoder_save_dir": "/data/ziz/jxu/models/conv_vae_celeba32_tc_beta5",
     "data_set": "celeba32",
@@ -270,7 +270,8 @@ saver = tf.train.Saver()
 var_list = get_trainable_variables(["conv_encoder"])
 encoder_saver = tf.train.Saver(var_list=var_list)
 
-var_list = get_trainable_variables(["conv_encoder", "deconv", "pixel_cnn"])
+#var_list = get_trainable_variables(["conv_encoder", "deconv", "pixel_cnn"])
+var_list = get_trainable_variables(["conv_encoder", "deconv"])
 saver1 = tf.train.Saver(var_list=var_list)
 
 config = tf.ConfigProto()
