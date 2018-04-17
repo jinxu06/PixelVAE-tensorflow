@@ -180,6 +180,7 @@ def compute_lse_sum_and_sum_lse(z, z_mu, z_log_sigma_sq):
     z_sigma = tf.sqrt(tf.exp(z_log_sigma_sq))
     log_probs = []
     batch_size, z_dim = int_shape(z_mu)
+    z = tf.stack([z[0] for i in range(batch_size)], axis=0)
     z_b = tf.stack([z for i in range(batch_size)], axis=0)
     z_mu_b = tf.stack([z_mu for i in range(batch_size)], axis=1)
     z_sigma_b = tf.stack([z_sigma for i in range(batch_size)], axis=1)
