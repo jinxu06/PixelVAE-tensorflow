@@ -201,7 +201,8 @@ def deconv_32_block(inputs, is_training, nonlinearity=None, bn=True, kernel_init
 
 
 @add_arg_scope
-def encode_context_block(contexts, masks, is_training, nr_resnet=5, nr_filters=32, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
+# nr_filters= 32
+def encode_context_block(contexts, masks, is_training, nr_resnet=5, nr_filters=96, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
     name = get_name("encode_context_block", counters)
     print("construct", name, "...")
     x = contexts * broadcast_masks_tf(masks, num_channels=3)
