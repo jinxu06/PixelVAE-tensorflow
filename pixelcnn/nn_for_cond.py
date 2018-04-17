@@ -163,6 +163,7 @@ def adam_updates(params, cost_or_grads, lr=0.001, mom1=0.9, mom2=0.999):
         adam_updates_op = tf.group(*updates)
     return adam_updates_op
 
+
 def get_name(layer_name, counters):
     ''' utlity for keeping track of layer names '''
     if not layer_name in counters:

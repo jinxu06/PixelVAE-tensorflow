@@ -3,7 +3,7 @@ import sys
 import json
 import argparse
 import time
-from pixelcnn.nn import adam_updates
+from pixelcnn.nn_for_cond import adam_updates
 import numpy as np
 import tensorflow as tf
 from utils import plotting
@@ -149,6 +149,10 @@ def generate_samples(sess, data):
     z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
+    print(z_mu[0])
+    print(z_sigma[0])
+    print(z[0])
+    quit()
     #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
     z = np.split(z, args.nr_gpu)
     feed_dict.update({vaes[i].z:z[i] for i in range(args.nr_gpu)})
@@ -185,27 +189,26 @@ config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
 
-    ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
-    print('restoring parameters from', ckpt_file)
-    saver.restore(sess, ckpt_file)
-
-    # saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
-    data = test_data.next(args.z_dim*10)
-    test_data.reset()
-    img = []
-    for i in range(3):
-        sample_x = latent_traversal(sess, data, use_image_id=5+i)
-        view = visualize_samples(sample_x, None, layout=(args.z_dim, 10))
-        img.append(view.copy())
-    img = np.concatenate(img, axis=1)
-    from PIL import Image
-    img = img.astype(np.uint8)
-    img = Image.fromarray(img, 'RGB')
-    img.save("results/conv_vae_samples_celeba64_rep.png")
-
-    # data = next(test_data)
-    # sample_x = generate_samples(sess, data)
-    # test_data.reset()
+    # ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
+    # print('restoring parameters from', ckpt_file)
+    # saver.restore(sess, ckpt_file)
     #
-    # visualize_samples(sample_x, "results/conv_vae_test.png", layout=(10, 10))
+    # data = test_data.next(args.z_dim*10)
+    # test_data.reset()
+    # img = []
+    # for i in range(3):
+    #     sample_x = latent_traversal(sess, data, use_image_id=5+i)
+    #     view = visualize_samples(sample_x, None, layout=(args.z_dim, 10))
+    #     img.append(view.copy())
+    # img = np.concatenate(img, axis=1)
+    # from PIL import Image
+    # img = img.astype(np.uint8)
+    # img = Image.fromarray(img, 'RGB')
+    # img.save("results/conv_vae_samples_celeba64_rep.png")
+
+    data = next(test_data)
+    sample_x = generate_samples(sess, data)
+    test_data.reset()
+
+    visualize_samples(sample_x, "results/conv_vae_test.png", layout=(10, 10))
     # visualize_samples(sample_x, "results/conv_vae_samples_id_{0}.png".format(i), layout=(32, 10))

@@ -3,7 +3,7 @@ import sys
 import json
 import argparse
 import time
-from pixelcnn.nn import adam_updates
+from pixelcnn.nn_for_cond import adam_updates
 import numpy as np
 import tensorflow as tf
 from utils import plotting
