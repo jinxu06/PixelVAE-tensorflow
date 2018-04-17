@@ -83,14 +83,14 @@ cfg = {
 
 cfg = {
     "img_size": 64,
-    "z_dim": 10,
+    "z_dim": 16,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta15_sconv",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta15_rep",
     "data_set": "celeba64",
     "batch_size": 512,
     "nr_gpu": 2,
     #"gpus": "4,5,6,7",
-    "learning_rate": 0.001,
+    "learning_rate": 0.0002,
     "beta": 15.0,
     "lam": 0.0,
     "save_interval": 10,
@@ -99,40 +99,6 @@ cfg = {
 }
 
 
-#
-# cfg = {
-#     "img_size": 64,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta30",
-#     "data_set": "celeba64",
-#     "batch_size": 512,
-#     "nr_gpu": 2,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.001,
-#     "beta": 30.0,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "train",
-# }
-#
-# cfg = {
-#     "img_size": 64,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_test",
-#     "data_set": "celeba64",
-#     "batch_size": 512,
-#     "nr_gpu": 2,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.001,
-#     "beta": 15.0,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "train",
-# }
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -258,7 +224,7 @@ def latent_traversal(sess, data, use_image_id=0):
     z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
-    num_features = args.z_dim 
+    num_features = args.z_dim
     num_traversal_step = 10
     for i in range(num_features):
         z[i*num_traversal_step:(i+1)*num_traversal_step, i] = np.linspace(start=-5., stop=5., num=num_traversal_step)
