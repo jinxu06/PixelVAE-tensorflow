@@ -11,7 +11,7 @@ def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', no
         outputs = tf.layers.batch_normalization(outputs, training=is_training)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
-    print("    + conv2d_layer", int_shape(inputs), int_shape(outputs))
+    print("    + conv2d_layer", int_shape(inputs), int_shape(outputs), nonlinearity, bn)
     return outputs
 
 @add_arg_scope
@@ -21,7 +21,7 @@ def deconv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', 
         outputs = tf.layers.batch_normalization(outputs, training=is_training)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
-    print("    + deconv2d_layer", int_shape(inputs), int_shape(outputs))
+    print("    + deconv2d_layer", int_shape(inputs), int_shape(outputs), nonlinearity, bn)
     return outputs
 
 @add_arg_scope
@@ -33,7 +33,7 @@ def dense_layer(inputs, num_outputs, nonlinearity=None, bn=True, kernel_initiali
         outputs = tf.layers.batch_normalization(outputs, training=is_training)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
-    print("    + dense_layer", int_shape(inputs), int_shape(outputs))
+    print("    + dense_layer", int_shape(inputs), int_shape(outputs), nonlinearity, bn)
     return outputs
 
 def down_shift(x):
