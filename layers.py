@@ -121,12 +121,15 @@ def gated_resnet(x, a=None, gh=None, sh=None, nonlinearity=tf.nn.elu, conv=conv2
 def int_shape(x):
     return list(map(int, x.get_shape()))
 
-def log_sum_exp(x, axis):
+def _log_sum_exp(x):
     """ numerically stable log_sum_exp implementation that prevents overflow """
-    #axis = len(x.get_shape())-1
+    axis = len(x.get_shape())-1
     m = tf.reduce_max(x, axis)
     m2 = tf.reduce_max(x, axis, keep_dims=True)
     return m + tf.log(tf.reduce_sum(tf.exp(x-m2), axis))
+
+def log_sum_exp(x, axis):
+    return tf.reduce_logsumexp(x, axis=axis)
 
 def get_name(layer_name, counters):
     ''' utlity for keeping track of layer names '''
