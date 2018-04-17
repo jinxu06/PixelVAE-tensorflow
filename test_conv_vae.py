@@ -149,7 +149,7 @@ def latent_traversal(sess, data, use_image_id=0):
     z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
-    num_features = 10
+    num_features = args.z_dim
     num_traversal_step = 10
     for i in range(num_features):
         z[i*num_traversal_step:(i+1)*num_traversal_step, i] = np.linspace(start=-5., stop=5., num=num_traversal_step)
@@ -171,7 +171,7 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
     # saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
-    data = test_data.next(32*10)
+    data = test_data.next(args.z_dim*10)
     test_data.reset()
     img = []
     for i in range(3):
