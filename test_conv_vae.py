@@ -35,7 +35,7 @@ cfg = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta10_rep",
     "data_set": "celeba64",
-    "batch_size": 40,
+    "batch_size": 512,#40,
     "nr_gpu": 2,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.0002,
@@ -149,9 +149,10 @@ def generate_samples(sess, data):
     z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
-    print(z_mu[0])
-    print(z_sigma[0])
-    print(z[0])
+    print(z.shape)
+    print(z.mean(0))
+    print(z.std(0))
+    print(z.mean(0).shape)
     quit()
     #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
     z = np.split(z, args.nr_gpu)
