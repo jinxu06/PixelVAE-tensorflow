@@ -207,10 +207,10 @@ def estimate_tc(z, z_mu, z_log_sigma_sq, N=200000):
     log_probs = dist.log_prob(z_norm)
     ratio = np.log(float(N-1) / (batch_size-1)) * np.ones((batch_size, batch_size))
     np.fill_diagonal(ratio, 0.)
-    print(ratio)
-    quit()
-    lse_sum = tf.reduce_mean(log_sum_exp(tf.reduce_sum(log_probs, axis=-1), axis=0))
-    sum_lse = tf.reduce_mean(tf.reduce_sum(log_sum_exp(log_probs, axis=0), axis=-1))
+    ratio_b = np.stack([ratio for i in range(z_dim)], axis=-1)
+
+    lse_sum = tf.reduce_mean(log_sum_exp(tf.reduce_sum(log_probs, axis=-1)+ratio, axis=0))
+    sum_lse = tf.reduce_mean(tf.reduce_sum(log_sum_exp(log_probs+ratio, axis=0), axis=-1))
     return lse_sum - sum_lse + tf.log(float(N)) * (float(z_dim)-1)
 
 def visualize_samples(images, name="results/test.png", layout=[5,5], vrange=[-1., 1.]):
