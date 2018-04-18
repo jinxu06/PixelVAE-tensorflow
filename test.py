@@ -29,10 +29,10 @@ def estimate_log_probs(z, z_mu, z_log_sigma_sq, N=200000):
 batch_size = 512
 z_dim = 16
 
-z_mu = np.random_normal(size=(batch_size, z_dim))
-z_log_sigma_sq = np.random_normal(size=(batch_size, z_dim))
+z_mu = np.random.random_normal(size=(batch_size, z_dim))
+z_log_sigma_sq = np.random.random_normal(size=(batch_size, z_dim))
 z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
-z = np.random_normal(loc=z_mu, scale=z_sigma)
+z = np.random.random_normal(loc=z_mu, scale=z_sigma)
 
 e = estimate_log_probs(z, z_mu, z_log_sigma_sq)
 print(e)
