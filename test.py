@@ -18,7 +18,9 @@ def z_sampler(loc, scale):
         z = dist.sample(sample_shape=int_shape(loc), seed=None)
         z = loc + tf.multiply(z, scale)
         return z
-
+        
+batch_size = 4
+z_dim = 2
 
 def estimate_log_probs(z, z_mu, z_log_sigma_sq, N=batch_size):
     z_b = tf.stack([z for i in range(batch_size)], axis=0)
@@ -40,8 +42,7 @@ def estimate_log_probs(z, z_mu, z_log_sigma_sq, N=batch_size):
 
 
 
-batch_size = 4
-z_dim = 2
+
 
 
 z_mu = tf.zeros((batch_size, z_dim))   #np.random.normal(size=(batch_size, z_dim))
