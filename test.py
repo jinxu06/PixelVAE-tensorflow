@@ -41,8 +41,8 @@ def estimate_log_probs(z, z_mu, z_log_sigma_sq):
 
 dist = tf.distributions.Normal(loc=0., scale=1.)
 
-z_mu = dist.sample(sample_shape=(batch_size, z_dim), seed=None) #tf.zeros((batch_size, z_dim))
-z_log_sigma_sq = - 10*tf.ones((batch_size, z_dim))
+z_mu = dist.sample(sample_shape=(batch_size, z_dim), seed=None) / 100. #tf.zeros((batch_size, z_dim))
+z_log_sigma_sq = tf.zeros((batch_size, z_dim))
 
 
 z_sigma = tf.sqrt(tf.exp(z_log_sigma_sq))
