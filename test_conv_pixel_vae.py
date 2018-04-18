@@ -85,7 +85,7 @@ test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shu
 train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
 #train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.25, max_ratio=1.0)
 #test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(8,24,24,8))
-test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(12, 29, 20, 3))
+test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(12, 32, 20, 0))
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -256,7 +256,7 @@ with tf.Session(config=config) as sess:
     #visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_no_conditioning_original.png", layout=(10, 10))
     sample_x = generate_samples(sess, data)
     #visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_no_conditioning_original.png", layout=(10, 10))
-    visualize_samples(sample_x, "results/show_11.png", layout=(10, 10))
+    visualize_samples(sample_x, "results/show_13.png", layout=(10, 10))
 
 
     # ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
