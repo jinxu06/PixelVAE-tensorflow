@@ -99,22 +99,22 @@ cfg = {
 }
 
 
-# cfg = {
-#     "img_size": 64,
-#     "z_dim": 16,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/temp",
-#     "data_set": "celeba64",
-#     "batch_size": 512,
-#     "nr_gpu": 2,
-#     #"gpus": "4,5,6,7",
-#     "learning_rate": 0.0002,
-#     "beta": 10.0,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "train",
-# }
+cfg = {
+    "img_size": 64,
+    "z_dim": 16,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/temp",
+    "data_set": "celeba64",
+    "batch_size": 512,
+    "nr_gpu": 2,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.0002,
+    "beta": 10.0,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "tc",
+    "use_mode": "train",
+}
 
 
 
