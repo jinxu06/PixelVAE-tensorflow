@@ -282,8 +282,8 @@ with tf.Session(config=config) as sess:
         loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
         for data in train_data:
             feed_dict = make_feed_dict(data, is_training=True)
-            #_, l, la, lr = sess.run([train_step, loss, loss_ae, loss_reg], feed_dict=feed_dict)
-            l, la, lr = sess.run([loss, loss_ae, loss_reg], feed_dict=feed_dict)
+            _, l, la, lr = sess.run([train_step, loss, loss_ae, loss_reg], feed_dict=feed_dict)
+            #l, la, lr = sess.run([loss, loss_ae, loss_reg], feed_dict=feed_dict)
             loss_arr.append(l)
             loss_ae_arr.append(la)
             loss_reg_arr.append(lr)
@@ -303,13 +303,13 @@ with tf.Session(config=config) as sess:
         print("test loss:{0:.3f}, test ae loss:{1:.3f}, test reg loss:{2:.3f}".format(test_loss, test_loss_ae, test_loss_reg))
         sys.stdout.flush()
 
-        # if epoch % args.save_interval == 0:
-        #     saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
-        #
-        #     data = next(test_data)
-        #     sample_x = sample_from_model(sess, data)
-        #     test_data.reset()
-        #
-        #     img_tile = plotting.img_tile(sample_x[:100], aspect_ratio=1.0, border_color=1.0, stretch=True)
-        #     img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
-        #     plotting.plt.savefig(os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)))
+        if epoch % args.save_interval == 0:
+            saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
+
+            data = next(test_data)
+            sample_x = sample_from_model(sess, data)
+            test_data.reset()
+
+            img_tile = plotting.img_tile(sample_x[:100], aspect_ratio=1.0, border_color=1.0, stretch=True)
+            img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
+            plotting.plt.savefig(os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)))
