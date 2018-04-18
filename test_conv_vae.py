@@ -70,7 +70,7 @@ cfg = {
     #"save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta10_rep_relu",
     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta10_rep_relu_r",
     "data_set": "celeba64",
-    "batch_size": 512,
+    "batch_size": 40,
     "nr_gpu": 2,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.0002,
@@ -78,7 +78,7 @@ cfg = {
     "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
-    "use_mode": "train",
+    "use_mode": "test",
 }
 
 
