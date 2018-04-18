@@ -47,7 +47,7 @@ class ConvVAE(object):
 
     def __loss(self, reg):
         print("******   Compute Loss   ******")
-        self.loss_ae = 1e-8 * tf.reduce_mean(tf.reduce_sum(tf.square(flatten(self.x)-flatten(self.x_hat)), 1))
+        self.loss_ae = tf.reduce_mean(tf.reduce_sum(tf.square(flatten(self.x)-flatten(self.x_hat)), 1))
         # self.loss_ae = tf.reduce_mean(tf.square(flatten(self.x)-flatten(self.x_hat)))
         if reg is None:
             self.loss_reg = 0
@@ -60,7 +60,7 @@ class ConvVAE(object):
         elif reg=='tc':
             tc = compute_tc(self.z, self.z_mu, self.z_log_sigma_sq)
             kld = tf.reduce_mean(- 0.5 * tf.reduce_sum(1 + self.z_log_sigma_sq - tf.square(self.z_mu) - tf.exp(self.z_log_sigma_sq), axis=-1))
-            self.loss_reg = tc #kld + (self.beta-1.) * tc
+            self.loss_reg = kld + (self.beta-1.) * tc
 
             # mi = compute_mi(self.z, self.z_mu, self.z_log_sigma_sq)
             # tc = compute_tc(self.z, self.z_mu, self.z_log_sigma_sq)
