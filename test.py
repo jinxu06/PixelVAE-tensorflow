@@ -2,6 +2,7 @@ import numpy as np
 import os
 import time
 import tensorflow as tf
+from pixelcnn.nn import int_shape
 
 import tensorflow.contrib.eager as tfe
 tfe.enable_eager_execution()
