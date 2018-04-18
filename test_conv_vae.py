@@ -31,32 +31,15 @@ cfg = {
 
 cfg = {
     "img_size": 64,
-    "z_dim": 16,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta10_rep",
-    "data_set": "celeba64",
-    "batch_size": 512,#40,
-    "nr_gpu": 2,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0002,
-    "beta": 10.0,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc",
-    "use_mode": "test",
-}
-
-cfg = {
-    "img_size": 64,
     "z_dim": 20,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta20_rep_relu",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta10_relu",
     "data_set": "celeba64",
     "batch_size": 50,
     "nr_gpu": 2,
     #"gpus": "4,5,6,7",
     "learning_rate": 0.0002,
-    "beta": 20.0,
+    "beta": 10.0,
     "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
@@ -217,7 +200,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("results/conv_vae_samples_celeba64_b20.png")
+    img.save("results/conv_vae_samples_celeba64_z20.png")
 
     # data = next(test_data)
     # sample_x = generate_samples(sess, data)
