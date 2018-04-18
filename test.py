@@ -20,7 +20,7 @@ def z_sampler(loc, scale):
         return z
 
 
-def estimate_log_probs(z, z_mu, z_log_sigma_sq, N):
+def estimate_log_probs(z, z_mu, z_log_sigma_sq, N=batch_size):
     z_b = tf.stack([z for i in range(batch_size)], axis=0)
 
     z_mu_b = tf.stack([z_mu for i in range(batch_size)], axis=1)
@@ -35,7 +35,7 @@ def estimate_log_probs(z, z_mu, z_log_sigma_sq, N):
 
     print(lse_sum)
     print(sum_lse)
-
+    print(np.log(batch_size)*(z_dim-1))
     print(tf.reduce_sum(tf.reduce_mean(log_sum_exp(log_probs, axis=0)), axis=-1))
 
 
