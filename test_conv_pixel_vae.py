@@ -189,8 +189,8 @@ def generate_samples(sess, data):
 
     tm = test_mgen.gen(args.batch_size)
     if masks[0] is not None:
-        # feed_dict.update({masks[i]:np.zeros_like(tm) for i in range(args.nr_gpu)})
-        feed_dict.update({masks[i]:tm for i in range(args.nr_gpu)})
+        feed_dict.update({masks[i]:np.zeros_like(tm) for i in range(args.nr_gpu)})
+        #feed_dict.update({masks[i]:tm for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
@@ -256,7 +256,7 @@ with tf.Session(config=config) as sess:
     #visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_no_conditioning_original.png", layout=(10, 10))
     sample_x = generate_samples(sess, data)
     #visualize_samples(sample_x, "results/conv_pixel_vae_celeba32_mmd_no_conditioning_original.png", layout=(10, 10))
-    visualize_samples(sample_x, "results/show_15.png", layout=(10, 10))
+    visualize_samples(sample_x, "results/show_16.png", layout=(10, 10))
 
 
     # ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
