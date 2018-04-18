@@ -174,7 +174,7 @@ def compute_entropy(z_mu, z_log_sigma_sq):
 def compute_tc(z, z_mu, z_log_sigma_sq):
     lse_sum, sum_lse = compute_lse_sum_and_sum_lse(z, z_mu, z_log_sigma_sq)
     batch_size, z_dim = int_shape(z_mu)
-    return lse_sum - sum_lse + tf.log(batch_size.astype(np.float32)) * (z_dim.astype(np.float32)-1)
+    return lse_sum - sum_lse + tf.log(float(batch_size)) * (float(z_dim)-1)
 
 def compute_lse_sum_and_sum_lse(z, z_mu, z_log_sigma_sq):
     z_sigma = tf.sqrt(tf.exp(z_log_sigma_sq))
