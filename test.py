@@ -27,14 +27,14 @@ def estimate_log_probs(z, z_mu, z_log_sigma_sq, N=200000):
     z_sigma_b = tf.stack([z_sigma for i in range(batch_size)], axis=1)
     z_norm = (z_b-z_mu_b) / z_sigma_b
 
-    print(z_b)
-    print(z_mu_b)
-    print(z_sigma_b)
 
     dist = tf.distributions.Normal(loc=0., scale=1.)
     log_probs = dist.log_prob(z_norm)
     lse_sum = tf.reduce_mean(log_sum_exp(tf.reduce_sum(log_probs, axis=-1), axis=0))
     sum_lse = tf.reduce_mean(tf.reduce_sum(log_sum_exp(log_probs, axis=0), axis=-1))
+
+    print(lse_sum)
+    print(sum_lse)
 
 
 
