@@ -190,8 +190,8 @@ def compute_lse_sum_and_sum_lse(z, z_mu, z_log_sigma_sq):
 
     dist = tf.distributions.Normal(loc=0., scale=1.)
     log_probs = dist.log_prob(z_norm)
-    lse_sum = tf.reduce_mean(log_sum_exp(tf.reduce_sum(log_probs, axis=-1), axis=1))
-    sum_lse = tf.reduce_mean(tf.reduce_sum(log_sum_exp(log_probs, axis=1), axis=-1))
+    lse_sum = tf.reduce_mean(log_sum_exp(tf.reduce_sum(log_probs, axis=-1), axis=0))
+    sum_lse = tf.reduce_mean(tf.reduce_sum(log_sum_exp(log_probs, axis=0), axis=-1))
     return lse_sum, sum_lse
 
 
