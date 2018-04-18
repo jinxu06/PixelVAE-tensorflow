@@ -90,7 +90,7 @@ cfg = {
     "batch_size": 512,
     "nr_gpu": 2,
     #"gpus": "4,5,6,7",
-    "learning_rate": 0.0002,
+    "learning_rate": 0.001,
     "beta": 10.0,
     "lam": 0.0,
     "save_interval": 10,
