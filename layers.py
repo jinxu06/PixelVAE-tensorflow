@@ -196,6 +196,8 @@ def compute_lse_sum_and_sum_lse(z, z_mu, z_log_sigma_sq):
     return lse_sum, sum_lse
 
 
+def estimate_log_probs(z, z_mu, z_log_sigma_sq, N=200000):
+    pass
 
 def visualize_samples(images, name="results/test.png", layout=[5,5], vrange=[-1., 1.]):
     images = (images - vrange[0]) / (vrange[1]-vrange[0]) * 255.
