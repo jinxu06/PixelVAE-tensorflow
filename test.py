@@ -19,10 +19,10 @@ def z_sampler(loc, scale):
         z = loc + tf.multiply(z, scale)
         return z
 
-batch_size = 4
-z_dim = 2
+batch_size = 512
+z_dim = 20
 
-def estimate_log_probs(z, z_mu, z_log_sigma_sq, N=batch_size):
+def estimate_log_probs(z, z_mu, z_log_sigma_sq):
     z_b = tf.stack([z for i in range(batch_size)], axis=0)
 
     z_mu_b = tf.stack([z_mu for i in range(batch_size)], axis=1)
@@ -32,8 +32,8 @@ def estimate_log_probs(z, z_mu, z_log_sigma_sq, N=batch_size):
 
     dist = tf.distributions.Normal(loc=0., scale=1.)
     log_probs = dist.log_prob(z_norm)
-    lse_sum = tf.reduce_mean(log_sum_exp(tf.reduce_sum(log_probs, axis=-1), axis=1))
-    sum_lse = tf.reduce_mean(tf.reduce_sum(log_sum_exp(log_probs, axis=1), axis=-1))
+    lse_sum = tf.reduce_mean(log_sum_exp(tf.reduce_sum(log_probs, axis=-1), axis=0))
+    sum_lse = tf.reduce_mean(tf.reduce_sum(log_sum_exp(log_probs, axis=0), axis=-1))
 
     print(lse_sum-sum_lse)
     print(np.log(batch_size)*(z_dim-1))
@@ -42,6 +42,8 @@ def estimate_log_probs(z, z_mu, z_log_sigma_sq, N=batch_size):
 
 z_mu = tf.zeros((batch_size, z_dim))   #np.random.normal(size=(batch_size, z_dim))
 z_log_sigma_sq = tf.ones((batch_size, z_dim))  #np.random.normal(size=(batch_size, z_dim))
+
+
 z_sigma = tf.sqrt(tf.exp(z_log_sigma_sq))
 z = z_sampler(loc=z_mu, scale=z_sigma)
 
