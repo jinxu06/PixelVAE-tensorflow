@@ -10,12 +10,12 @@ from utils import plotting
 from vae.conv_vae import ConvVAE
 
 
-import tensorflow.contrib.eager as tfe
-tfe.enable_eager_execution()
-
-print("TensorFlow version: {}".format(tf.VERSION))
-print("Eager execution: {}".format(tf.executing_eagerly()))
-
+# import tensorflow.contrib.eager as tfe
+# tfe.enable_eager_execution()
+#
+# print("TensorFlow version: {}".format(tf.VERSION))
+# print("Eager execution: {}".format(tf.executing_eagerly()))
+#
 
 
 parser = argparse.ArgumentParser()
