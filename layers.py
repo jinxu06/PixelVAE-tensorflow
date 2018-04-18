@@ -234,6 +234,7 @@ def estimate_log_probs(z, z_mu, z_log_sigma_sq, N=200000):
     return lse_sum, sum_lse
 
 def estimate_dwkld(z, z_mu, z_log_sigma_sq, N=200000):
+    batch_size, z_dim = int_shape(z_mu)
     lse_sum, sum_lse = estimate_log_probs(z, z_mu, z_log_sigma_sq, N=N)
     sum_lse += tf.log(float(N)) * float(z_dim)
     dist_prior = tf.distributions.Normal(loc=0., scale=1.)
