@@ -39,8 +39,8 @@ batch_size = 512
 z_dim = 16
 
 
-z_mu = np.zeros((batch_size, z_dim), np.float32)   #np.random.normal(size=(batch_size, z_dim))
-z_log_sigma_sq = np.ones((batch_size, z_dim), dtype=np.float32)  #np.random.normal(size=(batch_size, z_dim))
+z_mu = tf.zeros((batch_size, z_dim))   #np.random.normal(size=(batch_size, z_dim))
+z_log_sigma_sq = tf.ones((batch_size, z_dim))  #np.random.normal(size=(batch_size, z_dim))
 z_sigma = tf.sqrt(tf.exp(z_log_sigma_sq))
 z = z_sampler(loc=z_mu, scale=z_sigma)
 
