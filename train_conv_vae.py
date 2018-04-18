@@ -282,8 +282,8 @@ with tf.Session(config=config) as sess:
         loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
         for data in train_data:
             feed_dict = make_feed_dict(data, is_training=True)
-            _, l, la, lr = sess.run([train_step, loss, loss_ae, loss_reg], feed_dict=feed_dict)
-            #l, la, lr = sess.run([loss, loss_ae, loss_reg], feed_dict=feed_dict)
+            #_, l, la, lr = sess.run([train_step, loss, loss_ae, loss_reg], feed_dict=feed_dict)
+            l, la, lr = sess.run([loss, loss_ae, loss_reg], feed_dict=feed_dict)
             loss_arr.append(l)
             loss_ae_arr.append(la)
             loss_reg_arr.append(lr)

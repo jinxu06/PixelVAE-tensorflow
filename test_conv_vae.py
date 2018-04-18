@@ -29,6 +29,8 @@ cfg = {
     "use_mode": "test",
 }
 
+num_traversal_step = 13
+
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -152,7 +154,6 @@ def latent_traversal(sess, data, use_image_id=0):
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
     num_features = args.z_dim
-    num_traversal_step = 13
     for i in range(num_features):
         z[i*num_traversal_step:(i+1)*num_traversal_step, i] = np.linspace(start=-6., stop=6., num=num_traversal_step)
     z = np.split(z, args.nr_gpu)
@@ -172,12 +173,12 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    data = test_data.next(args.z_dim*13)
+    data = test_data.next(args.z_dim*num_traversal_step)
     test_data.reset()
     img = []
     for i in range(3):
         sample_x = latent_traversal(sess, data, use_image_id=5+i)
-        view = visualize_samples(sample_x, None, layout=(args.z_dim, 10))
+        view = visualize_samples(sample_x, None, layout=(args.z_dim, num_traversal_step))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
     from PIL import Image
