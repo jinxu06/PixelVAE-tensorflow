@@ -58,7 +58,9 @@ class ConvVAE(object):
             self.loss_reg = compute_mmd(tf.random_normal(int_shape(self.z)), self.z)
             self.loss_reg = self.beta * tf.maximum(self.lam, self.loss_reg)
         elif reg=='tc':
-            tc = compute_tc(self.z, self.z_mu, self.z_log_sigma_sq)
+            #tc = compute_tc(self.z, self.z_mu, self.z_log_sigma_sq)
+            from layers import estimate_tc
+            tc = estimate_tc(self.z, self.z_mu, self.z_log_sigma_sq)
             kld = tf.reduce_mean(- 0.5 * tf.reduce_sum(1 + self.z_log_sigma_sq - tf.square(self.z_mu) - tf.exp(self.z_log_sigma_sq), axis=-1))
             self.loss_reg = tc #kld + (self.beta-1.) * tc
 

@@ -174,7 +174,7 @@ def compute_entropy(z_mu, z_log_sigma_sq):
 def compute_tc(z, z_mu, z_log_sigma_sq):
     lse_sum, sum_lse = compute_lse_sum_and_sum_lse(z, z_mu, z_log_sigma_sq)
     batch_size, z_dim = int_shape(z_mu)
-    return lse_sum - sum_lse #+ tf.log(float(batch_size)) * (float(z_dim)-1)
+    return lse_sum - sum_lse + tf.log(float(batch_size)) * (float(z_dim)-1)
 
 def compute_lse_sum_and_sum_lse(z, z_mu, z_log_sigma_sq):
     z_sigma = tf.sqrt(tf.exp(z_log_sigma_sq))
@@ -188,13 +188,30 @@ def compute_lse_sum_and_sum_lse(z, z_mu, z_log_sigma_sq):
 
     dist = tf.distributions.Normal(loc=0., scale=1.)
     log_probs = dist.log_prob(z_norm)
-    lse_sum = tf.reduce_mean(log_sum_exp(tf.reduce_sum(log_probs, axis=-1), axis=1))
-    sum_lse = tf.reduce_mean(tf.reduce_sum(log_sum_exp(log_probs, axis=1), axis=-1))
+    lse_sum = tf.reduce_mean(log_sum_exp(tf.reduce_sum(log_probs, axis=-1), axis=0))
+    sum_lse = tf.reduce_mean(tf.reduce_sum(log_sum_exp(log_probs, axis=0), axis=-1))
     return lse_sum, sum_lse
 
 
-def estimate_log_probs(z, z_mu, z_log_sigma_sq, N=200000):
-    pass
+def estimate_tc(z, z_mu, z_log_sigma_sq, N=200000):
+    z_sigma = tf.sqrt(tf.exp(z_log_sigma_sq))
+    log_probs = []
+    batch_size, z_dim = int_shape(z_mu)
+
+    z_b = tf.stack([z for i in range(batch_size)], axis=0)
+    z_mu_b = tf.stack([z_mu for i in range(batch_size)], axis=1)
+    z_sigma_b = tf.stack([z_sigma for i in range(batch_size)], axis=1)
+    z_norm = (z_b-z_mu_b) / z_sigma_b
+
+    dist = tf.distributions.Normal(loc=0., scale=1.)
+    log_probs = dist.log_prob(z_norm)
+    ratio = np.log(float(N-1) / (batch_size-1)) * np.ones((batch_size, batch_size))
+    np.fill_diagonal(ratio, 0.)
+    print(ratio)
+    quit()
+    lse_sum = tf.reduce_mean(log_sum_exp(tf.reduce_sum(log_probs, axis=-1), axis=0))
+    sum_lse = tf.reduce_mean(tf.reduce_sum(log_sum_exp(log_probs, axis=0), axis=-1))
+    return lse_sum - sum_lse + tf.log(float(N)) * (float(z_dim)-1)
 
 def visualize_samples(images, name="results/test.png", layout=[5,5], vrange=[-1., 1.]):
     images = (images - vrange[0]) / (vrange[1]-vrange[0]) * 255.
