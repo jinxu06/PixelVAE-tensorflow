@@ -14,31 +14,14 @@ parser = argparse.ArgumentParser()
 
 cfg = {
     "img_size": 64,
-    "z_dim": 10,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta15_sconv",
-    "data_set": "celeba64",
-    "batch_size": 25,
-    "nr_gpu": 2,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.001,
-    "beta": 15.0,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc",
-    "use_mode": "test",
-}
-
-cfg = {
-    "img_size": 64,
     "z_dim": 20,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_beta10_relu",
     "data_set": "celeba64",
-    "batch_size": 50,
+    "batch_size": 65,
     "nr_gpu": 2,
     #"gpus": "4,5,6,7",
-    "learning_rate": 0.0002,
+    "learning_rate": 0.001,
     "beta": 10.0,
     "lam": 0.0,
     "save_interval": 10,
@@ -169,9 +152,9 @@ def latent_traversal(sess, data, use_image_id=0):
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
     num_features = args.z_dim
-    num_traversal_step = 10
+    num_traversal_step = 13
     for i in range(num_features):
-        z[i*num_traversal_step:(i+1)*num_traversal_step, i] = np.linspace(start=-5., stop=5., num=num_traversal_step)
+        z[i*num_traversal_step:(i+1)*num_traversal_step, i] = np.linspace(start=-6., stop=6., num=num_traversal_step)
     z = np.split(z, args.nr_gpu)
     feed_dict.update({vaes[i].z:z[i] for i in range(args.nr_gpu)})
     x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
@@ -189,7 +172,7 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    data = test_data.next(args.z_dim*10)
+    data = test_data.next(args.z_dim*13)
     test_data.reset()
     img = []
     for i in range(3):
@@ -200,7 +183,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("results/conv_vae_samples_celeba64_z20.png")
+    img.save("results/conv_vae_samples_celeba64_beta10_relu.png")
 
     # data = next(test_data)
     # sample_x = generate_samples(sess, data)
