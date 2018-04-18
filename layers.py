@@ -241,6 +241,13 @@ def estimate_dwkld(z, z_mu, z_log_sigma_sq, N=200000):
     nll_prior =  tf.reduce_mean(-tf.reduce_sum(dist_prior.log_prob(z), axis=-1))
     return sum_lse + nll_prior
 
+def estimate_mi(z, z_mu, z_log_sigma_sq, N=200000):
+    batch_size, z_dim = int_shape(z_mu)
+    lse_sum, sum_lse = estimate_log_probs(z, z_mu, z_log_sigma_sq, N=N)
+    lse_sum -= tf.log(float(N)) 
+    cond_entropy = tf.reduce_mean(compute_entropy(z_mu, z_log_sigma_sq))
+    return -lse_sum - cond_entropy
+
 def visualize_samples(images, name="results/test.png", layout=[5,5], vrange=[-1., 1.]):
     images = (images - vrange[0]) / (vrange[1]-vrange[0]) * 255.
     images = np.rint(images).astype(np.uint8)
