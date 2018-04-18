@@ -47,7 +47,7 @@ class ConvVAE(object):
 
     def __loss(self, reg):
         print("******   Compute Loss   ******")
-        self.loss_ae = 1e-8*tf.reduce_mean(tf.reduce_sum(tf.square(flatten(self.x)-flatten(self.x_hat)), 1))
+        self.loss_ae = tf.reduce_mean(tf.reduce_sum(tf.square(flatten(self.x)-flatten(self.x_hat)), 1))
         # self.loss_ae = tf.reduce_mean(tf.square(flatten(self.x)-flatten(self.x_hat)))
         if reg is None:
             self.loss_reg = 0
@@ -63,17 +63,9 @@ class ConvVAE(object):
             mi = estimate_mi(self.z, self.z_mu, self.z_log_sigma_sq, N=200000)
             tc = estimate_tc(self.z, self.z_mu, self.z_log_sigma_sq, N=200000)
             dwkld = estimate_dwkld(self.z, self.z_mu, self.z_log_sigma_sq, N=200000)
-
             #kld = tf.reduce_mean(- 0.5 * tf.reduce_sum(1 + self.z_log_sigma_sq - tf.square(self.z_mu) - tf.exp(self.z_log_sigma_sq), axis=-1))
             self.loss_reg = mi + self.beta * tc + dwkld  #kld + (self.beta-1.) * tc
 
-            # mi = compute_mi(self.z, self.z_mu, self.z_log_sigma_sq)
-            # tc = compute_tc(self.z, self.z_mu, self.z_log_sigma_sq)
-            # dwkld = compute_dwkld(self.z, self.z_mu, self.z_log_sigma_sq)
-            # self.loss_reg = mi + self.beta * tc + dwkld
-
-        #self.loss_ae *= 100
-        #self.loss_reg *= 100
         print("reg:{0}, beta:{1}, lam:{2}".format(self.reg, self.beta, self.lam))
         self.loss = self.loss_ae + self.loss_reg
 
