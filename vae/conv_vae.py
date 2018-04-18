@@ -60,9 +60,10 @@ class ConvVAE(object):
         elif reg=='tc':
             #tc = compute_tc(self.z, self.z_mu, self.z_log_sigma_sq)
             from layers import estimate_tc, estimate_dwkld, estimate_mi
-            mi = estimate_mi(self.z, self.z_mu, self.z_log_sigma_sq, N=200000)
-            tc = estimate_tc(self.z, self.z_mu, self.z_log_sigma_sq, N=200000)
-            dwkld = estimate_dwkld(self.z, self.z_mu, self.z_log_sigma_sq, N=200000)
+            N = 2000
+            mi = estimate_mi(self.z, self.z_mu, self.z_log_sigma_sq, N=N)
+            tc = estimate_tc(self.z, self.z_mu, self.z_log_sigma_sq, N=N)
+            dwkld = estimate_dwkld(self.z, self.z_mu, self.z_log_sigma_sq, N=N)
             #kld = tf.reduce_mean(- 0.5 * tf.reduce_sum(1 + self.z_log_sigma_sq - tf.square(self.z_mu) - tf.exp(self.z_log_sigma_sq), axis=-1))
             self.loss_reg = tc + dwkld #mi + self.beta * tc + dwkld  #kld + (self.beta-1.) * tc
 
