@@ -97,21 +97,20 @@ cfg = {
     "use_mode": "train",
 }
 
-# cfg = {
-#     "img_size": 64,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/temp",
-#     "data_set": "celeba64",
-#     "batch_size": 512,
-#     "gpus": "4,5,6,7",
-#     "learning_rate": 0.0005,
-#     "beta": 15.0,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "train",
-# }
+cfg = {
+    "img_size": 64,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/temp",
+    "data_set": "celeba64",
+    "batch_size": 512,
+    "learning_rate": 0.0005,
+    "beta": 15.0,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "tc",
+    "use_mode": "train",
+}
 
 
 
@@ -155,6 +154,8 @@ else:
 eval_data = data_set.train(shuffle=True, limit=batch_size*10)
 test_data = data_set.test(shuffle=False, limit=-1)
 
+eval_data = test_data ###
+
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
@@ -166,7 +167,7 @@ model_opt = {
     "reg": args.reg,
     "beta": args.beta,
     "lam": args.lam,
-    "nonlinearity": tf.nn.relu,
+    "nonlinearity": tf.nn.elu, ###
     "bn": True,
     "kernel_initializer": tf.contrib.layers.xavier_initializer(),
     "kernel_regularizer": None,
