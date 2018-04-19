@@ -86,34 +86,32 @@ cfg = {
     "img_size": 64,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta15",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta8",
     "data_set": "celeba64",
     "batch_size": 512,
-    "nr_gpu": 2,
-    #"gpus": "4,5,6,7",
     "learning_rate": 0.0005,
-    "beta": 15.0,
+    "beta": 8.0,
     "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
     "use_mode": "train",
 }
 
-cfg = {
-    "img_size": 64,
-    "z_dim": 32,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/temp",
-    "data_set": "celeba64",
-    "batch_size": 512,
-    "gpus": "4,5,6,7",
-    "learning_rate": 0.0005,
-    "beta": 15.0,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc",
-    "use_mode": "train",
-}
+# cfg = {
+#     "img_size": 64,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/temp",
+#     "data_set": "celeba64",
+#     "batch_size": 512,
+#     "gpus": "4,5,6,7",
+#     "learning_rate": 0.0005,
+#     "beta": 15.0,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "tc",
+#     "use_mode": "train",
+# }
 
 
 
@@ -317,8 +315,6 @@ with tf.Session(config=config) as sess:
         print('restoring parameters from', ckpt_file)
         saver.restore(sess, ckpt_file)
 
-
-
     max_num_epoch = 200
     for epoch in range(max_num_epoch+1):
         tt = time.time()
@@ -338,5 +334,6 @@ with tf.Session(config=config) as sess:
             data = next(test_data)
             sample_x = sample_from_model(sess, data)
             test_data.reset()
-
             visualize_samples(sample_x, os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)), layout=(10, 10))
+            print("------------ saved")
+            sys.stdout.flush()
