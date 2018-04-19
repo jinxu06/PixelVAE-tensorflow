@@ -149,7 +149,7 @@ def conv_decoder_64_block(inputs, is_training, nonlinearity=None, bn=True, kerne
     print("construct", name, "...")
     with tf.variable_scope(name):
         with arg_scope([deconv2d_layer, dense_layer], nonlinearity=nonlinearity, bn=bn, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
-            outputs = dense_layer(inputs, 512, nonlinearity=tf.nn.tanh)
+            outputs = dense_layer(inputs, 512)
             outputs = tf.reshape(outputs, [-1, 1, 1, 512])
             outputs = deconv2d_layer(outputs, 256, 4, 1, "VALID")
             outputs = deconv2d_layer(outputs, 128, 4, 2, "SAME")

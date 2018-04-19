@@ -13,85 +13,18 @@ import data.load_data as load_data
 
 parser = argparse.ArgumentParser()
 
-cfg = {
-    "img_size": 64,
-    "z_dim": 16,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z16_beta1",
-    "data_set": "celeba64",
-    "batch_size": 512,
-    "nr_gpu": 2,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0005,
-    "beta": 1.0,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc",
-    "use_mode": "train",
-}
 
-cfg = {
-    "img_size": 64,
-    "z_dim": 16,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z16_beta5",
-    "data_set": "celeba64",
-    "batch_size": 512,
-    "nr_gpu": 2,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0005,
-    "beta": 5.0,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc",
-    "use_mode": "train",
-}
-#
-cfg = {
-    "img_size": 64,
-    "z_dim": 16,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z16_beta15",
-    "data_set": "celeba64",
-    "batch_size": 512,
-    "nr_gpu": 2,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0005,
-    "beta": 15.0,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc",
-    "use_mode": "train",
-}
-
-
-cfg = {
-    "img_size": 64,
-    "z_dim": 20,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z16_beta10",
-    "data_set": "celeba64",
-    "batch_size": 512,
-    "nr_gpu": 2,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0005,
-    "beta": 10.0,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc",
-    "use_mode": "train",
-}
 
 cfg = {
     "img_size": 64,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta8",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta1",
     "data_set": "celeba64",
     "nonlinearity":"relu",
     "batch_size": 512,
     "learning_rate": 0.0005,
-    "beta": 8.0,
+    "beta": 1.0,
     "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
@@ -102,18 +35,51 @@ cfg = {
 #     "img_size": 64,
 #     "z_dim": 32,
 #     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/temp",
+#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta5",
 #     "data_set": "celeba64",
+#     "nonlinearity":"relu",
 #     "batch_size": 512,
 #     "learning_rate": 0.0005,
-#     "beta": 15.0,
+#     "beta": 5.0,
 #     "lam": 0.0,
 #     "save_interval": 10,
 #     "reg": "tc",
 #     "use_mode": "train",
 # }
-
-
+#
+# cfg = {
+#     "img_size": 64,
+#     "z_dim": 20,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z20_beta5",
+#     "data_set": "celeba64",
+#     "nonlinearity":"relu",
+#     "batch_size": 512,
+#     "learning_rate": 0.0005,
+#     "beta": 5.0,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "tc",
+#     "use_mode": "train",
+# }
+#
+#
+#
+# cfg = {
+#     "img_size": 64,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta5_elu",
+#     "data_set": "celeba64",
+#     "nonlinearity":"elu",
+#     "batch_size": 512,
+#     "learning_rate": 0.0005,
+#     "beta": 5.0,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "tc",
+#     "use_mode": "train",
+# }
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
