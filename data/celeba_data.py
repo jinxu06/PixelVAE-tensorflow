@@ -15,7 +15,7 @@ def read_imgs(dir, limit=-1):
     if limit >= 0:
         limit = min(limit, len(filenames))
         from random import shuffle
-        filenames = shuffle(filenames)
+        shuffle(filenames)
     else:
         limit = len(filenames)
     filenames = sorted(filenames[:limit])
