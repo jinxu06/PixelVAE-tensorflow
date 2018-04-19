@@ -7,10 +7,10 @@ import os
 import sys
 import numpy as np
 from PIL import Image
+from glob import glob
 
 def read_imgs(dir, limit=-1):
-    dirpath, dirnames, filenames = next(os.walk(dir))
-    filenames = sorted(filenames)
+    filenames = sorted(glob(dir+"/*.png"))
     if limit >= 0:
         limit = min(limit, len(filenames))
     else:
