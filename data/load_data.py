@@ -5,13 +5,6 @@ from PIL import Image
 import data.celeba_data as celeba_data
 
 
-DataLoader = celeba_data.DataLoader
-if args.debug:
-    train_data = DataLoader(args.data_dir, 'valid', args.batch_size * args.nr_gpu, rng=rng, shuffle=True, size=args.img_size)
-else:
-    train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu, rng=rng, shuffle=True, size=args.img_size)
-test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shuffle=False, size=args.img_size)
-
 class DataSet(object):
     pass
 
@@ -30,7 +23,7 @@ class CelebA(DataSet):
     def test(self, shuffle=False, limit=-1):
         return celeba_data.DataLoader(self.data_dir, 'valid', self.batch_size,
                 rng=self.rng, shuffle=shuffle, size=self.img_size, limit=limit)
-                
+
 
 class Cifar10(DataSet):
     pass
