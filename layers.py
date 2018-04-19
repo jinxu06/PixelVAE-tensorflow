@@ -4,23 +4,55 @@ from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
 from PIL import Image
 import utils.mfunc as uf
 
+# @add_arg_scope
+# def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, is_training=False):
+#     outputs = tf.layers.conv2d(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
+#     if bn:
+#         outputs = tf.layers.batch_normalization(outputs, training=is_training)
+#     if nonlinearity is not None:
+#         outputs = nonlinearity(outputs)
+#     print("    + conv2d_layer", int_shape(inputs), int_shape(outputs), nonlinearity, bn)
+#     return outputs
+#
+# @add_arg_scope
+# def deconv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, is_training=False):
+#     outputs = tf.layers.conv2d_transpose(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
+#     if bn:
+#         outputs = tf.layers.batch_normalization(outputs, training=is_training)
+#     if nonlinearity is not None:
+#         outputs = nonlinearity(outputs)
+#     print("    + deconv2d_layer", int_shape(inputs), int_shape(outputs), nonlinearity, bn)
+#     return outputs
+#
+# @add_arg_scope
+# def dense_layer(inputs, num_outputs, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, is_training=False):
+#     inputs_shape = int_shape(inputs)
+#     assert len(inputs_shape)==2, "inputs should be flattened first"
+#     outputs = tf.layers.dense(inputs, num_outputs, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
+#     if bn:
+#         outputs = tf.layers.batch_normalization(outputs, training=is_training)
+#     if nonlinearity is not None:
+#         outputs = nonlinearity(outputs)
+#     print("    + dense_layer", int_shape(inputs), int_shape(outputs), nonlinearity, bn)
+#     return outputs
+
 @add_arg_scope
 def conv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, is_training=False):
     outputs = tf.layers.conv2d(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
-    if bn:
-        outputs = tf.layers.batch_normalization(outputs, training=is_training)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
+    if bn:
+        outputs = tf.layers.batch_normalization(outputs, training=is_training)
     print("    + conv2d_layer", int_shape(inputs), int_shape(outputs), nonlinearity, bn)
     return outputs
 
 @add_arg_scope
 def deconv2d_layer(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, is_training=False):
     outputs = tf.layers.conv2d_transpose(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
-    if bn:
-        outputs = tf.layers.batch_normalization(outputs, training=is_training)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
+    if bn:
+        outputs = tf.layers.batch_normalization(outputs, training=is_training)
     print("    + deconv2d_layer", int_shape(inputs), int_shape(outputs), nonlinearity, bn)
     return outputs
 
@@ -29,12 +61,13 @@ def dense_layer(inputs, num_outputs, nonlinearity=None, bn=True, kernel_initiali
     inputs_shape = int_shape(inputs)
     assert len(inputs_shape)==2, "inputs should be flattened first"
     outputs = tf.layers.dense(inputs, num_outputs, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
-    if bn:
-        outputs = tf.layers.batch_normalization(outputs, training=is_training)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
+    if bn:
+        outputs = tf.layers.batch_normalization(outputs, training=is_training)
     print("    + dense_layer", int_shape(inputs), int_shape(outputs), nonlinearity, bn)
     return outputs
+
 
 def down_shift(x):
     xs = int_shape(x)
@@ -244,7 +277,7 @@ def estimate_dwkld(z, z_mu, z_log_sigma_sq, N=200000):
 def estimate_mi(z, z_mu, z_log_sigma_sq, N=200000):
     batch_size, z_dim = int_shape(z_mu)
     lse_sum, sum_lse = estimate_log_probs(z, z_mu, z_log_sigma_sq, N=N)
-    lse_sum -= tf.log(float(N)) 
+    lse_sum -= tf.log(float(N))
     cond_entropy = tf.reduce_mean(compute_entropy(z_mu, z_log_sigma_sq))
     return -lse_sum - cond_entropy
 
