@@ -9,6 +9,7 @@ import tensorflow as tf
 from utils import plotting
 from vae.conv_vae import ConvVAE
 from blocks.helpers import Recorder, visualize_samples
+import data.load_data as load_data
 
 parser = argparse.ArgumentParser()
 
@@ -98,21 +99,21 @@ cfg = {
     "use_mode": "train",
 }
 
-# cfg = {
-#     "img_size": 64,
-#     "z_dim": 32,
-#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-#     "save_dir": "/data/ziz/jxu/models/temp",
-#     "data_set": "celeba64",
-#     "batch_size": 512,
-#     "gpus": "4,5,6,7",
-#     "learning_rate": 0.0005,
-#     "beta": 15.0,
-#     "lam": 0.0,
-#     "save_interval": 10,
-#     "reg": "tc",
-#     "use_mode": "train",
-# }
+cfg = {
+    "img_size": 64,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/temp",
+    "data_set": "celeba64",
+    "batch_size": 512,
+    "gpus": "4,5,6,7",
+    "learning_rate": 0.0005,
+    "beta": 15.0,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "tc",
+    "use_mode": "train",
+}
 
 
 
@@ -145,17 +146,16 @@ args.nr_gpu = len(args.gpus.split(","))
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
 
-rng = np.random.RandomState(args.seed)
 tf.set_random_seed(args.seed)
 
-
-import data.celeba_data as celeba_data
-DataLoader = celeba_data.DataLoader
+data_set = load_data.CelebA(data_dir=args.data_dir, batch_size=args.batch_size, img_size=args.img_size)
 if args.debug:
-    train_data = DataLoader(args.data_dir, 'valid', args.batch_size * args.nr_gpu, rng=rng, shuffle=True, size=args.img_size)
+    train_data = data_set.train(shuffle=True, limit=args.batch_size*2)
 else:
-    train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu, rng=rng, shuffle=True, size=args.img_size)
-test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shuffle=False, size=args.img_size)
+    train_data = data_set.train(shuffle=True, limit=-1)
+
+eval_data = data_set.train(shuffle=True, limit=args.batch_size*10)
+test_data = data_set.test(shuffle=False, limit=-1)
 
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -326,7 +326,7 @@ with tf.Session(config=config) as sess:
             feed_dict = make_feed_dict(data, is_training=True)
             sess.run(train_step, feed_dict=feed_dict)
 
-        for data in test_data:
+        for data in eval_data:
             feed_dict = make_feed_dict(data, is_training=False)
             recorder.evaluate(sess, feed_dict)
 
