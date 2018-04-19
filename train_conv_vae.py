@@ -148,7 +148,7 @@ tf.set_random_seed(args.seed)
 batch_size = args.batch_size * args.nr_gpu
 data_set = load_data.CelebA(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
 if args.debug:
-    train_data = data_set.train(shuffle=True, limit=batch_size*10)
+    train_data = data_set.train(shuffle=True, limit=batch_size*5)
 else:
     train_data = data_set.train(shuffle=True, limit=-1)
 
@@ -331,7 +331,8 @@ with tf.Session(config=config) as sess:
         if epoch % args.save_interval == 0:
             saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
 
-            data = next(test_data)
+            # data = next(test_data)
+            data = next(eval_data)
             sample_x = sample_from_model(sess, data)
             test_data.reset()
             visualize_samples(sample_x, os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)), layout=(10, 10))
