@@ -9,13 +9,16 @@ import numpy as np
 from PIL import Image
 from glob import glob
 
+
 def read_imgs(dir, limit=-1):
-    filenames = sorted(glob(dir+"/*.png"))
+    filenames = glob(dir+"/*.png")
     if limit >= 0:
         limit = min(limit, len(filenames))
+        from random import shuffle
+        filenames = shuffle(filenames)
     else:
         limit = len(filenames)
-    filenames = filenames[:limit]
+    filenames = sorted(filenames[:limit])
     imgs = np.array([np.array(Image.open(os.path.join(dir, filename))) for filename in filenames]).astype(np.uint8)
     return imgs
 
