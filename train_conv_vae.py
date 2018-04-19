@@ -192,9 +192,13 @@ if args.use_mode == 'train':
             for j in range(len(grads[0])):
                 grads[0][j] += grads[i][j]
 
-        loss = tf.add_n([v.loss for v in vaes]) / args.nr_gpu
-        loss_ae = tf.add_n([v.loss_ae for v in vaes]) / args.nr_gpu
-        loss_reg = tf.add_n([v.loss_reg for v in vaes]) / args.nr_gpu
+        record_dict = {}
+        record_dict['total loss'] = tf.add_n([v.loss for v in vaes]) / args.nr_gpu
+        record_dict['recon loss'] = tf.add_n([v.loss_ae for v in vaes]) / args.nr_gpu
+        record_dict['mi reg'] = tf.add_n([v.mi for v in vaes]) / args.nr_gpu
+        record_dict['tc reg'] = tf.add_n([v.tc for v in vaes]) / args.nr_gpu
+        record_dict['dwkld reg'] = tf.add_n([v.dwkld for v in vaes]) / args.nr_gpu
+        recorder = Recorder(dict=record_dict)
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
 
@@ -313,7 +317,7 @@ with tf.Session(config=config) as sess:
         print('restoring parameters from', ckpt_file)
         saver.restore(sess, ckpt_file)
 
-    recorder = Recorder(dict={"total loss":loss, "ae loss":loss_ae, "reg loss":loss_reg})
+
 
     max_num_epoch = 200
     for epoch in range(max_num_epoch+1):
