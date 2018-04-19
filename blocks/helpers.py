@@ -90,7 +90,7 @@ class Recorder(object):
             results[k] = s
         ret_str = "* epoch {0} {1} -- ".format("{"+"%0.2f"%time+"s}", self.num_epoches)
         for key in keys:
-            ret_str += "{0}:{1}   ".format(key, results[key])
+            ret_str += "{0}:{1:.2f}   ".format(key, results[key])
         print(ret_str)
         sys.stdout.flush()
 
