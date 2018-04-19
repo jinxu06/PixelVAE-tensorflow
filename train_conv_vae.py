@@ -147,14 +147,14 @@ os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
 
 tf.set_random_seed(args.seed)
-
-data_set = load_data.CelebA(data_dir=args.data_dir, batch_size=args.batch_size, img_size=args.img_size)
+batch_size = args.batch_size * args.nr_gpu
+data_set = load_data.CelebA(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
 if args.debug:
-    train_data = data_set.train(shuffle=True, limit=args.batch_size*2)
+    train_data = data_set.train(shuffle=True, limit=batch_size*2)
 else:
     train_data = data_set.train(shuffle=True, limit=-1)
 
-eval_data = data_set.train(shuffle=True, limit=args.batch_size*10)
+eval_data = data_set.train(shuffle=True, limit=batch_size*10)
 test_data = data_set.test(shuffle=False, limit=-1)
 
 
