@@ -2,6 +2,7 @@ import sys
 import numpy as np
 import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
+from PIL import Image
 
 def int_shape(x):
     return list(map(int, x.get_shape()))
@@ -31,7 +32,7 @@ def tile_images(imgs, size=(6, 6)):
         for i in range(size[1]):
             all_images[img_h*j:img_h*(j+1), img_w*i:img_w*(i+1), :] = imgs[j*size[1]+i, :, :, :]
     return all_images
-    
+
 def visualize_samples(images, name="results/test.png", layout=[5,5], vrange=[-1., 1.]):
     images = (images - vrange[0]) / (vrange[1]-vrange[0]) * 255.
     images = np.rint(images).astype(np.uint8)
