@@ -314,6 +314,7 @@ with tf.Session(config=config) as sess:
         saver.restore(sess, ckpt_file)
 
     recorder = Recorder(dict={"total loss":loss, "ae loss":loss_ae, "reg loss":loss_reg})
+    
     max_num_epoch = 200
     for epoch in range(max_num_epoch+1):
         tt = time.time()
@@ -326,3 +327,12 @@ with tf.Session(config=config) as sess:
             recorder.evaluate(sess, feed_dict)
 
         recorder.finish_epoch_and_display(time=time.time()-tt)
+
+        if epoch % args.save_interval == 0:
+            saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
+
+            data = next(test_data)
+            sample_x = sample_from_model(sess, data)
+            test_data.reset()
+
+            visualize_samples(sample_x, os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)), layout=(10, 10))
