@@ -8,56 +8,20 @@ import numpy as np
 import tensorflow as tf
 from utils import plotting
 from vae.conv_vae import ConvVAE
-from layers import visualize_samples
+from blocks.helpers import Recorder, visualize_samples
+import data.load_data as load_data
 
 parser = argparse.ArgumentParser()
 
 cfg = {
     "img_size": 64,
-    "z_dim": 16,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z16_beta15",
-    "data_set": "celeba64",
-    "batch_size": 52,
-    "nr_gpu": 2,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0005,
-    "beta": 15.0,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc",
-    "use_mode": "test",
-}
-
-
-cfg = {
-    "img_size": 64,
-    "z_dim": 20,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z16_beta10",
-    "data_set": "celeba64",
-    "batch_size": 65,
-    "nr_gpu": 2,
-    #"gpus": "4,5,6,7",
-    "learning_rate": 0.0005,
-    "beta": 10.0,
-    "lam": 0.0,
-    "save_interval": 10,
-    "reg": "tc",
-    "use_mode": "test",
-}
-
-cfg = {
-    "img_size": 64,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta15",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta8",
     "data_set": "celeba64",
-    "batch_size": 13*32/4,
-    "nr_gpu": 2,
-    #"gpus": "4,5,6,7",
+    "batch_size": 13*32/2,
     "learning_rate": 0.0005,
-    "beta": 15.0,
+    "beta": 8.0,
     "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
@@ -77,7 +41,8 @@ parser.add_argument('-r', '--reg', type=str, default=cfg['reg'], help='regulariz
 parser.add_argument('-si', '--save_interval', type=int, default=cfg['save_interval'], help='Every how many epochs to write checkpoint/samples?')
 parser.add_argument('-lp', '--load_params', dest='load_params', action='store_true', help='Restore training from previous model checkpoint?')
 parser.add_argument('-bs', '--batch_size', type=int, default=cfg['batch_size'], help='Batch size during training per GPU')
-parser.add_argument('-ng', '--nr_gpu', type=int, default=cfg['nr_gpu'], help='How many GPUs to distribute the training across?')
+parser.add_argument('-ng', '--nr_gpu', type=int, default=0, help='How many GPUs to distribute the training across?')
+parser.add_argument('-g', '--gpus', type=str, default="", help='GPU No.s')
 parser.add_argument('-lr', '--learning_rate', type=float, default=cfg['learning_rate'], help='Base learning rate')
 parser.add_argument('-b', '--beta', type=float, default=cfg['beta'], help="strength of the KL divergence penalty")
 parser.add_argument('-l', '--lam', type=float, default=cfg['lam'], help="")
@@ -91,19 +56,20 @@ args = parser.parse_args()
 if args.use_mode == 'test':
     args.debug = True
 
+args.nr_gpu = len(args.gpus.split(","))
+os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
 
-rng = np.random.RandomState(args.seed)
 tf.set_random_seed(args.seed)
-
-
-import data.celeba_data as celeba_data
-DataLoader = celeba_data.DataLoader
+batch_size = args.batch_size * args.nr_gpu
+data_set = load_data.CelebA(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
 if args.debug:
-    train_data = DataLoader(args.data_dir, 'valid', args.batch_size * args.nr_gpu, rng=rng, shuffle=True, size=args.img_size)
+    train_data = data_set.train(shuffle=True, limit=batch_size*5)
 else:
-    train_data = DataLoader(args.data_dir, 'train', args.batch_size * args.nr_gpu, rng=rng, shuffle=True, size=args.img_size)
-test_data = DataLoader(args.data_dir, 'test', args.batch_size * args.nr_gpu, shuffle=False, size=args.img_size)
+    train_data = data_set.train(shuffle=True, limit=-1)
+
+eval_data = data_set.train(shuffle=True, limit=batch_size*10)
+test_data = data_set.test(shuffle=False, limit=-1)
 
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -118,9 +84,11 @@ model_opt = {
     "lam": args.lam,
     "nonlinearity": tf.nn.relu,
     "bn": True,
-    "kernel_initializer": None,
+    "kernel_initializer": tf.contrib.layers.xavier_initializer(),
     "kernel_regularizer": None,
 }
+
+
 model = tf.make_template('model', ConvVAE.build_graph)
 
 for i in range(args.nr_gpu):
@@ -138,9 +106,13 @@ if args.use_mode == 'train':
             for j in range(len(grads[0])):
                 grads[0][j] += grads[i][j]
 
-        loss = tf.add_n([v.loss for v in vaes]) / args.nr_gpu
-        loss_ae = tf.add_n([v.loss_ae for v in vaes]) / args.nr_gpu
-        loss_reg = tf.add_n([v.loss_reg for v in vaes]) / args.nr_gpu
+        record_dict = {}
+        record_dict['total loss'] = tf.add_n([v.loss for v in vaes]) / args.nr_gpu
+        record_dict['recon loss'] = tf.add_n([v.loss_ae for v in vaes]) / args.nr_gpu
+        record_dict['mi reg'] = tf.add_n([v.mi for v in vaes]) / args.nr_gpu
+        record_dict['tc reg'] = tf.add_n([v.tc for v in vaes]) / args.nr_gpu
+        record_dict['dwkld reg'] = tf.add_n([v.dwkld for v in vaes]) / args.nr_gpu
+        recorder = Recorder(dict=record_dict)
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
 
@@ -159,6 +131,7 @@ def sample_from_model(sess, data):
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
     return np.concatenate(x_hats, axis=0)
+
 
 def generate_samples(sess, data):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
@@ -189,8 +162,9 @@ def latent_traversal(sess, data, use_image_id=0):
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
     num_features = args.z_dim
+    num_traversal_step = 10
     for i in range(num_features):
-        z[i*num_traversal_step:(i+1)*num_traversal_step, i] = np.linspace(start=-6., stop=6., num=num_traversal_step)
+        z[i*num_traversal_step:(i+1)*num_traversal_step, i] = np.linspace(start=-5., stop=5., num=num_traversal_step)
     z = np.split(z, args.nr_gpu)
     feed_dict.update({vaes[i].z:z[i] for i in range(args.nr_gpu)})
     x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
@@ -219,13 +193,12 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("results/conv_vae_samples_celeba64_tc_z32_beta15.png")
+    img.save("results/conv_vae_samples_celeba64_tc_z32_beta8.png")
 
     # data = next(test_data)
     # sample_x = generate_samples(sess, data)
     # test_data.reset()
     #
     # visualize_samples(sample_x, "results/conv_vae_test.png", layout=(10, 10))
-
 
     # visualize_samples(sample_x, "results/conv_vae_samples_id_{0}.png".format(i), layout=(32, 10))
