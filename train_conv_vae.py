@@ -8,15 +8,7 @@ import numpy as np
 import tensorflow as tf
 from utils import plotting
 from vae.conv_vae import ConvVAE
-
-
-# import tensorflow.contrib.eager as tfe
-# tfe.enable_eager_execution()
-#
-# print("TensorFlow version: {}".format(tf.VERSION))
-# print("Eager execution: {}".format(tf.executing_eagerly()))
-#
-
+from blocks.helpers import Recorder
 
 parser = argparse.ArgumentParser()
 
@@ -148,7 +140,7 @@ parser.add_argument('-um', '--use_mode', type=str, default=cfg['use_mode'], help
 args = parser.parse_args()
 if args.use_mode == 'test':
     args.debug = True
-    
+
 args.nr_gpu = len(args.gpus.split(","))
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
@@ -271,45 +263,68 @@ with tf.Session(config=config) as sess:
 
     sess.run(initializer)
 
+    # if args.load_params:
+    #     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
+    #     print('restoring parameters from', ckpt_file)
+    #     saver.restore(sess, ckpt_file)
+    #
+    # max_num_epoch = 200
+    # for epoch in range(max_num_epoch+1):
+    #     tt = time.time()
+    #     loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
+    #     for data in train_data:
+    #         feed_dict = make_feed_dict(data, is_training=True)
+    #         _, l, la, lr = sess.run([train_step, loss, loss_ae, loss_reg], feed_dict=feed_dict)
+    #         #l, la, lr = sess.run([loss, loss_ae, loss_reg], feed_dict=feed_dict)
+    #         loss_arr.append(l)
+    #         loss_ae_arr.append(la)
+    #         loss_reg_arr.append(lr)
+    #     train_loss, train_loss_ae, train_loss_reg = np.mean(loss_arr), np.mean(loss_ae_arr), np.mean(loss_reg_arr)
+    #
+    #     loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
+    #     for data in test_data:
+    #         feed_dict = make_feed_dict(data, is_training=False)
+    #         l, la, lr = sess.run([loss, loss_ae, loss_reg], feed_dict=feed_dict)
+    #         loss_arr.append(l)
+    #         loss_ae_arr.append(la)
+    #         loss_reg_arr.append(lr)
+    #     test_loss, test_loss_ae, test_loss_reg = np.mean(loss_arr), np.mean(loss_ae_arr), np.mean(loss_reg_arr)
+    #
+    #     print("epoch {0} --------------------- Time {1:.2f}s".format(epoch, time.time()-tt))
+    #     print("train loss:{0:.3f}, train ae loss:{1:.3f}, train reg loss:{2:.3f}".format(train_loss, train_loss_ae, train_loss_reg))
+    #     print("test loss:{0:.3f}, test ae loss:{1:.3f}, test reg loss:{2:.3f}".format(test_loss, test_loss_ae, test_loss_reg))
+    #     sys.stdout.flush()
+    #
+    #     if epoch % args.save_interval == 0:
+    #         saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
+    #
+    #         data = next(test_data)
+    #         sample_x = sample_from_model(sess, data)
+    #         test_data.reset()
+    #
+    #         img_tile = plotting.img_tile(sample_x[:100], aspect_ratio=1.0, border_color=1.0, stretch=True)
+    #         img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
+    #         plotting.plt.savefig(os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)))
+    #
+
+
     if args.load_params:
         ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
         print('restoring parameters from', ckpt_file)
         saver.restore(sess, ckpt_file)
 
+    recorder = Recorder(dict={"total loss":loss, "ae loss":loss_ae, "reg loss":loss_reg})
     max_num_epoch = 200
     for epoch in range(max_num_epoch+1):
         tt = time.time()
-        loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
         for data in train_data:
             feed_dict = make_feed_dict(data, is_training=True)
-            _, l, la, lr = sess.run([train_step, loss, loss_ae, loss_reg], feed_dict=feed_dict)
-            #l, la, lr = sess.run([loss, loss_ae, loss_reg], feed_dict=feed_dict)
-            loss_arr.append(l)
-            loss_ae_arr.append(la)
-            loss_reg_arr.append(lr)
-        train_loss, train_loss_ae, train_loss_reg = np.mean(loss_arr), np.mean(loss_ae_arr), np.mean(loss_reg_arr)
+            sess.run(train_step, feed_dict=feed_dict)
 
-        loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
         for data in test_data:
             feed_dict = make_feed_dict(data, is_training=False)
-            l, la, lr = sess.run([loss, loss_ae, loss_reg], feed_dict=feed_dict)
-            loss_arr.append(l)
-            loss_ae_arr.append(la)
-            loss_reg_arr.append(lr)
-        test_loss, test_loss_ae, test_loss_reg = np.mean(loss_arr), np.mean(loss_ae_arr), np.mean(loss_reg_arr)
+            recorder.evaluate(sess, feed_dict)
 
-        print("epoch {0} --------------------- Time {1:.2f}s".format(epoch, time.time()-tt))
-        print("train loss:{0:.3f}, train ae loss:{1:.3f}, train reg loss:{2:.3f}".format(train_loss, train_loss_ae, train_loss_reg))
-        print("test loss:{0:.3f}, test ae loss:{1:.3f}, test reg loss:{2:.3f}".format(test_loss, test_loss_ae, test_loss_reg))
+        recorder.finish_epoch_and_display()
+        print("Time Elapsed {1:.2f}s".format(time.time()-tt))
         sys.stdout.flush()
-
-        if epoch % args.save_interval == 0:
-            saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
-
-            data = next(test_data)
-            sample_x = sample_from_model(sess, data)
-            test_data.reset()
-
-            img_tile = plotting.img_tile(sample_x[:100], aspect_ratio=1.0, border_color=1.0, stretch=True)
-            img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
-            plotting.plt.savefig(os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)))
