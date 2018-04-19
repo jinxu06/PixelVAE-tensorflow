@@ -91,10 +91,6 @@ cfg = {
 
 
 
-
-
-
-
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
 # data I/O
 parser.add_argument('-dd', '--data_dir', type=str, default=cfg['data_dir'], help='Location for the dataset')

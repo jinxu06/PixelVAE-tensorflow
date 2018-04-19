@@ -29,6 +29,24 @@ cfg = {
     "use_mode": "test",
 }
 
+
+cfg = {
+    "img_size": 64,
+    "z_dim": 20,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z16_beta10",
+    "data_set": "celeba64",
+    "batch_size": 65,
+    "nr_gpu": 2,
+    #"gpus": "4,5,6,7",
+    "learning_rate": 0.0005,
+    "beta": 10.0,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "tc",
+    "use_mode": "test",
+}
+
 num_traversal_step = 13
 
 
@@ -184,7 +202,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("results/conv_vae_samples_celeba64_tc_z16_beta15.png")
+    img.save("results/conv_vae_samples_celeba64_tc_z16_beta10.png")
 
     # data = next(test_data)
     # sample_x = generate_samples(sess, data)
