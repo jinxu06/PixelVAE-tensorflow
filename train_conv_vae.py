@@ -8,7 +8,7 @@ import numpy as np
 import tensorflow as tf
 from utils import plotting
 from vae.conv_vae import ConvVAE
-from blocks.helpers import Recorder
+from blocks.helpers import Recorder, visualize_samples
 
 parser = argparse.ArgumentParser()
 
@@ -314,7 +314,7 @@ with tf.Session(config=config) as sess:
         saver.restore(sess, ckpt_file)
 
     recorder = Recorder(dict={"total loss":loss, "ae loss":loss_ae, "reg loss":loss_reg})
-    
+
     max_num_epoch = 200
     for epoch in range(max_num_epoch+1):
         tt = time.time()
