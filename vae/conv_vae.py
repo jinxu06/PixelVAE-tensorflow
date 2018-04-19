@@ -71,6 +71,7 @@ class ConvVAE(object):
         self.loss = self.loss_ae + self.loss_reg
 
 
+
 # @add_arg_scope
 # def conv_encoder_64_block(inputs, z_dim, is_training, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
 #     name = get_name("conv_encoder_64_block", counters)
