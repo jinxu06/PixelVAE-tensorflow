@@ -120,8 +120,8 @@ def conv_encoder_64_block(inputs, z_dim, is_training, nonlinearity=None, bn=True
             outputs = conv2d_layer(outputs, 256, 4, 2, "SAME")
             outputs = conv2d_layer(outputs, 512, 4, 1, "VALID")
             outputs = tf.reshape(outputs, [-1, 512])
-            z_mu = dense_layer(outputs, z_dim, nonlinearity=None, bn=False)
-            z_log_sigma_sq = dense_layer(outputs, z_dim, nonlinearity=None, bn=False)
+            z_mu = dense_layer(outputs, z_dim, nonlinearity=None, bn=True)
+            z_log_sigma_sq = dense_layer(outputs, z_dim, nonlinearity=None, bn=True)
             return z_mu, z_log_sigma_sq
 
 # @add_arg_scope
