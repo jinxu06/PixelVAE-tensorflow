@@ -82,13 +82,13 @@ class Recorder(object):
         self.epoch_values = []
         self.num_epoches += 1
 
-    def __display(self, stats, keys=None):
+    def __display(self, stats, keys=None, time=0.):
         if keys is None:
             keys = self.keys
         results = {}
         for k, s in zip(self.keys, stats):
             results[k] = s
-        ret_str = "* epoch {0} -- ".format(self.num_epoches)
+        ret_str = "* epoch {0} \{{1}s\} -- ".format(time, self.num_epoches)
         for key in keys:
             ret_str += "{0}:{1}   ".format(key, results[key])
         print(ret_str)
