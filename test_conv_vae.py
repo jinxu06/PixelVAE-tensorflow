@@ -13,13 +13,15 @@ import data.load_data as load_data
 
 parser = argparse.ArgumentParser()
 
+num_traversal_step = 13
+
 cfg = {
     "img_size": 64,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta15",
     "data_set": "celeba64",
-    "batch_size": 13*32//2,
+    "batch_size": num_traversal_step * 32 //4 ,
     "learning_rate": 0.0005,
     "beta": 15.0,
     "lam": 0.0,
@@ -28,7 +30,7 @@ cfg = {
     "use_mode": "test",
 }
 
-num_traversal_step = 13
+
 
 
 
@@ -60,6 +62,7 @@ args.nr_gpu = len(args.gpus.split(","))
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
 
+
 tf.set_random_seed(args.seed)
 batch_size = args.batch_size * args.nr_gpu
 data_set = load_data.CelebA(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
@@ -82,7 +85,7 @@ model_opt = {
     "reg": args.reg,
     "beta": args.beta,
     "lam": args.lam,
-    "nonlinearity": tf.nn.relu,
+    "nonlinearity": tf.nn.elu,
     "bn": True,
     "kernel_initializer": tf.contrib.layers.xavier_initializer(),
     "kernel_regularizer": None,
@@ -162,9 +165,8 @@ def latent_traversal(sess, data, use_image_id=0):
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
     num_features = args.z_dim
-    num_traversal_step = 10
     for i in range(num_features):
-        z[i*num_traversal_step:(i+1)*num_traversal_step, i] = np.linspace(start=-5., stop=5., num=num_traversal_step)
+        z[i*num_traversal_step:(i+1)*num_traversal_step, i] = np.linspace(start=-6., stop=6., num=num_traversal_step)
     z = np.split(z, args.nr_gpu)
     feed_dict.update({vaes[i].z:z[i] for i in range(args.nr_gpu)})
     x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
