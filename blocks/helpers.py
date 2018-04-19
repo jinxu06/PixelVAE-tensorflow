@@ -88,7 +88,7 @@ class Recorder(object):
         results = {}
         for k, s in zip(self.keys, stats):
             results[k] = s
-        ret_str = "* epoch {0} {1} -- ".format("{"+time+"s}", self.num_epoches)
+        ret_str = "* epoch {0} {1} -- ".format("{"+str(float(time))+"s}", self.num_epoches)
         for key in keys:
             ret_str += "{0}:{1}   ".format(key, results[key])
         print(ret_str)
