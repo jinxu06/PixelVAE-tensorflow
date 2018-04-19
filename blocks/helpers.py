@@ -62,6 +62,16 @@ def get_trainable_variables(flist, filter_type="in"):
             vs = [p for p in vs if s not in p.name]
     return vs
 
+def get_nonlinearity(name):
+    if name=="relu":
+        return tf.nn.relu
+    elif name=="elu":
+        return tf.nn.elu
+    elif name=='tanh':
+        return tf.nn.tanh
+    elif name=='sigmoid':
+        return tf.sigmoid 
+
 
 class Recorder(object):
 

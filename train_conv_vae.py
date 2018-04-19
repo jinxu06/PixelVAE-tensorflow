@@ -8,7 +8,7 @@ import numpy as np
 import tensorflow as tf
 from utils import plotting
 from vae.conv_vae import ConvVAE
-from blocks.helpers import Recorder, visualize_samples
+from blocks.helpers import Recorder, visualize_samples, get_nonlinearity
 import data.load_data as load_data
 
 parser = argparse.ArgumentParser()
@@ -88,6 +88,7 @@ cfg = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta8",
     "data_set": "celeba64",
+    "nonlinearity":"relu",
     "batch_size": 512,
     "learning_rate": 0.0005,
     "beta": 8.0,
@@ -126,6 +127,7 @@ parser.add_argument('-lp', '--load_params', dest='load_params', action='store_tr
 parser.add_argument('-bs', '--batch_size', type=int, default=cfg['batch_size'], help='Batch size during training per GPU')
 parser.add_argument('-ng', '--nr_gpu', type=int, default=0, help='How many GPUs to distribute the training across?')
 parser.add_argument('-g', '--gpus', type=str, default="", help='GPU No.s')
+parser.add_argument('-n', '--nonlinearity', type=str, default="", help='')
 parser.add_argument('-lr', '--learning_rate', type=float, default=cfg['learning_rate'], help='Base learning rate')
 parser.add_argument('-b', '--beta', type=float, default=cfg['beta'], help="strength of the KL divergence penalty")
 parser.add_argument('-l', '--lam', type=float, default=cfg['lam'], help="")
@@ -143,6 +145,7 @@ args.nr_gpu = len(args.gpus.split(","))
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
 
+
 tf.set_random_seed(args.seed)
 batch_size = args.batch_size * args.nr_gpu
 data_set = load_data.CelebA(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
@@ -155,7 +158,6 @@ eval_data = data_set.train(shuffle=True, limit=batch_size*10)
 test_data = data_set.test(shuffle=False, limit=-1)
 
 
-
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 
@@ -166,7 +168,7 @@ model_opt = {
     "reg": args.reg,
     "beta": args.beta,
     "lam": args.lam,
-    "nonlinearity": tf.nn.relu, ###
+    "nonlinearity": get_nonlinearity(args.nonlinearity),
     "bn": True,
     "kernel_initializer": tf.contrib.layers.xavier_initializer(),
     "kernel_regularizer": None,
