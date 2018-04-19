@@ -325,6 +325,4 @@ with tf.Session(config=config) as sess:
             feed_dict = make_feed_dict(data, is_training=False)
             recorder.evaluate(sess, feed_dict)
 
-        recorder.finish_epoch_and_display()
-        print("Time Elapsed {1:.2f}s".format(time.time()-tt))
-        sys.stdout.flush()
+        recorder.finish_epoch_and_display(time=time.time()-tt)
