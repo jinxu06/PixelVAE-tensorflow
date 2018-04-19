@@ -74,11 +74,11 @@ class Recorder(object):
         self.cur_values = sess.run(self.fetches, feed_dict=feed_dict)
         self.epoch_values.append(self.cur_values)
 
-    def finish_epoch_and_display(self, keys=None):
+    def finish_epoch_and_display(self, keys=None, time=0.):
         epoch_values = np.array(self.epoch_values)
         stats = np.mean(epoch_values, axis=0)
         self.past_epoch_stats.append(stats)
-        self.__display(stats, keys)
+        self.__display(stats, keys, time)
         self.epoch_values = []
         self.num_epoches += 1
 
