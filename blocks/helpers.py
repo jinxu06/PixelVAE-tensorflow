@@ -85,7 +85,7 @@ class Recorder(object):
     def __display(self, stats, keys=None):
         if keys is None:
             keys = self.keys
-        results = []
+        results = {}
         for k, s in zip(self.keys, stats):
             results[k] = s
         ret_str = "* epoch {0} -- ".format(self.num_epoches)
