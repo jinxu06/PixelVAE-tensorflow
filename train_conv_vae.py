@@ -334,7 +334,7 @@ with tf.Session(config=config) as sess:
             # data = next(test_data)
             data = next(eval_data)
             sample_x = sample_from_model(sess, data)
-            test_data.reset()
+            eval_data.reset()
             visualize_samples(sample_x, os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)), layout=(10, 10))
             print("------------ saved")
             sys.stdout.flush()
