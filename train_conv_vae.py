@@ -154,7 +154,6 @@ else:
 eval_data = data_set.train(shuffle=True, limit=batch_size*10)
 test_data = data_set.test(shuffle=False, limit=-1)
 
-eval_data = test_data ###
 
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
