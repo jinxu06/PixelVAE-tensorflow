@@ -91,7 +91,7 @@ cfg = {
     "data_set": "celeba64",
     "nonlinearity":"relu",
     "batch_size": 512,
-    "learning_rate": 0.001,
+    "learning_rate": 0.0005,
     "beta": 10.0,
     "lam": 0.0,
     "save_interval": 10,
