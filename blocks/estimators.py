@@ -1,6 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
+from blocks.helpers import int_shape
 
 def compute_kernel(x, y):
     x_size = tf.shape(x)[0]

@@ -1,7 +1,6 @@
 import numpy as np
 import tensorflow as tf
-
-
+from blocks.helpers import int_shape, get_name
 
 def adam_updates(params, cost_or_grads, lr=0.001, mom1=0.9, mom2=0.999):
     ''' Adam optimizer '''

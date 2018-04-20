@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
-from blocks.helpers import int_shape
+from blocks.helpers import int_shape, get_name
 
 @add_arg_scope
 def gaussian_sampler(loc, scale, counters={}):
