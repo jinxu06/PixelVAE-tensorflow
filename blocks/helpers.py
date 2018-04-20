@@ -49,6 +49,13 @@ def broadcast_masks_tf(masks, num_channels=None, batch_size=None):
         masks = tf.stack([masks for i in range(batch_size)], axis=0)
     return masks
 
+def broadcast_masks_np(masks, num_channels=None, batch_size=None):
+    if num_channels is not None:
+        masks = np.stack([masks for i in range(num_channels)], axis=-1)
+    if batch_size is not None:
+        masks = np.stack([masks for i in range(batch_size)], axis=0)
+    return masks
+
 
 def get_trainable_variables(flist, filter_type="in"):
     all_vs = tf.trainable_variables()
@@ -75,7 +82,7 @@ def get_nonlinearity(name):
 
 class Recorder(object):
 
-    def __init__(self, dict={}, log_file="temp"):
+    def __init__(self, dict={}, config_str="config not given", log_file="temp"):
         self.dict = dict
         self.keys = self.dict.keys()
         self.fetches = self.__fetches(self.keys)
@@ -85,7 +92,7 @@ class Recorder(object):
         self.num_epoches = 0
         self.log_file = log_file
         with open(self.log_file, "w") as f:
-            f.write("")
+            f.write(config_str+"\n")
 
     def __fetches(self, keys):
         fetches = []
@@ -119,8 +126,3 @@ class Recorder(object):
         for key in keys:
             ret_str += "{0}:{1:.2f}   ".format(key, results[key])
         return ret_str
-
-
-    def log(self):
-        if keys is None:
-            keys = self.keys

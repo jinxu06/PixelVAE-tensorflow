@@ -5,20 +5,20 @@ from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
 @add_arg_scope
 def conv2d(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, is_training=False):
     outputs = tf.layers.conv2d(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
-    if bn:
-        outputs = tf.layers.batch_normalization(outputs, training=is_training)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
+    if bn:
+        outputs = tf.layers.batch_normalization(outputs, training=is_training)
     print("    + conv2d", int_shape(inputs), int_shape(outputs), nonlinearity, bn)
     return outputs
 
 @add_arg_scope
 def deconv2d(inputs, num_filters, kernel_size, strides=1, padding='SAME', nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, is_training=False):
     outputs = tf.layers.conv2d_transpose(inputs, num_filters, kernel_size=kernel_size, strides=strides, padding=padding, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
-    if bn:
-        outputs = tf.layers.batch_normalization(outputs, training=is_training)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
+    if bn:
+        outputs = tf.layers.batch_normalization(outputs, training=is_training)
     print("    + deconv2d", int_shape(inputs), int_shape(outputs), nonlinearity, bn)
     return outputs
 
@@ -27,10 +27,10 @@ def dense(inputs, num_outputs, nonlinearity=None, bn=True, kernel_initializer=No
     inputs_shape = int_shape(inputs)
     assert len(inputs_shape)==2, "inputs should be flattened first"
     outputs = tf.layers.dense(inputs, num_outputs, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer)
-    if bn:
-        outputs = tf.layers.batch_normalization(outputs, training=is_training)
     if nonlinearity is not None:
         outputs = nonlinearity(outputs)
+    if bn:
+        outputs = tf.layers.batch_normalization(outputs, training=is_training)
     print("    + dense", int_shape(inputs), int_shape(outputs), nonlinearity, bn)
     return outputs
 
@@ -55,22 +55,22 @@ def down_shifted_conv2d(x, num_filters, filter_size=[2,3], strides=[1,1], **kwar
     x = tf.pad(x, [[0,0],[filter_size[0]-1,0], [int((filter_size[1]-1)/2),int((filter_size[1]-1)/2)],[0,0]])
     return conv2d(x, num_filters, kernel_size=filter_size, strides=strides, padding='VALID', **kwargs)
 
-@add_arg_scope
-def down_shifted_deconv2d(x, num_filters, filter_size=[2,3], strides=[1,1], **kwargs):
-    x = deconv2d(x, num_filters, kernel_size=filter_size, strides=strides, padding='VALID', **kwargs)
-    xs = int_shape(x)
-    return x[:,:(xs[1]-filter_size[0]+1),int((filter_size[1]-1)/2):(xs[2]-int((filter_size[1]-1)/2)),:]
+# @add_arg_scope
+# def down_shifted_deconv2d(x, num_filters, filter_size=[2,3], strides=[1,1], **kwargs):
+#     x = deconv2d(x, num_filters, kernel_size=filter_size, strides=strides, padding='VALID', **kwargs)
+#     xs = int_shape(x)
+#     return x[:,:(xs[1]-filter_size[0]+1),int((filter_size[1]-1)/2):(xs[2]-int((filter_size[1]-1)/2)),:]
 
 @add_arg_scope
 def down_right_shifted_conv2d(x, num_filters, filter_size=[2,2], strides=[1,1], **kwargs):
     x = tf.pad(x, [[0,0],[filter_size[0]-1, 0], [filter_size[1]-1, 0],[0,0]])
     return conv2d(x, num_filters, kernel_size=filter_size, strides=strides, padding='VALID', **kwargs)
 
-@add_arg_scope
-def down_right_shifted_deconv2d(x, num_filters, filter_size=[2,2], strides=[1,1], **kwargs):
-    x = deconv2d(x, num_filters, kernel_size=filter_size, strides=strides, padding='VALID', **kwargs)
-    xs = int_shape(x)
-    return x[:,:(xs[1]-filter_size[0]+1):,:(xs[2]-filter_size[1]+1),:]
+# @add_arg_scope
+# def down_right_shifted_deconv2d(x, num_filters, filter_size=[2,2], strides=[1,1], **kwargs):
+#     x = deconv2d(x, num_filters, kernel_size=filter_size, strides=strides, padding='VALID', **kwargs)
+#     xs = int_shape(x)
+#     return x[:,:(xs[1]-filter_size[0]+1):,:(xs[2]-filter_size[1]+1),:]
 
 @add_arg_scope
 def up_shifted_conv2d(x, num_filters, filter_size=[2,3], strides=[1,1], **kwargs):

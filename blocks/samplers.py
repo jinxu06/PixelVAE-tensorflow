@@ -4,20 +4,20 @@ from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
 from blocks.helpers import int_shape
 
 @add_arg_scope
-def z_sampler(loc, scale, counters={}):
-    name = get_name("z_sampler", counters)
+def gaussian_sampler(loc, scale, counters={}):
+    name = get_name("gaussian_sampler", counters)
     print("construct", name, "...")
     with tf.variable_scope(name):
         dist = tf.distributions.Normal(loc=0., scale=1.)
         z = dist.sample(sample_shape=int_shape(loc), seed=None)
         z = loc + tf.multiply(z, scale)
-        print("    + normal_sampler", int_shape(z))
+        print("    + gaussian_sampler", int_shape(z))
         return z
 
 @add_arg_scope
 def mix_logistic_sampler(params, nr_logistic_mix=10, sample_range=3., counters={}):
     # sample from [loc - sample_range*scale, loc + sample_range*scale]
-    name = nn.get_name("logistic_mix_sampler", counters)
+    name = nn.get_name("mix_logistic_sampler", counters)
     print("construct", name, "...")
     epsilon = 1. / ( tf.exp(float(sample_range))+1. )
     x = sample_from_discretized_mix_logistic(params, nr_logistic_mix, epsilon)

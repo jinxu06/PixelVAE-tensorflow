@@ -15,6 +15,20 @@ parser = argparse.ArgumentParser()
 
 num_traversal_step = 13
 
+cfg = {
+    "img_size": 64,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "data_set": "celeba64",
+    "nonlinearity":"relu",
+    "batch_size": 32*num_traversal_step // 4,
+    "learning_rate": 0.0005,
+    "beta": 10.0,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "tc",
+    "use_mode": "test",
+}
+
 
 cfg = {
     "img_size": 64,
@@ -31,8 +45,6 @@ cfg = {
     "reg": "tc",
     "use_mode": "test",
 }
-
-
 
 
 
@@ -202,7 +214,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show1.png")
+    img.save("/data/ziz/jxu/gpu-results/show2.png")
 
     # data = next(test_data)
     # sample_x = generate_samples(sess, data)

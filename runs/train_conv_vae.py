@@ -3,13 +3,14 @@ import sys
 import json
 import argparse
 import time
-from pixelcnn.nn_for_cond import adam_updates, concat_elu
 import numpy as np
 import tensorflow as tf
-from utils import plotting
-from vae.conv_vae import ConvVAE
+
 from blocks.helpers import Recorder, visualize_samples, get_nonlinearity
+from blocks.optimizers import adam_updates
 import data.load_data as load_data
+
+from models.conv_vae import ConvVAE
 
 parser = argparse.ArgumentParser()
 
@@ -28,7 +29,7 @@ cfg_default = {
 cfg = cfg_default
 cfg.update({
     "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta10",
+    "save_dir": "/data/ziz/jxu/models/temp",
     "beta": 10.0,
     "reg": "tc",
     "use_mode": "train",
@@ -72,12 +73,13 @@ tf.set_random_seed(args.seed)
 batch_size = args.batch_size * args.nr_gpu
 data_set = load_data.CelebA(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
 if args.debug:
-    train_data = data_set.train(shuffle=True, limit=batch_size*5)
+    train_data = data_set.train(shuffle=True, limit=batch_size*2)
+    eval_data = data_set.train(shuffle=True, limit=batch_size*1)
+    test_data = data_set.test(shuffle=False, limit=batch_size*1)
 else:
     train_data = data_set.train(shuffle=True, limit=-1)
-
-eval_data = data_set.train(shuffle=True, limit=batch_size*10)
-test_data = data_set.test(shuffle=False, limit=-1)
+    eval_data = data_set.train(shuffle=True, limit=batch_size*10)
+    test_data = data_set.test(shuffle=False, limit=-1)
 
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -166,7 +168,6 @@ def latent_traversal(sess, data, use_image_id=0):
     z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = z_mu.copy()
-
     for i in range(z.shape[0]):
         z[i] = z[use_image_id].copy()
 
@@ -188,51 +189,6 @@ config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
 
     sess.run(initializer)
-
-    # if args.load_params:
-    #     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
-    #     print('restoring parameters from', ckpt_file)
-    #     saver.restore(sess, ckpt_file)
-    #
-    # max_num_epoch = 200
-    # for epoch in range(max_num_epoch+1):
-    #     tt = time.time()
-    #     loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
-    #     for data in train_data:
-    #         feed_dict = make_feed_dict(data, is_training=True)
-    #         _, l, la, lr = sess.run([train_step, loss, loss_ae, loss_reg], feed_dict=feed_dict)
-    #         #l, la, lr = sess.run([loss, loss_ae, loss_reg], feed_dict=feed_dict)
-    #         loss_arr.append(l)
-    #         loss_ae_arr.append(la)
-    #         loss_reg_arr.append(lr)
-    #     train_loss, train_loss_ae, train_loss_reg = np.mean(loss_arr), np.mean(loss_ae_arr), np.mean(loss_reg_arr)
-    #
-    #     loss_arr, loss_ae_arr, loss_reg_arr = [], [], []
-    #     for data in test_data:
-    #         feed_dict = make_feed_dict(data, is_training=False)
-    #         l, la, lr = sess.run([loss, loss_ae, loss_reg], feed_dict=feed_dict)
-    #         loss_arr.append(l)
-    #         loss_ae_arr.append(la)
-    #         loss_reg_arr.append(lr)
-    #     test_loss, test_loss_ae, test_loss_reg = np.mean(loss_arr), np.mean(loss_ae_arr), np.mean(loss_reg_arr)
-    #
-    #     print("epoch {0} --------------------- Time {1:.2f}s".format(epoch, time.time()-tt))
-    #     print("train loss:{0:.3f}, train ae loss:{1:.3f}, train reg loss:{2:.3f}".format(train_loss, train_loss_ae, train_loss_reg))
-    #     print("test loss:{0:.3f}, test ae loss:{1:.3f}, test reg loss:{2:.3f}".format(test_loss, test_loss_ae, test_loss_reg))
-    #     sys.stdout.flush()
-    #
-    #     if epoch % args.save_interval == 0:
-    #         saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
-    #
-    #         data = next(test_data)
-    #         sample_x = sample_from_model(sess, data)
-    #         test_data.reset()
-    #
-    #         img_tile = plotting.img_tile(sample_x[:100], aspect_ratio=1.0, border_color=1.0, stretch=True)
-    #         img = plotting.plot_img(img_tile, title=args.data_set + ' samples')
-    #         plotting.plt.savefig(os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)))
-    #
-
 
     if args.load_params:
         ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
