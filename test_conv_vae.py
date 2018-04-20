@@ -84,6 +84,23 @@ cfg = {
 # }
 
 
+cfg = {
+    "img_size": 64,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta5_br",
+    "data_set": "celeba64",
+    "nonlinearity":"relu",
+    "batch_size": num_traversal_step * 20 //4 ,
+    "learning_rate": 0.0005,
+    "beta": 5.0,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "tc",
+    "use_mode": "test",
+}
+
+
 
 
 
@@ -235,7 +252,7 @@ config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
 
-    #test_data = eval_data
+    test_data = eval_data
 
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
@@ -252,7 +269,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/conv_vae_samples_celeba64_tc_z20_beta5_test.png")
+    img.save("/data/ziz/jxu/gpu-results/conv_vae_samples_celeba64_tc_z20_beta5_br.png")
 
     # data = next(test_data)
     # sample_x = generate_samples(sess, data)
