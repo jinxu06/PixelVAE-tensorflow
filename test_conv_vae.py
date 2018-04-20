@@ -235,7 +235,7 @@ config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
 
-    #test_data = eval_data
+    test_data = eval_data
 
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
@@ -252,7 +252,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/conv_vae_samples_celeba64_tc_z32_beta5_test.png")
+    img.save("/data/ziz/jxu/gpu-results/conv_vae_samples_celeba64_tc_z32_beta5.png")
 
     # data = next(test_data)
     # sample_x = generate_samples(sess, data)
