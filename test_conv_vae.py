@@ -132,7 +132,8 @@ if args.use_mode == 'test':
 args.nr_gpu = len(args.gpus.split(","))
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
-
+if not os.path.exists(args.save_dir):
+    os.makedirs(args.save_dir)
 
 tf.set_random_seed(args.seed)
 batch_size = args.batch_size * args.nr_gpu
