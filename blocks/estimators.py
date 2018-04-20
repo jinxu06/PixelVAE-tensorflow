@@ -15,7 +15,7 @@ def compute_gaussian_entropy(z_mu, z_log_sigma_sq):
     entropy = (tf.reduce_mean(z_log_sigma_sq, axis=1) + tf.log(2*np.pi*np.e)) * z_dim / 2.
     return entropy
 
-def compute_mmd(x, y, sigma_sqr=1.0):
+def estimate_mmd(x, y, sigma_sqr=1.0):
     x_kernel = compute_kernel(x, x)
     y_kernel = compute_kernel(y, y)
     xy_kernel = compute_kernel(x, y)
