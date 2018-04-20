@@ -86,9 +86,9 @@ cfg = {
 
 cfg = {
     "img_size": 64,
-    "z_dim": 20,
+    "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z20_beta5",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta10",
     "data_set": "celeba64",
     "nonlinearity":"relu",
     "batch_size": num_traversal_step * 20 //4 ,

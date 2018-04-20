@@ -87,17 +87,19 @@ cfg = {
     "img_size": 64,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta5_br",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta10",
     "data_set": "celeba64",
     "nonlinearity":"relu",
     "batch_size": 512,
-    "learning_rate": 0.0005,
-    "beta": 5.0,
+    "learning_rate": 0.001,
+    "beta": 10.0,
     "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
     "use_mode": "train",
 }
+
+
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
