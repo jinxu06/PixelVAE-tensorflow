@@ -207,9 +207,6 @@ def generate_samples(sess, data):
 
 
 def latent_traversal(sess, data, use_image_id=0):
-    data = data.copy()
-    for i in range(data.shape[0]):
-        data[i] = data[use_image_id].copy()
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
@@ -217,7 +214,11 @@ def latent_traversal(sess, data, use_image_id=0):
     z_mu = np.concatenate(sess.run([vaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
-    z = np.random.normal(loc=z_mu, scale=z_sigma)
+    z = z_mu.copy()
+
+    for i in range(z.shape[0]):
+        z[i] = z[use_image_id].copy()
+
     num_features = args.z_dim
     for i in range(num_features):
         z[i*num_traversal_step:(i+1)*num_traversal_step, i] = np.linspace(start=-6., stop=6., num=num_traversal_step)
@@ -251,7 +252,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("results/conv_vae_samples_celeba64_tc_z32_beta5_test.png")
+    img.save("/data/ziz/jxu/gpu-results/conv_vae_samples_celeba64_tc_z32_beta5_test.png")
 
     # data = next(test_data)
     # sample_x = generate_samples(sess, data)
