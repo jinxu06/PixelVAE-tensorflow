@@ -15,21 +15,73 @@ parser = argparse.ArgumentParser()
 
 num_traversal_step = 13
 
+
 cfg = {
     "img_size": 64,
     "z_dim": 32,
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta8",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta1",
     "data_set": "celeba64",
+    "nonlinearity":"relu",
     "batch_size": num_traversal_step * 32 //4 ,
-    "nonlinearity": "relu",
     "learning_rate": 0.0005,
-    "beta": 8.0,
+    "beta": 1.0,
     "lam": 0.0,
     "save_interval": 10,
     "reg": "tc",
     "use_mode": "test",
 }
+
+cfg = {
+    "img_size": 64,
+    "z_dim": 32,
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta5",
+    "data_set": "celeba64",
+    "nonlinearity":"relu",
+    "batch_size": num_traversal_step * 32 //4 ,
+    "learning_rate": 0.0005,
+    "beta": 5.0,
+    "lam": 0.0,
+    "save_interval": 10,
+    "reg": "tc",
+    "use_mode": "test",
+}
+
+# #
+# cfg = {
+#     "img_size": 64,
+#     "z_dim": 20,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z20_beta5",
+#     "data_set": "celeba64",
+#     "nonlinearity":"relu",
+#     "batch_size": num_traversal_step * 32 //4 ,
+#     "learning_rate": 0.0005,
+#     "beta": 5.0,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "tc",
+#     "use_mode": "test",
+# }
+# #
+# #
+# #
+# cfg = {
+#     "img_size": 64,
+#     "z_dim": 32,
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z32_beta5_elu",
+#     "data_set": "celeba64",
+#     "nonlinearity":"elu",
+#     "batch_size": num_traversal_step * 32 //4 ,
+#     "learning_rate": 0.0005,
+#     "beta": 5.0,
+#     "lam": 0.0,
+#     "save_interval": 10,
+#     "reg": "tc",
+#     "use_mode": "test",
+# }
 
 
 
@@ -199,7 +251,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("results/conv_vae_samples_celeba64_tc_z32_beta8.png")
+    img.save("results/conv_vae_samples_celeba64_tc_z32_beta5.png")
 
     # data = next(test_data)
     # sample_x = generate_samples(sess, data)
