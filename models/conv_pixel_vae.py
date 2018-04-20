@@ -6,6 +6,9 @@ from blocks.layers import conv2d, deconv2d, dense
 from blocks.samplers import gaussian_sampler, mix_logistic_sampler
 from blocks.estimators import estimate_tc, estimate_dwkld, estimate_mi, estimate_mmd
 from blocks.losses import mix_logistic_loss
+from blocks.helpers import int_shape
+from blocks.components import conv_encoder_64_medium, conv_decoder_64_medium, conv_encoder_32_medium, conv_decoder_32_medium
+from blocks.components import cond_pixel_cnn, context_encoder
 
 
 class ConvPixelVAE(object):
@@ -31,7 +34,6 @@ class ConvPixelVAE(object):
         self.__model(x, x_bar, is_training, dropout_p, masks)
         self.__loss(self.reg)
 
-
     def __model(self, x, x_bar, is_training, dropout_p, masks):
         print("******   Building Graph   ******")
         self.x = x
@@ -40,27 +42,29 @@ class ConvPixelVAE(object):
         self.dropout_p = dropout_p
         self.masks = masks
         if int_shape(x)[1]==64:
-            conv_block = conv_encoder_64_block
-            deconv_block = deconv_64_block
+            conv_encoder = conv_encoder_64_medium
+            conv_decoder = conv_decoder_64_medium
         elif int_shape(x)[1]==32:
-            conv_block = conv_encoder_32_block
-            deconv_block = deconv_32_block
-        with arg_scope([conv_block, deconv_block, encode_context_block], nonlinearity=self.nonlinearity, bn=self.bn, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
-            self.z_mu, self.z_log_sigma_sq = conv_block(x, self.z_dim)
+            conv_encoder = conv_encoder_32_medium
+            conv_decoder = conv_decoder_32_medium
+        with arg_scope([conv_encoder, conv_decoder, context_encoder, cond_pixel_cnn], nonlinearity=self.nonlinearity, bn=self.bn, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
+            self.z_mu, self.z_log_sigma_sq = conv_encoder(self.x, self.z_dim)
             sigma = tf.exp(self.z_log_sigma_sq / 2.)
             if self.use_mode=='train':
                 self.z = gaussian_sampler(self.z_mu, sigma)
             elif self.use_mode=='test':
                 self.z = tf.placeholder(tf.float32, shape=int_shape(self.z_mu))
             print("use mode:{0}".format(self.use_mode))
-            self.decoded_features = deconv_block(self.z)
+            self.decoded_features = conv_decoder(self.z, output_features=True)
             if self.masks is None:
                 sh = self.decoded_features
             else:
-                self.encoded_context = encode_context_block(self.x, self.masks)
+                self.encoded_context = context_encoder(self.x, self.masks, bn=False, nr_resnet=self.nr_resnet, nr_filters=self.nr_filters)
                 sh = tf.concat([self.decoded_features, self.encoded_context], axis=-1)
-            self.mix_logistic_params = cond_pixel_cnn(self.x_bar, sh=sh, nonlinearity=self.nonlinearity, nr_resnet=self.nr_resnet, nr_filters=self.nr_filters, nr_logistic_mix=self.nr_logistic_mix, bn=self.bn, dropout_p=self.dropout_p, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters)
+            self.mix_logistic_params = cond_pixel_cnn(self.x_bar, sh=sh, bn=False, dropout_p=self.dropout_p, nr_resnet=self.nr_resnet, nr_filters=self.nr_filters, nr_logistic_mix=self.nr_logistic_mix)
             self.x_hat = mix_logistic_sampler(self.mix_logistic_params, nr_logistic_mix=self.nr_logistic_mix, sample_range=self.sample_range, counters=self.counters)
+
+
 
 
     def __loss(self, reg):
