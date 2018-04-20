@@ -164,7 +164,7 @@ def context_encoder(contexts, masks, is_training, nr_resnet=5, nr_filters=100, n
     print("construct", name, "...")
     x = contexts * broadcast_masks_tf(masks, num_channels=3)
     x = tf.concat([x, broadcast_masks_tf(masks, num_channels=1)], axis=-1)
-    if bn
+    if bn:
         print("*** Attention *** using bn in the context encoder\n")
     with tf.variable_scope(name):
         with arg_scope([gated_resnet], nonlinearity=nonlinearity, counters=counters):
