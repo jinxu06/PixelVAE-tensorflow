@@ -184,7 +184,7 @@ if args.use_mode == 'train':
         record_dict['mi reg'] = tf.add_n([v.mi for v in vaes]) / args.nr_gpu
         record_dict['tc reg'] = tf.add_n([v.tc for v in vaes]) / args.nr_gpu
         record_dict['dwkld reg'] = tf.add_n([v.dwkld for v in vaes]) / args.nr_gpu
-        recorder = Recorder(dict=record_dict)
+        recorder = Recorder(dict=record_dict, log_file=args.save_dir+"/log_file")
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
 
@@ -314,7 +314,7 @@ with tf.Session(config=config) as sess:
             feed_dict = make_feed_dict(data, is_training=False)
             recorder.evaluate(sess, feed_dict)
 
-        recorder.finish_epoch_and_display(time=time.time()-tt)
+        recorder.finish_epoch_and_display(time=time.time()-tt, log=True)
 
         if epoch % args.save_interval == 0:
             saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')

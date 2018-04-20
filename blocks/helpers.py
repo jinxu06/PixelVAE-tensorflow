@@ -70,12 +70,12 @@ def get_nonlinearity(name):
     elif name=='tanh':
         return tf.nn.tanh
     elif name=='sigmoid':
-        return tf.sigmoid 
+        return tf.sigmoid
 
 
 class Recorder(object):
 
-    def __init__(self, dict={}):
+    def __init__(self, dict={}, log_file="temp"):
         self.dict = dict
         self.keys = self.dict.keys()
         self.fetches = self.__fetches(self.keys)
@@ -83,6 +83,7 @@ class Recorder(object):
         self.epoch_values = []
         self.past_epoch_stats = []
         self.num_epoches = 0
+        self.log_file = log_file
 
     def __fetches(self, keys):
         fetches = []
@@ -94,11 +95,17 @@ class Recorder(object):
         self.cur_values = sess.run(self.fetches, feed_dict=feed_dict)
         self.epoch_values.append(self.cur_values)
 
-    def finish_epoch_and_display(self, keys=None, time=0.):
+    def finish_epoch_and_display(self, keys=None, time=0., log=True):
         epoch_values = np.array(self.epoch_values)
         stats = np.mean(epoch_values, axis=0)
         self.past_epoch_stats.append(stats)
-        self.__display(stats, keys, time)
+        s = self.__display(stats, keys, time)
+        print(s)
+        sys.stdout.flush()
+        with open(self.log_file, "w") as f:
+            f.write("")
+        with open(self.log_file, "a") as f:
+            f.write(s+"\n")
         self.epoch_values = []
         self.num_epoches += 1
 
@@ -111,9 +118,9 @@ class Recorder(object):
         ret_str = "* epoch {0} {1} -- ".format(self.num_epoches, "{"+"%0.2f"%time+"s}")
         for key in keys:
             ret_str += "{0}:{1:.2f}   ".format(key, results[key])
-        print(ret_str)
-        sys.stdout.flush()
+        return ret_str
 
-    def save(self, keys=None):
+
+    def log(self):
         if keys is None:
             keys = self.keys

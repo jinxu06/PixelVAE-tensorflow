@@ -186,7 +186,7 @@ if args.use_mode == 'train':
         record_dict['mi reg'] = tf.add_n([v.mi for v in vaes]) / args.nr_gpu
         record_dict['tc reg'] = tf.add_n([v.tc for v in vaes]) / args.nr_gpu
         record_dict['dwkld reg'] = tf.add_n([v.dwkld for v in vaes]) / args.nr_gpu
-        recorder = Recorder(dict=record_dict)
+        recorder = Recorder(dict=record_dict, log_file=args.save_dir+"/log_file")
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
 
