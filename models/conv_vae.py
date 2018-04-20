@@ -6,6 +6,8 @@ from blocks.layers import conv2d, deconv2d, dense
 from blocks.samplers import gaussian_sampler
 from blocks.estimators import estimate_tc, estimate_dwkld, estimate_mi, estimate_mmd
 from blocks.losses import gaussian_recons_loss
+from blocks.helpers import int_shape
+from blocks.components import conv_encoder_64_medium, conv_decoder_64_medium, conv_encoder_32_medium, conv_decoder_32_medium
 
 
 class ConvVAE(object):
@@ -32,11 +34,11 @@ class ConvVAE(object):
         self.x = x
         self.is_training = is_training
         if int_shape(x)[1]==64:
-            encoder = conv_encoder_64_block
-            decoder = conv_decoder_64_block
+            encoder = conv_encoder_64_medium
+            decoder = conv_decoder_64_medium
         elif int_shape(x)[1]==32:
-            encoder = conv_encoder_32_block
-            decoder = conv_decoder_32_block
+            encoder = conv_encoder_32_medium
+            decoder = conv_decoder_32_medium 
         with arg_scope([encoder, decoder], nonlinearity=self.nonlinearity, bn=self.bn, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
             self.z_mu, self.z_log_sigma_sq = encoder(x, self.z_dim)
             sigma = tf.exp(self.z_log_sigma_sq / 2.)
