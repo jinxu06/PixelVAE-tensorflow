@@ -5,13 +5,11 @@ import argparse
 import time
 import numpy as np
 import tensorflow as tf
-
+sys.path.append("../")
 from blocks.helpers import Recorder, visualize_samples, get_nonlinearity
 from blocks.optimizers import adam_updates
 import data.load_data as load_data
-
 from models.conv_vae import ConvVAE
-sys.path.append("..")
 
 
 parser = argparse.ArgumentParser()
