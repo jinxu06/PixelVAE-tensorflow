@@ -56,7 +56,7 @@ cfg = {
     "save_dir": "/data/ziz/jxu/models/conv_vae_celeba64_tc_z20_beta5",
     "data_set": "celeba64",
     "nonlinearity":"relu",
-    "batch_size": num_traversal_step * 32 //4 ,
+    "batch_size": num_traversal_step * 20 //4 ,
     "learning_rate": 0.0005,
     "beta": 5.0,
     "lam": 0.0,
