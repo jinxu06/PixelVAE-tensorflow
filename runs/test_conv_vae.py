@@ -11,6 +11,8 @@ from blocks.optimizers import adam_updates
 import data.load_data as load_data
 
 from models.conv_vae import ConvVAE
+sys.path.append("..")
+
 
 parser = argparse.ArgumentParser()
 
