@@ -84,6 +84,8 @@ class Recorder(object):
         self.past_epoch_stats = []
         self.num_epoches = 0
         self.log_file = log_file
+        with open(self.log_file, "w") as f:
+            f.write("")
 
     def __fetches(self, keys):
         fetches = []
@@ -102,8 +104,6 @@ class Recorder(object):
         s = self.__display(stats, keys, time)
         print(s)
         sys.stdout.flush()
-        with open(self.log_file, "w") as f:
-            f.write("")
         with open(self.log_file, "a") as f:
             f.write(s+"\n")
         self.epoch_values = []
