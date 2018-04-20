@@ -28,11 +28,38 @@ cfg_default = {
 cfg = cfg_default
 cfg.update({
     "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/temp",
-    "beta": 10.0,
+    "save_dir": "/data/ziz/jxu/models/vae_celeba64_tc_z32_b8",
+    "beta": 8.0,
     "reg": "tc",
     "use_mode": "train",
 })
+
+# cfg = cfg_default
+# cfg.update({
+#     "z_dim": 32,
+#     "save_dir": "/data/ziz/jxu/models/vae_celeba64_tc_z32_b15",
+#     "beta": 15.0,
+#     "reg": "tc",
+#     "use_mode": "train",
+# })
+#
+# cfg = cfg_default
+# cfg.update({
+#     "z_dim": 16,
+#     "save_dir": "/data/ziz/jxu/models/vae_celeba64_tc_z16_b8",
+#     "beta": 8.0,
+#     "reg": "tc",
+#     "use_mode": "train",
+# })
+#
+# cfg = cfg_default
+# cfg.update({
+#     "z_dim": 16,
+#     "save_dir": "/data/ziz/jxu/models/vae_celeba64_tc_z16_b15",
+#     "beta": 15.0,
+#     "reg": "tc",
+#     "use_mode": "train",
+# })
 
 
 
