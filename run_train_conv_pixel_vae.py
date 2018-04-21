@@ -33,11 +33,11 @@ cfg = cfg_default
 cfg.update({
     "z_dim": 32,
     "save_dir": "/data/ziz/jxu/models/pvae_temp",
-    "beta": 8.0,
-    "reg": "tc",
+    "beta": 1e5,
+    "reg": "mmd",
     "use_mode": "train",
     "mask_type": "none",
-    "batch_size": 8,
+    "batch_size": 16,
 })
 
 
