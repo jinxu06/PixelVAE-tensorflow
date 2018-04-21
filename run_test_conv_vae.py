@@ -221,6 +221,10 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
     data = test_data.next((args.z_dim+4)*num_traversal_step)
+    visualize_samples(sample_x, "results/original.png", layout=(10, 10))
+    quit()
+
+
     test_data.reset()
     img = []
     for i in range(3):
