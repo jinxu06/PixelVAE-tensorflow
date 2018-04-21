@@ -37,7 +37,7 @@ cfg.update({
     "reg": "mmd",
     "use_mode": "train",
     "mask_type": "none",
-    "batch_size": 16,
+    "batch_size": 64,
 })
 
 
