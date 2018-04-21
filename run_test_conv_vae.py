@@ -187,8 +187,8 @@ def latent_traversal(sess, image, range=[-6, 6], num_traversal_step=13):
     image = np.cast[np.float32]((image - 127.5) / 127.5)
     num_instances = num_traversal_step * args.z_dim
     num_instances_ceil = int(np.ceil(num_instances/float(args.nr_gpu)))
-    print([image.copy() for i in range(num_instances_ceil)])
-    data = np.stack([image for i in range(num_instances_ceil)], axis=0)
+    range(num_instances_ceil)
+    data = np.stack([image.copy() for i in range(num_instances_ceil)], axis=0)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
