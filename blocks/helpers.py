@@ -7,7 +7,7 @@ from PIL import Image
 def int_shape(x):
     return list(map(int, x.get_shape()))
 
-def log_sum_exp(x, axis):
+def log_sum_exp(x, axis=-1):
     return tf.reduce_logsumexp(x, axis=axis)
 
 def log_prob_from_logits(x):
