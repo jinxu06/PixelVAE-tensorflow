@@ -187,7 +187,7 @@ def context_encoder(contexts, masks, is_training, nr_resnet=5, nr_filters=100, n
 
 @add_arg_scope
 def cond_pixel_cnn(x, gh=None, sh=None, nonlinearity=tf.nn.elu, nr_resnet=5, nr_filters=100, nr_logistic_mix=10, bn=False, dropout_p=0.0, kernel_initializer=None, kernel_regularizer=None, is_training=False, counters={}):
-    name = nn.get_name("conv_pixel_cnn", counters)
+    name = get_name("conv_pixel_cnn", counters)
     print("construct", name, "...")
     print("    * nr_resnet: ", nr_resnet)
     print("    * nr_filters: ", nr_filters)
