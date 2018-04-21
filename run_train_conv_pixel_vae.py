@@ -39,7 +39,7 @@ cfg.update({
     "reg": "mmd",
     "use_mode": "train",
     "mask_type": "full",
-    "batch_size": 32,
+    "batch_size": 16,
 })
 
 
@@ -103,7 +103,7 @@ else:
         train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
     elif args.mask_type=="center rec":
         train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
-test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=(8, 24, 24, 8))
+test_mgen = train_mgen #RectangleMaskGenerator(args.img_size, args.img_size, rec=(8, 24, 24, 8))
 
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
