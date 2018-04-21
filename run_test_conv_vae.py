@@ -185,6 +185,8 @@ def generate_samples(sess, data):
 
 def latent_traversal(sess, image, range=[-6, 6], num_traversal_step=13):
     num_instances = num_traversal_step * args.z_dim
+    print(image)
+    quit()
     data = np.stack([image.copy() for i in range(int(np.ceil(num_instances/float(args.nr_gpu))))], axis=0)
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
