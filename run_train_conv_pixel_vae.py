@@ -38,7 +38,7 @@ cfg.update({
     "beta": 1e5,
     "reg": "mmd",
     "use_mode": "train",
-    "mask_type": "random rec",
+    "mask_type": "full",
     "batch_size": 32,
 })
 
@@ -138,9 +138,6 @@ for i in range(args.nr_gpu):
 
 if args.use_mode == 'train':
     all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
-    for p in all_params:
-        print(p.name)
-    quit()
     grads = []
     for i in range(args.nr_gpu):
         with tf.device('/gpu:%d' % i):
@@ -287,6 +284,8 @@ with tf.Session(config=config) as sess:
         print('restoring parameters from', ckpt_file)
         saver.restore(sess, ckpt_file)
 
+    fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
+
     max_num_epoch = 200
     for epoch in range(max_num_epoch+1):
         tt = time.time()
@@ -304,7 +303,7 @@ with tf.Session(config=config) as sess:
             saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
             # data = next(test_data)
             data = next(eval_data)
-            sample_x = sample_from_model(sess, data)
+            sample_x = sample_from_model(sess, data, fill_region=fill_region)
             eval_data.reset()
             visualize_samples(sample_x, os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)), layout=(4, 4))
             print("------------ saved")
