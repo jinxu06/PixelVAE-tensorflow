@@ -190,7 +190,6 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
     data = np.stack([image.copy() for i in range(num_instances_ceil)], axis=0)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
-    feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
     z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
