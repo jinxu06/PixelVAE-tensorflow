@@ -137,7 +137,7 @@ for i in range(args.nr_gpu):
         model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], **model_opt)
 
 if args.use_mode == 'train':
-    all_params = tf.trainable_variables() #get_trainable_variables(["encode_context", "pixel_cnn"])
+    all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
     for p in all_params:
         print(p.name)
     quit()
