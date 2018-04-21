@@ -37,7 +37,7 @@ cfg.update({
     "reg": "mmd",
     "use_mode": "train",
     "mask_type": "none",
-    "batch_size": 64,
+    "batch_size": 16,
 })
 
 
@@ -135,7 +135,7 @@ for i in range(args.nr_gpu):
         model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], **model_opt)
 
 if args.use_mode == 'train':
-    all_params = get_trainable_variables(["encode_context", "pixel_cnn"])
+    all_params = trainable_variables() #get_trainable_variables(["encode_context", "pixel_cnn"])
     grads = []
     for i in range(args.nr_gpu):
         with tf.device('/gpu:%d' % i):
