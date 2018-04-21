@@ -184,11 +184,10 @@ def generate_samples(sess, data):
 #     return np.concatenate(x_hats, axis=0)
 
 def latent_traversal(sess, image, range=[-6, 6], num_traversal_step=13):
+    image = np.cast[np.float32]((image - 127.5) / 127.5)
     num_instances = num_traversal_step * args.z_dim
-    print(image)
-    quit()
     data = np.stack([image.copy() for i in range(int(np.ceil(num_instances/float(args.nr_gpu))))], axis=0)
-    data = np.cast[np.float32]((data - 127.5) / 127.5)
+    #data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
