@@ -87,10 +87,9 @@ args = parser.parse_args()
 if args.use_mode == 'test':
     args.debug = True
 
+args.nr_gpu = len(args.gpus.split(","))
 num_traversal_step = 13
 args.batch_size = num_traversal_step * args.z_dim // args.nr_gpu
-
-args.nr_gpu = len(args.gpus.split(","))
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
 if not os.path.exists(args.save_dir):
