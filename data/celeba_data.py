@@ -10,7 +10,7 @@ from PIL import Image
 
 
 def read_imgs(dir, limit=-1):
-    filenames = [entry.name for entry in os.scandir(path) if not entry.name.startswith('.') and entry.is_file()]
+    filenames = [entry.name for entry in os.scandir(dir) if not entry.name.startswith('.') and entry.is_file()]
     if limit >= 0:
         limit = min(limit, len(filenames))
         from random import shuffle
