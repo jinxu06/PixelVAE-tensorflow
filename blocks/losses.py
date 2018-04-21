@@ -15,7 +15,7 @@ def gaussian_recons_loss(x, x_hat, output_mean=True):
 
 @add_arg_scope
 def mix_logistic_loss(x, params, masks=None, output_mean=True):
-    l = nn.discretized_mix_logistic_loss(x, params, sum_all=False, masks=masks)
+    l = discretized_mix_logistic_loss(x, params, sum_all=False, masks=masks)
     if output_mean:
         l = tf.reduce_mean(l)
     return l

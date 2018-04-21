@@ -17,7 +17,7 @@ def gaussian_sampler(loc, scale, counters={}):
 @add_arg_scope
 def mix_logistic_sampler(params, nr_logistic_mix=10, sample_range=3., counters={}):
     # sample from [loc - sample_range*scale, loc + sample_range*scale]
-    name = nn.get_name("mix_logistic_sampler", counters)
+    name = get_name("mix_logistic_sampler", counters)
     print("construct", name, "...")
     epsilon = 1. / ( tf.exp(float(sample_range))+1. )
     x = sample_from_discretized_mix_logistic(params, nr_logistic_mix, epsilon)
