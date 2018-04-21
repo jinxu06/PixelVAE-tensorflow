@@ -12,6 +12,9 @@ from glob import glob
 
 def read_imgs(dir, limit=-1):
     filenames = glob(dir+"/*.png")
+    print(filenames[0])
+    print(len(filenames))
+    quit()
     if limit >= 0:
         limit = min(limit, len(filenames))
         from random import shuffle
