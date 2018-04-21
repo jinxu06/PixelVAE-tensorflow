@@ -31,6 +31,8 @@ cfg_default = {
 
 cfg = cfg_default
 cfg.update({
+    "image_size": 32,
+    "data_set": "celeba32",
     "z_dim": 32,
     "save_dir": "/data/ziz/jxu/models/pvae_temp",
     "beta": 1e5,
