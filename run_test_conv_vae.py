@@ -153,8 +153,7 @@ def generate_samples(sess, data):
     z_mu = np.concatenate(sess.run([vaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
-    #z = np.random.normal(loc=z_mu, scale=z_sigma)
-    z = z_mu.copy()
+    z = np.random.normal(loc=z_mu, scale=z_sigma)
 
     z = np.split(z, args.nr_gpu)
     feed_dict.update({vaes[i].z:z[i] for i in range(args.nr_gpu)})
@@ -219,23 +218,23 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    # data = test_data.next((args.z_dim+4)*num_traversal_step)
-    # test_data.reset()
-    # img = []
-    # for i in range(3):
-    #     sample_x = latent_traversal(sess, data, use_image_id=95+i)
-    #     view = visualize_samples(sample_x, None, layout=(args.z_dim+4, num_traversal_step))
-    #     img.append(view.copy())
-    # img = np.concatenate(img, axis=1)
-    # from PIL import Image
-    # img = img.astype(np.uint8)
-    # img = Image.fromarray(img, 'RGB')
-    # img.save("/data/ziz/jxu/gpu-results/show_z32_b8.png")
-
-    data = next(test_data)
-    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
-    visualize_samples(vdata, "results/conv_vae_original.png", layout=(10, 10))
-    sample_x = generate_samples(sess, data)
+    data = test_data.next((args.z_dim+4)*num_traversal_step)
     test_data.reset()
+    img = []
+    for i in [2, 3, 6]:
+        sample_x = latent_traversal(sess, data, use_image_id=i)
+        view = visualize_samples(sample_x, None, layout=(args.z_dim+4, num_traversal_step))
+        img.append(view.copy())
+    img = np.concatenate(img, axis=1)
+    from PIL import Image
+    img = img.astype(np.uint8)
+    img = Image.fromarray(img, 'RGB')
+    img.save("/data/ziz/jxu/gpu-results/show_z32_b8.png")
 
-    visualize_samples(sample_x, "results/conv_vae_recon.png", layout=(10, 10))
+    # data = next(test_data)
+    # vdata = np.cast[np.float32]((data - 127.5) / 127.5)
+    # visualize_samples(vdata, "results/conv_vae_original.png", layout=(10, 10))
+    # sample_x = generate_samples(sess, data)
+    # test_data.reset()
+    #
+    # visualize_samples(sample_x, "results/conv_vae_recon.png", layout=(10, 10))
