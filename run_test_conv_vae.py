@@ -221,6 +221,7 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
     data = test_data.next((args.z_dim+4)*num_traversal_step)
+    sample_x = np.cast[np.float32]((data - 127.5) / 127.5)
     visualize_samples(sample_x, "results/original.png", layout=(10, 10))
     quit()
 
