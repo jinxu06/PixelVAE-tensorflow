@@ -38,7 +38,7 @@ cfg.update({
     "beta": 1e5,
     "reg": "mmd",
     "use_mode": "train",
-    "mask_type": "none",
+    "mask_type": "random rec",
     "batch_size": 32,
 })
 
