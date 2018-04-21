@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
 from blocks.layers import conv2d, deconv2d, dense
 from blocks.samplers import gaussian_sampler, mix_logistic_sampler
-from blocks.estimators import estimate_tc, estimate_dwkld, estimate_mi, estimate_mmd
+from blocks.estimators import estimate_mi_tc_dwkld, estimate_mmd, compute_gaussian_kld
 from blocks.losses import mix_logistic_loss
 from blocks.helpers import int_shape
 from blocks.components import conv_encoder_64_medium, conv_decoder_64_medium, conv_encoder_32_medium, conv_decoder_32_medium
@@ -66,22 +66,19 @@ class ConvPixelVAE(object):
 
 
 
-
     def __loss(self, reg):
         print("******   Compute Loss   ******")
         self.loss_ae = mix_logistic_loss(self.x, self.mix_logistic_params, masks=self.masks)
         if reg is None:
             self.loss_reg = 0
         elif reg=='kld':
-            self.loss_reg = tf.reduce_mean(- 0.5 * tf.reduce_sum(1 + self.z_log_sigma_sq - tf.square(self.z_mu) - tf.exp(self.z_log_sigma_sq), axis=-1))
+            self.loss_reg = compute_gaussian_kld(self.z_mu, self.z_log_sigma_sq)
             self.loss_reg = self.beta * tf.maximum(self.lam, self.loss_reg)
         elif reg=='mmd':
             self.loss_reg = estimate_mmd(tf.random_normal(int_shape(self.z)), self.z)
             self.loss_reg = self.beta * tf.maximum(self.lam, self.loss_reg)
         elif reg=='tc':
-            self.mi = estimate_mi(self.z, self.z_mu, self.z_log_sigma_sq, N=self.N)
-            self.tc = estimate_tc(self.z, self.z_mu, self.z_log_sigma_sq, N=self.N)
-            self.dwkld = estimate_dwkld(self.z, self.z_mu, self.z_log_sigma_sq, N=self.N)
+            self.mi, self.tc, self.dwkld = estimate_mi_tc_dwkld(self.z, self.z_mu, self.z_log_sigma_sq, N=self.N)
             self.loss_reg = self.mi + self.beta * self.tc + self.dwkld
         print("reg:{0}, beta:{1}, lam:{2}".format(self.reg, self.beta, self.lam))
         self.loss = self.loss_ae + self.loss_reg

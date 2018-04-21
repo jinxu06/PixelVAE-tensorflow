@@ -89,7 +89,7 @@ if args.use_mode == 'test':
 
 args.nr_gpu = len(args.gpus.split(","))
 num_traversal_step = 13
-args.batch_size = num_traversal_step * args.z_dim // args.nr_gpu
+args.batch_size = num_traversal_step * (args.z_dim+1) // args.nr_gpu
 args.use_mode = 'test'
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
