@@ -29,14 +29,27 @@ cfg_default = {
 }
 
 
+# cfg = cfg_default
+# cfg.update({
+#     "image_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 32,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd",
+#     "beta": 1e5,
+#     "reg": "mmd",
+#     "use_mode": "train",
+#     "mask_type": "full",
+#     "batch_size": 16,
+# })
+
 cfg = cfg_default
 cfg.update({
     "image_size": 32,
     "data_set": "celeba32",
     "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd",
-    "beta": 1e5,
-    "reg": "mmd",
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_tc_b5",
+    "beta": 5,
+    "reg": "tc",
     "use_mode": "train",
     "mask_type": "full",
     "batch_size": 16,
