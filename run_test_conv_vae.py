@@ -218,11 +218,13 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    data = test_data.next(args.z_dim*num_traversal_step)
+    #data = test_data.next(args.z_dim*num_traversal_step)
+    data = next(test_data)
     test_data.reset()
     img = []
     for i in [2, 3, 6]:
-        sample_x = latent_traversal(sess, data, use_image_id=i)
+        # sample_x = latent_traversal(sess, data, use_image_id=i)
+        sample_x = latent_traversal(sess, data[i])
         view = visualize_samples(sample_x, None, layout=(args.z_dim, num_traversal_step))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
