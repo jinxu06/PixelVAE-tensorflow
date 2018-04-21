@@ -7,14 +7,10 @@ import os
 import sys
 import numpy as np
 from PIL import Image
-from glob import glob
 
 
 def read_imgs(dir, limit=-1):
-    filenames = glob(dir+"/*.png")
-    print(filenames[0])
-    print(len(filenames))
-    quit()
+    filenames = [entry.name for entry in os.scandir(path) if not entry.name.startswith('.') and entry.is_file()]
     if limit >= 0:
         limit = min(limit, len(filenames))
         from random import shuffle
@@ -22,7 +18,10 @@ def read_imgs(dir, limit=-1):
     else:
         limit = len(filenames)
     filenames = sorted(filenames[:limit])
+    print(filenames[:10])
     imgs = np.array([np.array(Image.open(os.path.join(dir, filename))) for filename in filenames]).astype(np.uint8)
+    print(imgs[0])
+    quit()
     return imgs
 
 def load(data_dir, subset='train', size=64, limit=-1):
