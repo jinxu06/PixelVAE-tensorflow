@@ -28,13 +28,38 @@ cfg_default = {
 cfg = cfg_default
 cfg.update({
     "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/temp",
-    "beta": 10.0,
+    "save_dir": "/data/ziz/jxu/models/vae_celeba64_tc_z32_b8",
+    "beta": 8.0,
     "reg": "tc",
-    "use_mode": "train",
+    "use_mode": "test",
 })
 
-
+# cfg = cfg_default
+# cfg.update({
+#     "z_dim": 32,
+#     "save_dir": "/data/ziz/jxu/models/vae_celeba64_tc_z32_b15",
+#     "beta": 15.0,
+#     "reg": "tc",
+#     "use_mode": "train",
+# })
+#
+# cfg = cfg_default
+# cfg.update({
+#     "z_dim": 16,
+#     "save_dir": "/data/ziz/jxu/models/vae_celeba64_tc_z16_b8",
+#     "beta": 8.0,
+#     "reg": "tc",
+#     "use_mode": "train",
+# })
+#
+# cfg = cfg_default
+# cfg.update({
+#     "z_dim": 16,
+#     "save_dir": "/data/ziz/jxu/models/vae_celeba64_tc_z16_b15",
+#     "beta": 15.0,
+#     "reg": "tc",
+#     "use_mode": "train",
+# })
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -61,6 +86,9 @@ parser.add_argument('-um', '--use_mode', type=str, default=cfg['use_mode'], help
 args = parser.parse_args()
 if args.use_mode == 'test':
     args.debug = True
+
+num_traversal_step = 13
+args.batch_size = num_traversal_step * args.z_dim // args.nr_gpu
 
 args.nr_gpu = len(args.gpus.split(","))
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
@@ -127,6 +155,7 @@ if args.use_mode == 'train':
 
 
 
+
 def make_feed_dict(data, is_training=True):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
@@ -178,6 +207,7 @@ def latent_traversal(sess, data, use_image_id=0):
     feed_dict.update({vaes[i].z:z[i] for i in range(args.nr_gpu)})
     x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
     return np.concatenate(x_hats, axis=0)
+
 
 
 
