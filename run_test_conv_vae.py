@@ -220,7 +220,7 @@ with tf.Session(config=config) as sess:
 
     data = next(test_data)
     test_data.reset()
-    vdata = np.cast[np.float32]((image - 127.5) / 127.5)
+    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=(10, 10))
     img = []
     for i in [2, 3, 6]:
