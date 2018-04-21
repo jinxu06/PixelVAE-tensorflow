@@ -51,7 +51,7 @@ parser.add_argument('-r', '--reg', type=str, default=cfg['reg'], help='regulariz
 parser.add_argument('-si', '--save_interval', type=int, default=cfg['save_interval'], help='Every how many epochs to write checkpoint/samples?')
 parser.add_argument('-lp', '--load_params', dest='load_params', action='store_true', help='Restore training from previous model checkpoint?')
 parser.add_argument('-bs', '--batch_size', type=int, default=cfg['batch_size'], help='Batch size during training per GPU')
-parser.add_argument('-ng', '--nr_gpu', type=int, default=cfg['nr_gpu'], help='How many GPUs to distribute the training across?')
+parser.add_argument('-ng', '--nr_gpu', type=int, default=0, help='How many GPUs to distribute the training across?')
 parser.add_argument('-g', '--gpus', type=str, default="", help='GPU No.s')
 parser.add_argument('-n', '--nonlinearity', type=str, default=cfg['nonlinearity'], help='')
 parser.add_argument('-lr', '--learning_rate', type=float, default=cfg['learning_rate'], help='Base learning rate')
