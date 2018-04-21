@@ -40,7 +40,7 @@ cfg.update({
     "save_dir": "/data/ziz/jxu/models/vae_celeba64_tc_z32_b15",
     "beta": 15.0,
     "reg": "tc",
-    "use_mode": "train",
+    "use_mode": "test",
 })
 #
 # cfg = cfg_default
@@ -49,7 +49,7 @@ cfg.update({
 #     "save_dir": "/data/ziz/jxu/models/vae_celeba64_tc_z16_b8",
 #     "beta": 8.0,
 #     "reg": "tc",
-#     "use_mode": "train",
+#     "use_mode": "test",
 # })
 #
 # cfg = cfg_default
@@ -58,7 +58,7 @@ cfg.update({
 #     "save_dir": "/data/ziz/jxu/models/vae_celeba64_tc_z16_b15",
 #     "beta": 15.0,
 #     "reg": "tc",
-#     "use_mode": "train",
+#     "use_mode": "test",
 # })
 
 
@@ -90,6 +90,7 @@ if args.use_mode == 'test':
 args.nr_gpu = len(args.gpus.split(","))
 num_traversal_step = 13
 args.batch_size = num_traversal_step * args.z_dim // args.nr_gpu
+args.use_mode = 'test'
 os.environ["CUDA_VISIBLE_DEVICES"] = args.gpus
 print('input args:\n', json.dumps(vars(args), indent=4, separators=(',',':'))) # pretty print args
 if not os.path.exists(args.save_dir):
