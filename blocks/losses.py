@@ -1,7 +1,7 @@
 import numpy as np
 import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
-from blocks.helpers import log_prob_from_logits, int_shape, get_name
+from blocks.helpers import log_prob_from_logits, int_shape, get_name, log_sum_exp
 flatten = tf.contrib.layers.flatten
 
 
