@@ -5,11 +5,11 @@ import argparse
 import time
 import numpy as np
 import tensorflow as tf
-from blocks.helpers import Recorder, visualize_samples, get_nonlinearity, int_shape
+from blocks.helpers import Recorder, visualize_samples, get_nonlinearity, int_shape, get_trainable_variables
 from blocks.optimizers import adam_updates
 import data.load_data as load_data
-from models.conv_vae import ConvVAE
-
+from models.conv_pixel_vae import ConvPixelVAE
+from masks import RandomRectangleMaskGenerator, RectangleMaskGenerator, CenterMaskGenerator
 
 parser = argparse.ArgumentParser()
 
@@ -18,33 +18,29 @@ cfg_default = {
     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "data_set": "celeba64",
     "nonlinearity":"relu",
-    "batch_size": 512,
-    "learning_rate": 0.0005,
+    "batch_size": 32,
+    "learning_rate": 0.0001,
     "lam": 0.0,
     "save_interval": 10,
+    "nr_resnet": 5,
+    "nr_filters": 100,
+    "nr_logistic_mix": 10,
+    "sample_range": 3.0,
 }
 
 
-# cfg = cfg_default
-# cfg.update({
-#     "z_dim": 32,
-#     "save_dir": "/data/ziz/jxu/models/vae_celeba64_tc_z32_b8",
-#     "beta": 8.0,
-#     "reg": "tc",
-#     "use_mode": "train",
-# })
-
 cfg = cfg_default
 cfg.update({
-    "img_size": 32,
+    "image_size": 32,
     "data_set": "celeba32",
     "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/vae_celeba32_tc_z32_b6",
-    "beta": 6.0,
-    "reg": "tc",
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd",
+    "beta": 1e5,
+    "reg": "mmd",
     "use_mode": "train",
+    "mask_type": "full",
+    "batch_size": 16,
 })
-
 
 
 
@@ -64,10 +60,15 @@ parser.add_argument('-lr', '--learning_rate', type=float, default=cfg['learning_
 parser.add_argument('-b', '--beta', type=float, default=cfg['beta'], help="strength of the KL divergence penalty")
 parser.add_argument('-l', '--lam', type=float, default=cfg['lam'], help="")
 parser.add_argument('-zd', '--z_dim', type=float, default=cfg['z_dim'], help="")
+parser.add_argument('-nr', '--nr_resnet', type=float, default=cfg['nr_resnet'], help="")
+parser.add_argument('-nf', '--nr_filters', type=float, default=cfg['nr_filters'], help="")
+parser.add_argument('-nlm', '--nr_logistic_mix', type=float, default=cfg['nr_logistic_mix'], help="")
+parser.add_argument('-sr', '--sample_range', type=float, default=cfg['sample_range'], help="")
 parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to use')
 # new features
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
 parser.add_argument('-um', '--use_mode', type=str, default=cfg['use_mode'], help='')
+parser.add_argument('-mt', '--mask_type', type=str, default=cfg['mask_type'], help='')
 
 args = parser.parse_args()
 if args.use_mode == 'test':
@@ -91,11 +92,26 @@ else:
     eval_data = data_set.train(shuffle=True, limit=batch_size*10)
     test_data = data_set.test(shuffle=False, limit=-1)
 
+# masks
+if args.mask_type=="none":
+    masks = [None for i in range(args.nr_gpu)]
+else:
+    masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
+    if args.mask_type=="random rec":
+        train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.125, max_ratio=1.0)
+    elif args.mask_type=="full":
+        train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
+    elif args.mask_type=="center rec":
+        train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
+test_mgen = train_mgen #RectangleMaskGenerator(args.img_size, args.img_size, rec=(8, 24, 24, 8))
+
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
+x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
+dropout_ps = [tf.placeholder(tf.float32, shape=()) for i in range(args.nr_gpu)]
 
-vaes = [ConvVAE(counters={}) for i in range(args.nr_gpu)]
+pvaes = [ConvPixelVAE(counters={}) for i in range(args.nr_gpu)]
 model_opt = {
     "use_mode": args.use_mode,
     "z_dim": args.z_dim,
@@ -107,21 +123,25 @@ model_opt = {
     "bn": True,
     "kernel_initializer": tf.contrib.layers.xavier_initializer(),
     "kernel_regularizer": None,
+    "nr_resnet": args.nr_resnet,
+    "nr_filters": args.nr_filters,
+    "nr_logistic_mix": args.nr_logistic_mix,
+    "sample_range": args.sample_range,
 }
 
 
-model = tf.make_template('model', ConvVAE.build_graph)
+model = tf.make_template('model', ConvPixelVAE.build_graph)
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        model(vaes[i], xs[i],  is_trainings[i], **model_opt)
+        model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], **model_opt)
 
 if args.use_mode == 'train':
-    all_params = tf.trainable_variables()
+    all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
     grads = []
     for i in range(args.nr_gpu):
         with tf.device('/gpu:%d' % i):
-            grads.append(tf.gradients(vaes[i].loss, all_params, colocate_gradients_with_ops=True))
+            grads.append(tf.gradients(pvaes[i].loss, all_params, colocate_gradients_with_ops=True))
     with tf.device('/gpu:0'):
         for i in range(1, args.nr_gpu):
             for j in range(len(grads[0])):
@@ -142,79 +162,111 @@ if args.use_mode == 'train':
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
 
+# if args.use_mode == 'train':
+#     #all_params = tf.trainable_variables()
+#     #all_params = get_trainable_variables(["encode_context"], "not in")
+#     all_params = get_trainable_variables(["encode_context", "pixel_cnn"])
+#
+#     if args.freeze_encoder:
+#         all_params = [p for p in all_params if "conv_encoder_" not in p.name]
 
-def make_feed_dict(data, is_training=True):
+
+
+def make_feed_dict(data, is_training=True, dropout_p=0.5):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]: is_training for i in range(args.nr_gpu)}
+    feed_dict.update({dropout_ps[i]: dropout_p for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
+    feed_dict.update({ x_bars[i]:ds[i] for i in range(args.nr_gpu) })
+    if masks[0] is not None:
+        feed_dict.update({masks[i]:train_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
     return feed_dict
 
-def sample_from_model(sess, data):
+def sample_from_model(sess, data, fill_region=None):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]: False for i in range(args.nr_gpu)}
+    feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
-    x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
-    return np.concatenate(x_hats, axis=0)
+    if masks[0] is not None:
+        feed_dict.update({masks[i]:test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
 
+    x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
+    #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
+    for yi in range(args.img_size):
+        for xi in range(args.img_size):
+            if fill_region is not None and fill_region[yi, xi]==0:
+                feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
+                x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+                for i in range(args.nr_gpu):
+                    x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
+    return np.concatenate(x_gen, axis=0)
 
-def generate_samples(sess, data):
+def generate_samples(sess, data, fill_region=None):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
+    feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
-    z_mu = np.concatenate(sess.run([vaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
-    z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
     #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
     z = np.split(z, args.nr_gpu)
-    feed_dict.update({vaes[i].z:z[i] for i in range(args.nr_gpu)})
-    x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
-    return np.concatenate(x_hats, axis=0)
+    feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
+    if masks[0] is not None:
+        feed_dict.update({masks[i]:test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
 
-def latent_traversal(sess, data, use_image_id=0):
-    data = np.cast[np.float32]((data - 127.5) / 127.5)
-    ds = np.split(data, args.nr_gpu)
-    feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
-    feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
-    z_mu = np.concatenate(sess.run([vaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
-    z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
-    z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
-    z = z_mu.copy()
-    for i in range(z.shape[0]):
-        z[i] = z[use_image_id].copy()
+    x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
+    #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
 
-    num_features = args.z_dim
-    for i in range(num_features):
-        z[i*num_traversal_step:(i+1)*num_traversal_step, i] = np.linspace(start=-6., stop=6., num=num_traversal_step)
-    z = np.split(z, args.nr_gpu)
-    feed_dict.update({vaes[i].z:z[i] for i in range(args.nr_gpu)})
-    x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
-    return np.concatenate(x_hats, axis=0)
+    for yi in range(args.img_size):
+        for xi in range(args.img_size):
+            if fill_region is not None and fill_region[yi, xi]==0:
+                print(yi, xi)
+                feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
+                x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+                for i in range(args.nr_gpu):
+                    x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
+    return np.concatenate(x_gen, axis=0)
 
-def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13):
+def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13, fill_region=None):
     image = np.cast[np.float32]((image - 127.5) / 127.5)
     num_instances = num_traversal_step * args.z_dim
     num_instances_ceil = int(np.ceil(num_instances/float(args.nr_gpu))*args.nr_gpu)
     data = np.stack([image.copy() for i in range(num_instances_ceil)], axis=0)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
+    feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
-    z_mu = np.concatenate(sess.run([vaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
-    z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
-    z = z_mu.copy() #np.random.normal(loc=z_mu, scale=z_sigma)
+    z = z_mu.copy() # np.random.normal(loc=z_mu, scale=z_sigma)
     for i in range(z.shape[0]):
         z[i] = z[0].copy()
     for i in range(args.z_dim):
         z[i*num_traversal_step:(i+1)*num_traversal_step, i] = np.linspace(start=traversal_range[0], stop=traversal_range[1], num=num_traversal_step)
     z = np.split(z, args.nr_gpu)
-    feed_dict.update({vaes[i].z:z[i] for i in range(args.nr_gpu)})
-    x_hats = sess.run([vaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
-    return np.concatenate(x_hats, axis=0)[:num_instances]
+    feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
+
+    if masks[0] is not None:
+        feed_dict.update({masks[i]:test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+
+    x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
+    #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
+    for yi in range(args.img_size):
+        for xi in range(args.img_size):
+            if fill_region is not None and fill_region[yi, xi]==0:
+                print(yi, xi)
+                feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
+                x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+                for i in range(args.nr_gpu):
+                    x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
+    return np.concatenate(x_gen, axis=0)[:num_instances]
 
 
 
@@ -232,26 +284,27 @@ with tf.Session(config=config) as sess:
         print('restoring parameters from', ckpt_file)
         saver.restore(sess, ckpt_file)
 
+    fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
+
     max_num_epoch = 200
     for epoch in range(max_num_epoch+1):
         tt = time.time()
         for data in train_data:
-            feed_dict = make_feed_dict(data, is_training=True)
+            feed_dict = make_feed_dict(data, is_training=True, dropout_p=0.5)
             sess.run(train_step, feed_dict=feed_dict)
 
         for data in eval_data:
-            feed_dict = make_feed_dict(data, is_training=False)
+            feed_dict = make_feed_dict(data, is_training=False, dropout_p=0.)
             recorder.evaluate(sess, feed_dict)
 
         recorder.finish_epoch_and_display(time=time.time()-tt, log=True)
 
         if epoch % args.save_interval == 0:
             saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
-
             # data = next(test_data)
             data = next(eval_data)
-            sample_x = sample_from_model(sess, data)
+            sample_x = sample_from_model(sess, data, fill_region=fill_region)
             eval_data.reset()
-            visualize_samples(sample_x, os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)), layout=(10, 10))
+            visualize_samples(sample_x, os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)), layout=(4, 4))
             print("------------ saved")
             sys.stdout.flush()
