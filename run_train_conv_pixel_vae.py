@@ -46,7 +46,6 @@ parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help
 # data I/O
 parser.add_argument('-dd', '--data_dir', type=str, default=cfg['data_dir'], help='Location for the dataset')
 parser.add_argument('-sd', '--save_dir', type=str, default=cfg['save_dir'], help='Location for parameter checkpoints and samples')
-parser.add_argument('-esd', '--encoder_save_dir', type=str, default=cfg['encoder_save_dir'], help='Location for encoder parameter checkpoints and samples')
 parser.add_argument('-ds', '--data_set', type=str, default=cfg['data_set'], help='Can be either cifar|imagenet')
 parser.add_argument('-r', '--reg', type=str, default=cfg['reg'], help='regularization type')
 parser.add_argument('-si', '--save_interval', type=int, default=cfg['save_interval'], help='Every how many epochs to write checkpoint/samples?')
@@ -66,7 +65,6 @@ parser.add_argument('-sr', '--sample_range', type=float, default=cfg['sample_ran
 parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to use')
 # new features
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
-parser.add_argument('-fe', '--freeze_encoder', dest='freeze_encoder', action='store_true', help='freeze parameters for the encoder?')
 parser.add_argument('-um', '--use_mode', type=str, default=cfg['use_mode'], help='')
 parser.add_argument('-mt', '--mask_type', type=str, default=cfg['mask_type'], help='')
 
