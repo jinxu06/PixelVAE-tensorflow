@@ -220,7 +220,7 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    data = test_data.next(args.z_dim*num_traversal_step)
+    data = test_data.next((args.z_dim+4)*num_traversal_step)
     test_data.reset()
     img = []
     for i in range(3):
