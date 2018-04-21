@@ -175,7 +175,7 @@ def latent_traversal(sess, data, use_image_id=0):
     for i in range(z.shape[0]):
         z[i] = z[use_image_id].copy()
 
-    num_features = args.z_dim
+    num_features = args.z_dim+4
     for i in range(num_features):
         z[i*num_traversal_step:(i+1)*num_traversal_step, i] = np.linspace(start=-6., stop=6., num=num_traversal_step)
     z = np.split(z, args.nr_gpu)
