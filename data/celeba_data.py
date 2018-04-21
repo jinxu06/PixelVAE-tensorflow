@@ -10,21 +10,20 @@ from PIL import Image
 
 
 def read_imgs(dir, limit=-1):
-    filenames = [entry.name for entry in os.scandir(dir) if not entry.name.startswith('.') and entry.is_file()]
-    if limit >= 0:
-        limit = min(limit, len(filenames))
-        from random import shuffle
-        shuffle(filenames)
-    else:
-        limit = len(filenames)
-    filenames = sorted(filenames[:limit])
+    filenames = []
+    for entry in os.scandir(dir):
+        if limit==0:
+            break
+        if not entry.name.startswith('.') and entry.is_file():
+            limit -= 1
+            filenames.append(entry.name)
+    filenames = sorted(filenames)
     print(filenames[:10])
     imgs = np.array([np.array(Image.open(os.path.join(dir, filename))) for filename in filenames]).astype(np.uint8)
-    print(imgs[0])
-    quit()
     return imgs
 
 def load(data_dir, subset='train', size=64, limit=-1):
+    print(subset)
     if subset in ['train', 'valid', 'test']:
         #trainx = np.load(os.path.join(data_dir, "img_cropped_celeba.npz"))['arr_0'][:200000, :, :, :]
         trainx = read_imgs(os.path.join(data_dir, "celeba{0}-{1}-new".format(size, subset)), limit=limit)
