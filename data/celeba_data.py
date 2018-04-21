@@ -18,12 +18,10 @@ def read_imgs(dir, limit=-1):
             limit -= 1
             filenames.append(entry.name)
     filenames = sorted(filenames)
-    print(filenames[:10])
     imgs = np.array([np.array(Image.open(os.path.join(dir, filename))) for filename in filenames]).astype(np.uint8)
     return imgs
 
 def load(data_dir, subset='train', size=64, limit=-1):
-    print(subset)
     if subset in ['train', 'valid', 'test']:
         #trainx = np.load(os.path.join(data_dir, "img_cropped_celeba.npz"))['arr_0'][:200000, :, :, :]
         trainx = read_imgs(os.path.join(data_dir, "celeba{0}-{1}-new".format(size, subset)), limit=limit)
