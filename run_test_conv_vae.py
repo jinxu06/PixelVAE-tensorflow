@@ -232,7 +232,9 @@ with tf.Session(config=config) as sess:
     # img.save("/data/ziz/jxu/gpu-results/show_z32_b8.png")
 
     data = next(test_data)
+    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
+    visualize_samples(vdata, "results/conv_vae_original.png", layout=(10, 10))
     sample_x = generate_samples(sess, data)
     test_data.reset()
 
-    visualize_samples(sample_x, "results/conv_vae_test.png", layout=(10, 10))
+    visualize_samples(sample_x, "results/conv_vae_recon.png", layout=(10, 10))
