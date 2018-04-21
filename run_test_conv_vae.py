@@ -235,7 +235,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_z32_b8.png")
+    img.save("/data/ziz/jxu/gpu-results/show_z32_b15.png")
 
     # data = next(test_data)
     # sample_x = generate_samples(sess, data)
