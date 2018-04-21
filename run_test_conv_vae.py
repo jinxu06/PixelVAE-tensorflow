@@ -171,7 +171,7 @@ def latent_traversal(sess, data, use_image_id=0):
     z_mu = np.concatenate(sess.run([vaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_log_sigma_sq = np.concatenate(sess.run([vaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
-    z = z_mu.copy()
+    z = np.random.normal(loc=z_mu, scale=z_sigma)
     for i in range(z.shape[0]):
         z[i] = z[use_image_id].copy()
 
@@ -221,15 +221,11 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
     data = test_data.next((args.z_dim+4)*num_traversal_step)
-    sample_x = np.cast[np.float32]((data - 127.5) / 127.5)
-    visualize_samples(sample_x, "results/original.png", layout=(10, 10))
-    quit()
-
 
     test_data.reset()
     img = []
     for i in range(3):
-        sample_x = latent_traversal(sess, data, use_image_id=5+i)
+        sample_x = latent_traversal(sess, data, use_image_id=95+i)
         view = visualize_samples(sample_x, None, layout=(args.z_dim+4, num_traversal_step))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
