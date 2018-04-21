@@ -225,7 +225,7 @@ with tf.Session(config=config) as sess:
     img = []
     for i in range(3):
         sample_x = latent_traversal(sess, data, use_image_id=5+i)
-        view = visualize_samples(sample_x, None, layout=(args.z_dim, num_traversal_step))
+        view = visualize_samples(sample_x, None, layout=(args.z_dim+4, num_traversal_step))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
     from PIL import Image
