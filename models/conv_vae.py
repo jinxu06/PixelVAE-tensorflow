@@ -52,15 +52,16 @@ class ConvVAE(object):
 
     def __loss(self, reg):
         print("******   Compute Loss   ******")
+        self.mmd, self.kld, self.mi, self.tc, self.dwkld = [None for i in range(5)]
         self.loss_ae = gaussian_recons_loss(self.x, self.x_hat)
         if reg is None:
             self.loss_reg = 0
         elif reg=='kld':
-            self.loss_reg = compute_gaussian_kld(self.z_mu, self.z_log_sigma_sq)
-            self.loss_reg = self.beta * tf.maximum(self.lam, self.loss_reg)
+            self.kld = compute_gaussian_kld(self.z_mu, self.z_log_sigma_sq)
+            self.loss_reg = self.beta * tf.maximum(self.lam, self.kld)
         elif reg=='mmd':
-            self.loss_reg = estimate_mmd(tf.random_normal(int_shape(self.z)), self.z)
-            self.loss_reg = self.beta * tf.maximum(self.lam, self.loss_reg)
+            self.mmd = estimate_mmd(tf.random_normal(int_shape(self.z)), self.z)
+            self.loss_reg = self.beta * tf.maximum(self.lam, self.mmd)
         elif reg=='tc':
             self.mi, self.tc, self.dwkld = estimate_mi_tc_dwkld(self.z, self.z_mu, self.z_log_sigma_sq, N=self.N)
             self.loss_reg = self.mi + self.beta * self.tc + self.dwkld
