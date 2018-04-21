@@ -184,6 +184,7 @@ def generate_samples(sess, data):
 #     return np.concatenate(x_hats, axis=0)
 
 def latent_traversal(sess, image, range=[-6, 6], num_traversal_step=13):
+    print(type(image))
     image = np.cast[np.float32]((image - 127.5) / 127.5)
     num_instances = num_traversal_step * args.z_dim
     data = np.stack([image.copy() for i in range(int(np.ceil(num_instances/float(args.nr_gpu))))], axis=0)
@@ -225,7 +226,7 @@ with tf.Session(config=config) as sess:
     img = []
     for i in [2, 3, 6]:
         # sample_x = latent_traversal(sess, data, use_image_id=i)
-        sample_x = latent_traversal(sess, data[i, :, :, :])
+        sample_x = latent_traversal(sess, data[i])
         view = visualize_samples(sample_x, None, layout=(args.z_dim, num_traversal_step))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
