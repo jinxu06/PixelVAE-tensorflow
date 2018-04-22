@@ -206,7 +206,7 @@ if args.use_mode == 'train':
         elif args.reg=='kld':
             record_dict['kld'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
         recorder = Recorder(dict=record_dict, config_str=str(json.dumps(vars(args), indent=4, separators=(',',':'))), log_file=args.save_dir+"/log_file")
-        #train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
+        train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
 
 
