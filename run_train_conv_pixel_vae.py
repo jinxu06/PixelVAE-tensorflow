@@ -66,7 +66,7 @@ cfg.update({
     "use_mode": "train",
     "mask_type": "random rec",
     "batch_size": 16,
-    "masked": True,
+    "masked": False,
 })
 
 
