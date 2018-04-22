@@ -207,7 +207,9 @@ if args.use_mode == 'train':
         recorder = Recorder(dict=record_dict, config_str=str(json.dumps(vars(args), indent=4, separators=(',',':'))), log_file=args.save_dir+"/log_file")
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
-
+for v in tf.trainable_variables():
+    print(v.name)
+quit()
 
 def make_feed_dict(data, is_training=True, dropout_p=0.5):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
@@ -305,9 +307,7 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)[:num_instances]
 
-for v in tf.trainable_variables():
-    print(v.name)
-quit()
+
 
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
