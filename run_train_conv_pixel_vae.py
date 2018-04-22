@@ -179,7 +179,7 @@ for i in range(args.nr_gpu):
         model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], **model_opt)
 
 if args.use_mode == 'train':
-    for v in trainable_variables():
+    for v in tf.trainable_variables():
         print(v.name)
     quit()
     if "masked" in cfg and cfg['masked']:
