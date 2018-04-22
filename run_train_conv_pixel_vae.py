@@ -206,7 +206,7 @@ if args.use_mode == 'train':
         elif args.reg=='kld':
             record_dict['kld'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
         recorder = Recorder(dict=record_dict, config_str=str(json.dumps(vars(args), indent=4, separators=(',',':'))), log_file=args.save_dir+"/log_file")
-        train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
+        #train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
 
 
@@ -325,7 +325,7 @@ with tf.Session(config=config) as sess:
     # restore part of parameters
     var_list=get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn", "context_encoder"])
     pretraining_dir = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd"
-    saver1 = tf.train.Saver(var_list=var_list)
+    saver1 = tf.train.Saver()
     ckpt_file = pretraining_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver1.restore(sess, ckpt_file)
