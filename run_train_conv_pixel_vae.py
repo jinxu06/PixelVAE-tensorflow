@@ -179,6 +179,9 @@ for i in range(args.nr_gpu):
         model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], **model_opt)
 
 if args.use_mode == 'train':
+    for v in trainable_variables():
+        print(v.name)
+    quit()
     if "masked" in cfg and cfg['masked']:
         all_params = get_trainable_variables(["conv_pixel_cnn", "context_encoder"])
     else:
@@ -205,15 +208,6 @@ if args.use_mode == 'train':
             record_dict['kld'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
         recorder = Recorder(dict=record_dict, config_str=str(json.dumps(vars(args), indent=4, separators=(',',':'))), log_file=args.save_dir+"/log_file")
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
-
-
-# if args.use_mode == 'train':
-#     #all_params = tf.trainable_variables()
-#     #all_params = get_trainable_variables(["encode_context"], "not in")
-#     all_params = get_trainable_variables(["encode_context", "pixel_cnn"])
-#
-#     if args.freeze_encoder:
-#         all_params = [p for p in all_params if "conv_encoder_" not in p.name]
 
 
 
