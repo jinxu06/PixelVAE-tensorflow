@@ -127,9 +127,8 @@ def conv_encoder_32_medium(inputs, z_dim, is_training, nonlinearity=None, bn=Tru
     with tf.variable_scope(name):
         with arg_scope([conv2d, dense], nonlinearity=nonlinearity, bn=bn, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
             outputs = inputs
-            outputs = conv2d(outputs, 32, 1, 1, "SAME")
             outputs = conv2d(outputs, 64, 4, 2, "SAME")
-            outputs = conv2d(outputs, 64, 4, 2, "SAME")
+            outputs = conv2d(outputs, 128, 4, 2, "SAME")
             outputs = conv2d(outputs, 128, 4, 2, "SAME")
             outputs = conv2d(outputs, 256, 4, 1, "VALID")
             outputs = tf.reshape(outputs, [-1, 256])
@@ -147,12 +146,11 @@ def conv_decoder_32_medium(inputs, is_training, output_features=False, nonlinear
             outputs = dense(inputs, 256)
             outputs = tf.reshape(outputs, [-1, 1, 1, 256])
             outputs = deconv2d(outputs, 128, 4, 1, "VALID")
+            outputs = deconv2d(outputs, 128, 4, 2, "SAME")
             outputs = deconv2d(outputs, 64, 4, 2, "SAME")
-            outputs = deconv2d(outputs, 64, 4, 2, "SAME")
-            outputs = deconv2d(outputs, 32, 4, 2, "SAME")
             if output_features:
-                return outputs
-            outputs = deconv2d(outputs, 3, 1, 1, "SAME", nonlinearity=tf.sigmoid, bn=False)
+                return deconv2d(outputs, 32, 4, 2, "SAME")
+            outputs = deconv2d(outputs, 3, 4, 2, "SAME", nonlinearity=tf.sigmoid, bn=False)
             outputs = 2. * outputs - 1.
             return outputs
 

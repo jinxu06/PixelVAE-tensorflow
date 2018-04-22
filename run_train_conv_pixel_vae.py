@@ -31,10 +31,10 @@ cfg_default = {
 
 # cfg = cfg_default
 # cfg.update({
-#     "image_size": 32,
+#     "img_size": 64,
 #     "data_set": "celeba32",
 #     "z_dim": 32,
-#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd",
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba64_z32_mmd",
 #     "beta": 1e5,
 #     "reg": "mmd",
 #     "use_mode": "train",
@@ -44,10 +44,10 @@ cfg_default = {
 
 # cfg = cfg_default
 # cfg.update({
-#     "image_size": 32,
+#     "img_size": 64,
 #     "data_set": "celeba32",
 #     "z_dim": 32,
-#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_tc_b5",
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba64_z32_tc_b5",
 #     "beta": 5,
 #     "reg": "tc",
 #     "use_mode": "train",
@@ -55,18 +55,32 @@ cfg_default = {
 #     "batch_size": 16,
 # })
 
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 32,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_mask",
+#     "beta": 1e5,
+#     "reg": "mmd",
+#     "use_mode": "train",
+#     "mask_type": "random rec",
+#     "batch_size": 16,
+#     "masked": True,
+# })
+
 cfg = cfg_default
 cfg.update({
-    "image_size": 32,
+    "img_size": 32,
     "data_set": "celeba32",
     "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_mask",
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd",
     "beta": 1e5,
     "reg": "mmd",
     "use_mode": "train",
-    "mask_type": "random rec",
-    "batch_size": 16,
-    "masked": True,
+    "mask_type": "full",
+    "batch_size": 64,
+    "masked": False,
 })
 
 
@@ -131,7 +145,7 @@ else:
         train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
     elif args.mask_type=="center rec":
         train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
-test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
+test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.)#CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
 
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -306,11 +320,11 @@ with tf.Session(config=config) as sess:
         saver.restore(sess, ckpt_file)
 
     # restore part of parameters
-    pretraining_dir = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd"
-    saver1 = tf.train.Saver()
-    ckpt_file = pretraining_dir + '/params_' + args.data_set + '.ckpt'
-    print('restoring parameters from', ckpt_file)
-    saver1.restore(sess, ckpt_file)
+    # pretraining_dir = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd"
+    # saver1 = tf.train.Saver()
+    # ckpt_file = pretraining_dir + '/params_' + args.data_set + '.ckpt'
+    # print('restoring parameters from', ckpt_file)
+    # saver1.restore(sess, ckpt_file)
 
     fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
 
