@@ -130,7 +130,9 @@ else:
         train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
     elif args.mask_type=="center rec":
         train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
-test_mgen = train_mgen #RectangleMaskGenerator(args.img_size, args.img_size, rec=(8, 24, 24, 8))
+    else:
+        raise Exception("unknown mask type")
+test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
 
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -166,8 +168,6 @@ for i in range(args.nr_gpu):
 if args.use_mode == 'train':
     if "masked" in cfg and cfg['masked']:
         all_params = get_trainable_variables(["conv_pixel_cnn", "context_encoder"])
-        print(all_params)
-        quit()
     else:
         all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
     grads = []
@@ -318,15 +318,11 @@ with tf.Session(config=config) as sess:
 
     # restore part of parameters
     var_list=get_trainable_variables(["conv_encoder", "conv_decoder"])
-    for v in var_list:
-        print(v.name)
     pretraining_dir = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd"
     saver1 = tf.train.Saver(var_list=var_list)
     ckpt_file = pretraining_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver1.restore(sess, ckpt_file)
-    quit()
-
 
     fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
 
@@ -345,10 +341,10 @@ with tf.Session(config=config) as sess:
 
         if epoch % args.save_interval == 0:
             saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
-            # data = next(test_data)
-            data = next(eval_data)
+            data = next(test_data)
+            test_data.reset()
+            #data = next(eval_data)
             sample_x = sample_from_model(sess, data, fill_region=fill_region)
-            eval_data.reset()
             visualize_samples(sample_x, os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)), layout=(4, 4))
             print("------------ saved")
             sys.stdout.flush()
