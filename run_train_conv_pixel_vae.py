@@ -324,7 +324,7 @@ with tf.Session(config=config) as sess:
         saver.restore(sess, ckpt_file)
 
     # restore part of parameters
-    var_list=get_trainable_variables(["context_encoder"], "not in")
+    var_list=get_trainable_variables(["contex_encoder"], "not in")
     pretraining_dir = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd"
     saver1 = tf.train.Saver(var_list=var_list)
     ckpt_file = pretraining_dir + '/params_' + args.data_set + '.ckpt'
