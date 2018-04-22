@@ -66,7 +66,7 @@ cfg.update({
     "use_mode": "train",
     "mask_type": "random rec",
     "batch_size": 16,
-    "masked": False,
+    "masked": True,
 })
 
 
@@ -169,8 +169,6 @@ if args.use_mode == 'train':
         all_params = get_trainable_variables(["conv_pixel_cnn", "context_encoder"])
     else:
         all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
-    for p in all_params:
-        print(p.name)
     grads = []
     for i in range(args.nr_gpu):
         with tf.device('/gpu:%d' % i):

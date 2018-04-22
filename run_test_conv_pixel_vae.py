@@ -37,7 +37,7 @@ cfg.update({
     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd",
     "beta": 1e5,
     "reg": "mmd",
-    "use_mode": "train",
+    "use_mode": "test",
     "mask_type": "full",
     "batch_size": 16,
 })
@@ -286,15 +286,35 @@ with tf.Session(config=config) as sess:
 
     fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
 
-    max_num_epoch = 200
-    for epoch in range(max_num_epoch+1):
-        tt = time.time()
-        for data in train_data:
-            feed_dict = make_feed_dict(data, is_training=True, dropout_p=0.5)
-            sess.run(train_step, feed_dict=feed_dict)
+    data = next(test_data)
+    test_data.reset()
+    # vdata = np.cast[np.float32]((data - 127.5) / 127.5)
+    # visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=(10, 10))
+    img = []
+    for i in [4,5,8,42,47]: #[2, 3, 5, 40, 55]:
+        # sample_x = latent_traversal(sess, data, use_image_id=i)
+        sample_x = latent_traversal(sess, data[i])
+        view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
+        img.append(view.copy())
+    img = np.concatenate(img, axis=1)
+    from PIL import Image
+    img = img.astype(np.uint8)
+    img = Image.fromarray(img, 'RGB')
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_01.png")
 
-        for data in eval_data:
-            feed_dict = make_feed_dict(data, is_training=False, dropout_p=0.)
-            recorder.evaluate(sess, feed_dict)
 
-        recorder.finish_epoch_and_display(time=time.time()-tt, log=True)
+    #
+    # fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
+    #
+    # max_num_epoch = 200
+    # for epoch in range(max_num_epoch+1):
+    #     tt = time.time()
+    #     for data in train_data:
+    #         feed_dict = make_feed_dict(data, is_training=True, dropout_p=0.5)
+    #         sess.run(train_step, feed_dict=feed_dict)
+    #
+    #     for data in eval_data:
+    #         feed_dict = make_feed_dict(data, is_training=False, dropout_p=0.)
+    #         recorder.evaluate(sess, feed_dict)
+    #
+    #     recorder.finish_epoch_and_display(time=time.time()-tt, log=True)
