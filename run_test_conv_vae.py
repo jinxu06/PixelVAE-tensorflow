@@ -170,8 +170,9 @@ def generate_samples(sess, data):
 def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13):
     image = np.cast[np.float32]((image - 127.5) / 127.5)
     num_instances = num_traversal_step * args.z_dim
-    num_instances_ceil = int(np.ceil(num_instances/float(args.nr_gpu))*args.nr_gpu)
-    data = np.stack([image.copy() for i in range(num_instances_ceil)], axis=0)
+    assert num_instances >= args.nr_gpu * args.batch_size, "cannot feed all the instances into GPUs"
+    # num_instances_ceil = int(np.ceil(num_instances/float(args.nr_gpu))*args.nr_gpu)
+    data = np.stack([image.copy() for i in range(args.nr_gpu * args.batch_size)], axis=0)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
     feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
@@ -204,8 +205,8 @@ with tf.Session(config=config) as sess:
 
     data = next(test_data)
     test_data.reset()
-    # vdata = np.cast[np.float32]((data - 127.5) / 127.5)
-    # visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=(10, 10))
+    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
+    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=(10, 10))
     img = []
     for i in [2, 3, 5, 40, 55]:
         # sample_x = latent_traversal(sess, data, use_image_id=i)
