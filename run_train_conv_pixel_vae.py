@@ -69,6 +69,19 @@ cfg.update({
     "masked": True,
 })
 
+cfg = cfg_default
+cfg.update({
+    "image_size": 32,
+    "data_set": "celeba32",
+    "z_dim": 32,
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_mask",
+    "beta": 1e5,
+    "reg": "mmd",
+    "use_mode": "train",
+    "mask_type": "full",
+    "batch_size": 16,
+})
+
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
