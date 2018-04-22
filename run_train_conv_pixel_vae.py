@@ -179,9 +179,7 @@ for i in range(args.nr_gpu):
         model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], **model_opt)
 
 if args.use_mode == 'train':
-    for v in tf.trainable_variables():
-        print(v.name)
-    quit()
+
     if "masked" in cfg and cfg['masked']:
         all_params = get_trainable_variables(["conv_pixel_cnn", "context_encoder"])
     else:
@@ -307,7 +305,9 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)[:num_instances]
 
-
+for v in tf.trainable_variables():
+    print(v.name)
+quit()
 
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
