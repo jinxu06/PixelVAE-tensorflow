@@ -29,8 +29,8 @@ cfg = cfg_default
 cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
-    "z_dim": 20,
-    "save_dir": "/data/ziz/jxu/models/vae_celeba32_tc_z20_b8",
+    "z_dim": 32,
+    "save_dir": "/data/ziz/jxu/models/vae_celeba32_tc_z32_b8",
     "beta": 8.0,
     "reg": "tc",
     "use_mode": "test",
@@ -217,7 +217,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_celeba32_z20_b8.png")
+    img.save("/data/ziz/jxu/gpu-results/show_celeba32_z32_b8.png")
 
     # data = next(test_data)
     # vdata = np.cast[np.float32]((data - 127.5) / 127.5)
