@@ -318,10 +318,6 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
 
-#var_list=get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
-pretraining_dir = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd"
-#saver1 = tf.train.Saver(var_list=var_list)
-
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
@@ -334,9 +330,12 @@ with tf.Session(config=config) as sess:
         saver.restore(sess, ckpt_file)
 
     # restore part of parameters
+    var_list=get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
+    pretraining_dir = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd"
+    saver1 = tf.train.Saver(var_list=var_list)
     ckpt_file = pretraining_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
-    saver.restore(sess, ckpt_file)
+    saver1.restore(sess, ckpt_file)
 
     fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
 

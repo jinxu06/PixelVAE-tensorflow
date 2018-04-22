@@ -279,10 +279,18 @@ with tf.Session(config=config) as sess:
 
     sess.run(initializer)
 
+    if args.load_params:
+        ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
+        print('restoring parameters from', ckpt_file)
+        saver.restore(sess, ckpt_file)
 
-    ckpt_file = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd" + '/params_' + args.data_set + '.ckpt'
+    # restore part of parameters
+    var_list=get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
+    pretraining_dir = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd"
+    saver1 = tf.train.Saver(var_list=var_list)
+    ckpt_file = pretraining_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
-    saver.restore(sess, ckpt_file)
+    saver1.restore(sess, ckpt_file)
 
     fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
 
