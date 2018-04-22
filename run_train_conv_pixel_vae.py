@@ -143,9 +143,7 @@ else:
         train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
     elif args.mask_type=="center rec":
         train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
-    else:
-        raise Exception("unknown mask type")
-test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
+test_mgen = train_mgen #RectangleMaskGenerator(args.img_size, args.img_size, rec=(8, 24, 24, 8))
 
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -179,16 +177,11 @@ for i in range(args.nr_gpu):
         model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], **model_opt)
 
 if args.use_mode == 'train':
-
-    if "masked" in cfg and cfg['masked']:
-        all_params = get_trainable_variables(["conv_pixel_cnn", "context_encoder"])
-    else:
-        all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
+    all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
     grads = []
     for i in range(args.nr_gpu):
         with tf.device('/gpu:%d' % i):
             grads.append(tf.gradients(pvaes[i].loss, all_params, colocate_gradients_with_ops=True))
-
     with tf.device('/gpu:0'):
         for i in range(1, args.nr_gpu):
             for j in range(len(grads[0])):
@@ -207,6 +200,15 @@ if args.use_mode == 'train':
             record_dict['kld'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
         recorder = Recorder(dict=record_dict, config_str=str(json.dumps(vars(args), indent=4, separators=(',',':'))), log_file=args.save_dir+"/log_file")
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
+
+
+# if args.use_mode == 'train':
+#     #all_params = tf.trainable_variables()
+#     #all_params = get_trainable_variables(["encode_context"], "not in")
+#     all_params = get_trainable_variables(["encode_context", "pixel_cnn"])
+#
+#     if args.freeze_encoder:
+#         all_params = [p for p in all_params if "conv_encoder_" not in p.name]
 
 
 
@@ -305,7 +307,6 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
                 for i in range(args.nr_gpu):
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)[:num_instances]
-
 
 
 initializer = tf.global_variables_initializer()
