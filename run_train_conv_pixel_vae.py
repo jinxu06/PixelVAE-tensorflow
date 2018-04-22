@@ -218,7 +218,7 @@ def sample_from_model(sess, data, fill_region=None):
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
         for xi in range(args.img_size):
-            if fill_region is not None and fill_region[yi, xi]==0:
+            if fill_region is None or fill_region[yi, xi]==0:
                 feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
                 x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
                 for i in range(args.nr_gpu):
@@ -247,7 +247,7 @@ def generate_samples(sess, data, fill_region=None):
 
     for yi in range(args.img_size):
         for xi in range(args.img_size):
-            if fill_region is not None and fill_region[yi, xi]==0:
+            if fill_region is None or fill_region[yi, xi]==0:
                 print(yi, xi)
                 feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
                 x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
@@ -282,7 +282,7 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
     for yi in range(args.img_size):
         for xi in range(args.img_size):
-            if fill_region is not None and fill_region[yi, xi]==0:
+            if fill_region is None or fill_region[yi, xi]==0:
                 print(yi, xi)
                 feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
                 x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
