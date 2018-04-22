@@ -206,7 +206,7 @@ if args.use_mode == 'train':
         elif args.reg=='kld':
             record_dict['kld'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
         recorder = Recorder(dict=record_dict, config_str=str(json.dumps(vars(args), indent=4, separators=(',',':'))), log_file=args.save_dir+"/log_file")
-        train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
+        #train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
 
 
@@ -337,7 +337,7 @@ with tf.Session(config=config) as sess:
         tt = time.time()
         for data in train_data:
             feed_dict = make_feed_dict(data, is_training=True, dropout_p=0.5)
-            sess.run(train_step, feed_dict=feed_dict)
+            #sess.run(train_step, feed_dict=feed_dict)
 
         for data in eval_data:
             feed_dict = make_feed_dict(data, is_training=False, dropout_p=0.)
