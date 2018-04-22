@@ -42,16 +42,29 @@ cfg_default = {
 #     "batch_size": 16,
 # })
 
+# cfg = cfg_default
+# cfg.update({
+#     "image_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 32,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_tc_b5",
+#     "beta": 5,
+#     "reg": "tc",
+#     "use_mode": "train",
+#     "mask_type": "full",
+#     "batch_size": 16,
+# })
+
 cfg = cfg_default
 cfg.update({
     "image_size": 32,
     "data_set": "celeba32",
     "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_tc_b5",
-    "beta": 5,
-    "reg": "tc",
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_mask",
+    "beta": 1e5,
+    "reg": "mmd",
     "use_mode": "train",
-    "mask_type": "full",
+    "mask_type": "random rec",
     "batch_size": 16,
 })
 
@@ -296,6 +309,18 @@ with tf.Session(config=config) as sess:
         ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
         print('restoring parameters from', ckpt_file)
         saver.restore(sess, ckpt_file)
+
+    # restore part of parameters
+    var_list=get_trainable_variables(["conv_encoder", "conv_decoder"])
+    for v in var_list:
+        print(v.name)
+    pretraining_dir = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd"
+    saver1 = tf.train.Saver(var_list=var_list)
+    ckpt_file = pretraining_dir + '/params_' + args.data_set + '.ckpt'
+    print('restoring parameters from', ckpt_file)
+    saver1.restore(sess, ckpt_file)
+    quit()
+
 
     fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
 
