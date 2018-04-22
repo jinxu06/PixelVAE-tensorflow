@@ -66,6 +66,7 @@ cfg.update({
     "use_mode": "train",
     "mask_type": "random rec",
     "batch_size": 16,
+    "masked": True,
 })
 
 
@@ -163,7 +164,12 @@ for i in range(args.nr_gpu):
         model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], **model_opt)
 
 if args.use_mode == 'train':
-    all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
+    if "masked" in cfg and cfg['masked']:
+        all_params = get_trainable_variables(["conv_pixel_cnn", "context_encoder"])
+        print(all_params)
+        quit()
+    else:
+        all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
     grads = []
     for i in range(args.nr_gpu):
         with tf.device('/gpu:%d' % i):
