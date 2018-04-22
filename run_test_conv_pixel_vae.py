@@ -39,7 +39,7 @@ cfg.update({
     "reg": "mmd",
     "use_mode": "test",
     "mask_type": "full",
-    "batch_size": 512,
+    "batch_size": 80,
 })
 
 
@@ -293,7 +293,7 @@ with tf.Session(config=config) as sess:
     img = []
     for i in [4,5,8,42,47]: #[2, 3, 5, 40, 55]:
         # sample_x = latent_traversal(sess, data, use_image_id=i)
-        sample_x = latent_traversal(sess, data[i], fill_region=fill_region)
+        sample_x = latent_traversal(sess, data[i], traversal_range=[-5, 5], num_traversal_step=10, fill_region=fill_region)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
