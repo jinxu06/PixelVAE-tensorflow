@@ -39,7 +39,7 @@ cfg.update({
     "reg": "mmd",
     "use_mode": "test",
     "mask_type": "full",
-    "batch_size": 16,
+    "batch_size": 512,
 })
 
 
