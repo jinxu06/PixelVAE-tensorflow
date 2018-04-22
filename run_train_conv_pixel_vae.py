@@ -189,14 +189,11 @@ if args.use_mode == 'train':
         with tf.device('/gpu:%d' % i):
             grads.append(tf.gradients(pvaes[i].loss, all_params, colocate_gradients_with_ops=True))
 
-    for v in tf.trainable_variables():
-        print(v.name)
-
     with tf.device('/gpu:0'):
         for i in range(1, args.nr_gpu):
             for j in range(len(grads[0])):
                 grads[0][j] += grads[i][j]
-
+        print(tf.trainable_variables())
         record_dict = {}
         record_dict['total loss'] = tf.add_n([v.loss for v in pvaes]) / args.nr_gpu
         record_dict['recon loss'] = tf.add_n([v.loss_ae for v in pvaes]) / args.nr_gpu
@@ -206,13 +203,15 @@ if args.use_mode == 'train':
             record_dict['dwkld reg'] = tf.add_n([v.dwkld for v in pvaes]) / args.nr_gpu
         elif args.reg=='mmd':
             record_dict['mmd'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
+            print(tf.trainable_variables())
         elif args.reg=='kld':
             record_dict['kld'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
         recorder = Recorder(dict=record_dict, config_str=str(json.dumps(vars(args), indent=4, separators=(',',':'))), log_file=args.save_dir+"/log_file")
+
+        print(tf.trainable_variables())
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
-        for v in tf.trainable_variables():
-            print(v.name)
+        print(tf.trainable_variables())
         quit()
 
 
