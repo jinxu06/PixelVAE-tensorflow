@@ -125,7 +125,7 @@ batch_size = args.batch_size * args.nr_gpu
 data_set = load_data.CelebA(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
 if args.debug:
     train_data = data_set.train(shuffle=True, limit=batch_size*2)
-    eval_data = data_set.train(shuffle=True, limit=batch_size*10)##
+    eval_data = data_set.train(shuffle=True, limit=batch_size*1)
     test_data = data_set.test(shuffle=False, limit=batch_size*1)
 else:
     train_data = data_set.train(shuffle=True, limit=-1)
@@ -318,9 +318,9 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
 
-var_list=get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
+#var_list=get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
 pretraining_dir = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd"
-saver1 = tf.train.Saver(var_list=var_list)
+#saver1 = tf.train.Saver(var_list=var_list)
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
@@ -336,7 +336,7 @@ with tf.Session(config=config) as sess:
     # restore part of parameters
     ckpt_file = pretraining_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
-    saver1.restore(sess, ckpt_file)
+    saver.restore(sess, ckpt_file)
 
     fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
 
