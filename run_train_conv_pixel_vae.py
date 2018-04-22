@@ -193,6 +193,10 @@ if args.use_mode == 'train':
             for j in range(len(grads[0])):
                 grads[0][j] += grads[i][j]
 
+        for v in tf.trainable_variables():
+            print(v.name)
+        quit()
+
         record_dict = {}
         record_dict['total loss'] = tf.add_n([v.loss for v in pvaes]) / args.nr_gpu
         record_dict['recon loss'] = tf.add_n([v.loss_ae for v in pvaes]) / args.nr_gpu
@@ -207,9 +211,7 @@ if args.use_mode == 'train':
         recorder = Recorder(dict=record_dict, config_str=str(json.dumps(vars(args), indent=4, separators=(',',':'))), log_file=args.save_dir+"/log_file")
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
-for v in tf.trainable_variables():
-    print(v.name)
-quit()
+
 
 def make_feed_dict(data, is_training=True, dropout_p=0.5):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
