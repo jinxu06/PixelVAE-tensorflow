@@ -69,18 +69,6 @@ cfg.update({
     "masked": True,
 })
 
-cfg = cfg_default
-cfg.update({
-    "image_size": 32,
-    "data_set": "celeba32",
-    "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_mask",
-    "beta": 1e5,
-    "reg": "mmd",
-    "use_mode": "train",
-    "mask_type": "full",
-    "batch_size": 16,
-})
 
 
 
@@ -143,7 +131,7 @@ else:
         train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
     elif args.mask_type=="center rec":
         train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
-test_mgen = train_mgen #RectangleMaskGenerator(args.img_size, args.img_size, rec=(8, 24, 24, 8))
+test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
 
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -177,7 +165,12 @@ for i in range(args.nr_gpu):
         model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], **model_opt)
 
 if args.use_mode == 'train':
-    all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
+    if "masked" in cfg and cfg['masked']:
+        all_params = get_trainable_variables(["conv_pixel_cnn", "context_encoder"])
+    else:
+        all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
+    for p in all_params:
+        print(p.name)
     grads = []
     for i in range(args.nr_gpu):
         with tf.device('/gpu:%d' % i):
@@ -200,15 +193,6 @@ if args.use_mode == 'train':
             record_dict['kld'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
         recorder = Recorder(dict=record_dict, config_str=str(json.dumps(vars(args), indent=4, separators=(',',':'))), log_file=args.save_dir+"/log_file")
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
-
-
-# if args.use_mode == 'train':
-#     #all_params = tf.trainable_variables()
-#     #all_params = get_trainable_variables(["encode_context"], "not in")
-#     all_params = get_trainable_variables(["encode_context", "pixel_cnn"])
-#
-#     if args.freeze_encoder:
-#         all_params = [p for p in all_params if "conv_encoder_" not in p.name]
 
 
 
@@ -324,9 +308,8 @@ with tf.Session(config=config) as sess:
         saver.restore(sess, ckpt_file)
 
     # restore part of parameters
-    var_list = tf.trainable_variables()
     pretraining_dir = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd"
-    saver1 = tf.train.Saver(var_list=var_list)
+    saver1 = tf.train.Saver()
     ckpt_file = pretraining_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver1.restore(sess, ckpt_file)
@@ -338,7 +321,7 @@ with tf.Session(config=config) as sess:
         tt = time.time()
         for data in train_data:
             feed_dict = make_feed_dict(data, is_training=True, dropout_p=0.5)
-            #sess.run(train_step, feed_dict=feed_dict)
+            sess.run(train_step, feed_dict=feed_dict)
 
         for data in eval_data:
             feed_dict = make_feed_dict(data, is_training=False, dropout_p=0.)
