@@ -236,8 +236,8 @@ def generate_samples(sess, data, fill_region=None):
 def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13, fill_region=None):
     image = np.cast[np.float32]((image - 127.5) / 127.5)
     num_instances = num_traversal_step * args.z_dim
-    num_instances_ceil = int(np.ceil(num_instances/float(args.nr_gpu))*args.nr_gpu)
-    data = np.stack([image.copy() for i in range(num_instances_ceil)], axis=0)
+    assert num_instances <= args.nr_gpu * args.batch_size, "cannot feed all the instances into GPUs"
+    data = np.stack([image.copy() for i in range(args.nr_gpu * args.batch_size)], axis=0)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
