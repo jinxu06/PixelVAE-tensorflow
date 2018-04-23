@@ -124,5 +124,5 @@ class Recorder(object):
             results[k] = s
         ret_str = "* epoch {0} {1} -- ".format(self.num_epoches, "{"+"%0.2f"%time+"s}")
         for key in keys:
-            ret_str += "{0}:{1:.2f}   ".format(key, results[key])
+            ret_str += "{0}:{1:.3f}   ".format(key, results[key])
         return ret_str
