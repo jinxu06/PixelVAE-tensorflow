@@ -29,9 +29,49 @@ cfg_default = {
 }
 
 
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 64,
+#     "data_set": "celeba32",
+#     "z_dim": 32,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba64_z32_mmd",
+#     "beta": 1e5,
+#     "reg": "mmd",
+#     "use_mode": "train",
+#     "mask_type": "full",
+#     "batch_size": 16,
+# })
+
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 64,
+#     "data_set": "celeba32",
+#     "z_dim": 32,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba64_z32_tc_b5",
+#     "beta": 5,
+#     "reg": "tc",
+#     "use_mode": "train",
+#     "mask_type": "full",
+#     "batch_size": 16,
+# })
+
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 32,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_mask",
+#     "beta": 1e5,
+#     "reg": "mmd",
+#     "use_mode": "train",
+#     "mask_type": "random rec",
+#     "batch_size": 16,
+#     "masked": True,
+# })
+
 cfg = cfg_default
 cfg.update({
-    "image_size": 32,
+    "img_size": 32,
     "data_set": "celeba32",
     "z_dim": 32,
     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd",
@@ -39,8 +79,10 @@ cfg.update({
     "reg": "mmd",
     "use_mode": "test",
     "mask_type": "full",
-    "batch_size": 80,
+    "batch_size": 64,
+    "masked": False,
 })
+
 
 
 
@@ -103,7 +145,7 @@ else:
         train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
     elif args.mask_type=="center rec":
         train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
-test_mgen = train_mgen #RectangleMaskGenerator(args.img_size, args.img_size, rec=(8, 24, 24, 8))
+test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.)#CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
 
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -137,7 +179,10 @@ for i in range(args.nr_gpu):
         model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], **model_opt)
 
 if args.use_mode == 'train':
-    all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
+    if "masked" in cfg and cfg['masked']:
+        all_params = get_trainable_variables(["conv_pixel_cnn", "context_encoder"])
+    else:
+        all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
     grads = []
     for i in range(args.nr_gpu):
         with tf.device('/gpu:%d' % i):
@@ -160,15 +205,6 @@ if args.use_mode == 'train':
             record_dict['kld'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
         recorder = Recorder(dict=record_dict, config_str=str(json.dumps(vars(args), indent=4, separators=(',',':'))), log_file=args.save_dir+"/log_file")
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
-
-
-# if args.use_mode == 'train':
-#     #all_params = tf.trainable_variables()
-#     #all_params = get_trainable_variables(["encode_context"], "not in")
-#     all_params = get_trainable_variables(["encode_context", "pixel_cnn"])
-#
-#     if args.freeze_encoder:
-#         all_params = [p for p in all_params if "conv_encoder_" not in p.name]
 
 
 
@@ -287,19 +323,18 @@ with tf.Session(config=config) as sess:
 
     data = next(test_data)
     test_data.reset()
-    sample_x = generate_samples(sess, data, fill_region=None)
-    visualize_samples(sample_x, os.path.join(args.save_dir, "show1.png"))
-    # img = []
-    # for i in [4,5,8,42,47]: #[2, 3, 5, 40, 55]:
-    #     # sample_x = latent_traversal(sess, data, use_image_id=i)
-    #     sample_x = latent_traversal(sess, data[i], traversal_range=[-5, 5], num_traversal_step=10, fill_region=fill_region)
-    #     view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
-    #     img.append(view.copy())
-    # img = np.concatenate(img, axis=1)
-    # from PIL import Image
-    # img = img.astype(np.uint8)
-    # img = Image.fromarray(img, 'RGB')
-    # img.save("/data/ziz/jxu/gpu-results/show_pvae_01.png")
+    # sample_x = generate_samples(sess, data, fill_region=None)
+    # visualize_samples(sample_x, os.path.join(args.save_dir, "show1.png"))
+    img = []
+    for i in [4,5]:  #[4,5,8,42,47]: #[2, 3, 5, 40, 55]:
+        sample_x = latent_traversal(sess, data[i], traversal_range=[-5, 5], num_traversal_step=10, fill_region=fill_region)
+        view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
+        img.append(view.copy())
+    img = np.concatenate(img, axis=1)
+    from PIL import Image
+    img = img.astype(np.uint8)
+    img = Image.fromarray(img, 'RGB')
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_01.png")
 
 
     #
