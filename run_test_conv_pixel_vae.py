@@ -79,8 +79,9 @@ cfg.update({
     "reg": "mmd",
     "use_mode": "test",
     "mask_type": "full",
-    "batch_size": 64,
+    "batch_size": 80,
     "masked": False,
+    "sample_range": 1.,
 })
 
 
@@ -323,10 +324,11 @@ with tf.Session(config=config) as sess:
 
     data = next(test_data)
     test_data.reset()
-    # sample_x = generate_samples(sess, data, fill_region=None)
-    # visualize_samples(sample_x, os.path.join(args.save_dir, "show1.png"))
+    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
+    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
+
     img = []
-    for i in [4,5]:  #[4,5,8,42,47]: #[2, 3, 5, 40, 55]:
+    for i in [1,2,5]:  #[4,5,8,42,47]: #[2, 3, 5, 40, 55]:
         sample_x = latent_traversal(sess, data[i], traversal_range=[-5, 5], num_traversal_step=10, fill_region=fill_region)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
