@@ -49,13 +49,13 @@ cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
     "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large",
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1",
     "beta": 1e5,
     "reg": "mmd",
     "use_mode": "train",
     "mask_type": "full",
     "batch_size": 64,
-    "network_size": "large",
+    "network_size": "large1",
     "masked": False,
 })
 
@@ -74,7 +74,6 @@ cfg.update({
 #     "network_size": "large",
 #     "masked": False,
 # })
-
 
 
 
