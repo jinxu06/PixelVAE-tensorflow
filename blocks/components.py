@@ -9,8 +9,8 @@ from blocks.layers import down_shifted_conv2d, down_right_shifted_conv2d, down_s
 
 # # big conv blocks
 # @add_arg_scope
-# def conv_encoder_64_big(inputs, z_dim, is_training, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
-#     name = get_name("conv_encoder_64_big", counters)
+# def conv_encoder_64_large(inputs, z_dim, is_training, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
+#     name = get_name("conv_encoder_64_large", counters)
 #     print("construct", name, "...")
 #     with tf.variable_scope(name):
 #         with arg_scope([conv2d, dense], nonlinearity=nonlinearity, bn=bn, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
@@ -28,8 +28,8 @@ from blocks.layers import down_shifted_conv2d, down_right_shifted_conv2d, down_s
 #
 #
 # @add_arg_scope
-# def conv_decoder_64_big(inputs, is_training, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
-#     name = get_name("conv_decoder_64_big", counters)
+# def conv_decoder_64_large(inputs, is_training, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
+#     name = get_name("conv_decoder_64_large", counters)
 #     print("construct", name, "...")
 #     with tf.variable_scope(name):
 #         with arg_scope([deconv2d, dense], nonlinearity=nonlinearity, bn=bn, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
@@ -121,6 +121,75 @@ def conv_decoder_64_medium(inputs, is_training, output_features=False, nonlinear
 
 
 @add_arg_scope
+def conv_encoder_32_block(inputs, z_dim, is_training, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
+    name = get_name("conv_encoder_32_block", counters)
+    print("construct", name, "...")
+    with tf.variable_scope(name):
+        with arg_scope([conv2d_layer, dense_layer], nonlinearity=nonlinearity, bn=bn, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
+            outputs = inputs
+            outputs = conv2d_layer(outputs, 32, 1, 1, "SAME")
+            outputs = conv2d_layer(outputs, 64, 4, 2, "SAME")
+            outputs = conv2d_layer(outputs, 128, 4, 2, "SAME")
+            outputs = conv2d_layer(outputs, 256, 4, 2, "SAME")
+            outputs = conv2d_layer(outputs, 512, 4, 1, "VALID")
+            outputs = tf.reshape(outputs, [-1, 512])
+            z_mu = dense_layer(outputs, z_dim, nonlinearity=None, bn=True)
+            z_log_sigma_sq = dense_layer(outputs, z_dim, nonlinearity=None, bn=True)
+            return z_mu, z_log_sigma_sq
+
+
+@add_arg_scope
+def conv_decoder_32_block(inputs, is_training, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
+    name = get_name("conv_decoder_32_block", counters)
+    print("construct", name, "...")
+    with tf.variable_scope(name):
+        with arg_scope([deconv2d_layer, dense_layer], nonlinearity=nonlinearity, bn=bn, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
+            outputs = dense_layer(inputs, 512)
+            outputs = tf.reshape(outputs, [-1, 1, 1, 512])
+            outputs = deconv2d_layer(outputs, 256, 4, 1, "VALID")
+            outputs = deconv2d_layer(outputs, 128, 4, 2, "SAME")
+            outputs = deconv2d_layer(outputs, 64, 4, 2, "SAME")
+            outputs = deconv2d_layer(outputs, 32, 4, 2, "SAME")
+            outputs = deconv2d_layer(outputs, 3, 1, 1, "SAME", nonlinearity=tf.sigmoid, bn=True)
+            outputs = 2. * outputs - 1.
+            return outputs
+
+
+@add_arg_scope
+def conv_encoder_32_large(inputs, z_dim, is_training, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
+    name = get_name("conv_encoder_32_large", counters)
+    print("construct", name, "...")
+    with tf.variable_scope(name):
+        with arg_scope([conv2d, dense], nonlinearity=nonlinearity, bn=bn, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
+            outputs = inputs
+            outputs = conv2d(outputs, 64, 4, 2, "SAME")
+            outputs = conv2d(outputs, 128, 4, 2, "SAME")
+            outputs = conv2d(outputs, 256, 4, 2, "SAME")
+            outputs = conv2d(outputs, 512, 4, 1, "VALID")
+            outputs = tf.reshape(outputs, [-1, 512])
+            z_mu = dense(outputs, z_dim, nonlinearity=None, bn=False)
+            z_log_sigma_sq = dense(outputs, z_dim, nonlinearity=None, bn=False)
+            return z_mu, z_log_sigma_sq
+
+@add_arg_scope
+def conv_decoder_32_large(inputs, is_training, output_features=False, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
+    name = get_name("conv_decoder_32_large", counters)
+    print("construct", name, "...")
+    with tf.variable_scope(name):
+        with arg_scope([deconv2d, dense], nonlinearity=nonlinearity, bn=bn, kernel_initializer=kernel_initializer, kernel_regularizer=kernel_regularizer, is_training=is_training):
+            outputs = dense(inputs, 512)
+            outputs = tf.reshape(outputs, [-1, 1, 1, 512])
+            outputs = deconv2d(outputs, 256, 4, 1, "VALID")
+            outputs = deconv2d(outputs, 128, 4, 2, "SAME")
+            outputs = deconv2d(outputs, 64, 4, 2, "SAME")
+            if output_features:
+                return deconv2d(outputs, 32, 4, 2, "SAME")
+            outputs = deconv2d(outputs, 3, 4, 2, "SAME", nonlinearity=tf.sigmoid, bn=False)
+            outputs = 2. * outputs - 1.
+            return outputs
+
+
+@add_arg_scope
 def conv_encoder_32_medium(inputs, z_dim, is_training, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):
     name = get_name("conv_encoder_32_medium", counters)
     print("construct", name, "...")
@@ -135,7 +204,6 @@ def conv_encoder_32_medium(inputs, z_dim, is_training, nonlinearity=None, bn=Tru
             z_mu = dense(outputs, z_dim, nonlinearity=None, bn=False)
             z_log_sigma_sq = dense(outputs, z_dim, nonlinearity=None, bn=False)
             return z_mu, z_log_sigma_sq
-
 
 @add_arg_scope
 def conv_decoder_32_medium(inputs, is_training, output_features=False, nonlinearity=None, bn=True, kernel_initializer=None, kernel_regularizer=None, counters={}):

@@ -81,7 +81,7 @@ cfg.update({
     "mask_type": "full",
     "batch_size": 104,
     "masked": False,
-    "sample_range": 3.,
+    "sample_range": 1.,
 })
 
 
@@ -328,7 +328,7 @@ with tf.Session(config=config) as sess:
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
 
     img = []
-    for i in [2,3,33,56]:  #[4,5,8,42,47]: #[2, 3, 5, 40, 55]:
+    for i in [2]:  #[4,5,8,42,47]: #[2, 3, 5, 40, 55]:
         sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
@@ -336,7 +336,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_01.png")
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_02.png")
 
 
     #
