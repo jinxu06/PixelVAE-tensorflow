@@ -210,7 +210,7 @@ if args.use_mode == 'train':
         elif args.reg=='mmd':
             record_dict['mmd'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
         elif args.reg=='kld':
-            record_dict['kld'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
+            record_dict['kld'] = tf.add_n([v.kld for v in pvaes]) / args.nr_gpu
         elif args.reg=='tc-dwmmd':
             record_dict['mi reg'] = tf.add_n([v.mi for v in pvaes]) / args.nr_gpu
             record_dict['tc reg'] = tf.add_n([v.tc for v in pvaes]) / args.nr_gpu
