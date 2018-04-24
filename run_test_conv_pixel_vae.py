@@ -65,14 +65,15 @@ cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
     "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_tc_b5_large",
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_tc_b5_large1",
     "beta": 5,
     "reg": "tc",
     "use_mode": "test",
     "mask_type": "full",
-    "batch_size": 104,
-    "network_size": "large",
+    "batch_size": 64,
+    "network_size": "large1",
     "masked": False,
+    "sample_range", 1.0, 
 })
 
 
