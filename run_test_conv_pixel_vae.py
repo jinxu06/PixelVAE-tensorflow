@@ -70,10 +70,10 @@ cfg.update({
     "reg": "tc",
     "use_mode": "test",
     "mask_type": "full",
-    "batch_size": 64,
+    "batch_size": 104,
     "network_size": "large1",
     "masked": False,
-    "sample_range", 1.0, 
+    "sample_range": 1.0,
 })
 
 
