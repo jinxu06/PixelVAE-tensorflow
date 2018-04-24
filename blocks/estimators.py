@@ -100,7 +100,6 @@ def estimate_mi_tc_dwkld(z, z_mu, z_log_sigma_sq, N=2e5):
     z_sigma = tf.sqrt(tf.exp(z_log_sigma_sq))
     log_probs = []
     batch_size, z_dim = int_shape(z_mu)
-    print(batch_size, z_dim)
 
     z_b = tf.stack([z for i in range(batch_size)], axis=0)
     z_mu_b = tf.stack([z_mu for i in range(batch_size)], axis=1)
@@ -115,8 +114,6 @@ def estimate_mi_tc_dwkld(z, z_mu, z_log_sigma_sq, N=2e5):
 
     lse_sum = tf.reduce_mean(log_sum_exp(tf.reduce_sum(log_probs, axis=-1)+ratio, axis=0))
     sum_lse = tf.reduce_mean(tf.reduce_sum(log_sum_exp(log_probs+ratio_b, axis=0), axis=-1))
-    print(N)
-    N = 20000000
     lse_sum -= tf.log(float(N))
     sum_lse -= tf.log(float(N)) * float(z_dim)
 
