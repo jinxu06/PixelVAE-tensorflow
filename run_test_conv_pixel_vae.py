@@ -44,30 +44,14 @@ cfg_default = {
 #     "masked": False,
 # })
 
-# cfg = cfg_default
-# cfg.update({
-#     "img_size": 32,
-#     "data_set": "celeba32",
-#     "z_dim": 32,
-#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1",
-#     "beta": 1e5,
-#     "reg": "mmd",
-#     "use_mode": "train",
-#     "mask_type": "full",
-#     "batch_size": 64,
-#     "network_size": "large1",
-#     "masked": False,
-# })
-
-
 cfg = cfg_default
 cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
     "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_tc_b5_large1",
-    "beta": 5,
-    "reg": "tc",
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1",
+    "beta": 1e5,
+    "reg": "mmd",
     "use_mode": "test",
     "mask_type": "full",
     "batch_size": 104,
@@ -75,6 +59,23 @@ cfg.update({
     "masked": False,
     "sample_range": 1.0,
 })
+
+
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 32,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_tc_b5_large1",
+#     "beta": 5,
+#     "reg": "tc",
+#     "use_mode": "test",
+#     "mask_type": "full",
+#     "batch_size": 104,
+#     "network_size": "large1",
+#     "masked": False,
+#     "sample_range": 1.0,
+# })
 
 
 
@@ -329,7 +330,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_03.png")
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_04.png")
 
 
     #
