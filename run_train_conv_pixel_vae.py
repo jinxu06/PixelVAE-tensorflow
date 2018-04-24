@@ -131,7 +131,7 @@ batch_size = args.batch_size * args.nr_gpu
 data_set = load_data.CelebA(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
 if args.debug:
     train_data = data_set.train(shuffle=True, limit=batch_size*2)
-    eval_data = data_set.train(shuffle=True, limit=batch_size*1)
+    eval_data = data_set.train(shuffle=True, limit=batch_size*2)
     test_data = data_set.test(shuffle=False, limit=batch_size*1)
 else:
     train_data = data_set.train(shuffle=True, limit=-1)
