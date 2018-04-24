@@ -85,7 +85,8 @@ class ConvPixelVAE(object):
             self.kld = compute_gaussian_kld(self.z_mu, self.z_log_sigma_sq)
             self.loss_reg = self.beta * tf.maximum(self.lam, self.kld)
         elif reg=='mmd':
-            self.mmd = estimate_mmd(tf.random_normal(int_shape(self.z)), self.z)
+            # self.mmd = estimate_mmd(tf.random_normal(int_shape(self.z)), self.z)
+            self.mmd = estimate_mmd(tf.random_normal(tf.stack([256, self.z_dim])), self.z)
             self.loss_reg = self.beta * tf.maximum(self.lam, self.mmd)
         elif reg=='tc':
             self.mi, self.tc, self.dwkld = estimate_mi_tc_dwkld(self.z, self.z_mu, self.z_log_sigma_sq, N=self.N)

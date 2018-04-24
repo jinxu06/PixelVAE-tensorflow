@@ -24,7 +24,7 @@ def compute_gaussian_kld(z_mu, z_log_sigma_sq, output_mean=True):
     return kld
 
 
-def estimate_mmd(x, y, sigma_sqr=1.0):
+def estimate_mmd(x, y):
     x_kernel = compute_kernel(x, x)
     y_kernel = compute_kernel(y, y)
     xy_kernel = compute_kernel(x, y)
@@ -119,4 +119,4 @@ def estimate_mi_tc_dwkld(z, z_mu, z_log_sigma_sq, N=2e5):
     tc = lse_sum - sum_lse
     dwkld = sum_lse + (kld + cond_entropy)
 
-    return mi, tc, dwkld 
+    return mi, tc, dwkld
