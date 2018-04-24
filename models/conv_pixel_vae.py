@@ -93,9 +93,8 @@ class ConvPixelVAE(object):
             self.mi, self.tc, self.dwkld = estimate_mi_tc_dwkld(self.z, self.z_mu, self.z_log_sigma_sq, N=self.N)
             self.loss_reg = self.mi + self.beta * self.tc + self.dwkld
         elif reg=='tc-dwmmd':
+            print(self.N)
             self.mi, self.tc, self.dwkld = estimate_mi_tc_dwkld(self.z, self.z_mu, self.z_log_sigma_sq, N=self.N)
-            self.tc += 1
-            print("tc")
             self.dwmmd = estimate_mmd(tf.random_normal(int_shape(self.z)), self.z, is_dimention_wise=True)
             self.loss_reg = self.beta * self.tc + self.dwmmd * self.gamma
         print("reg:{0}, beta:{1}, lam:{2}".format(self.reg, self.beta, self.lam))
