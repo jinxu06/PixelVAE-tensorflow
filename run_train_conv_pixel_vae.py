@@ -169,7 +169,7 @@ model_opt = {
     "lam": args.lam,
     "N": 2000,
     "nonlinearity": get_nonlinearity(args.nonlinearity),
-    "bn": True,
+    "bn": False, #True,
     "kernel_initializer": tf.contrib.layers.xavier_initializer(),
     "kernel_regularizer": None,
     "nr_resnet": args.nr_resnet,
@@ -349,7 +349,7 @@ with tf.Session(config=config) as sess:
         tt = time.time()
         for data in train_data:
             feed_dict = make_feed_dict(data, is_training=True, dropout_p=0.5)
-            #sess.run(train_step, feed_dict=feed_dict)
+            sess.run(train_step, feed_dict=feed_dict)
 
         for data in eval_data:
             feed_dict = make_feed_dict(data, is_training=False, dropout_p=0.)

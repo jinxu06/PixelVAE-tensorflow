@@ -330,7 +330,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_05.png")
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_06.png")
 
 
     #
