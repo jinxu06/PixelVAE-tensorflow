@@ -167,7 +167,7 @@ model_opt = {
     "reg": args.reg,
     "beta": args.beta,
     "lam": args.lam,
-    "N": 200000,
+    "N": 2, #200000,
     "nonlinearity": get_nonlinearity(args.nonlinearity),
     "bn": True,
     "kernel_initializer": tf.contrib.layers.xavier_initializer(),
