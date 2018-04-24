@@ -10,7 +10,7 @@ def compute_kernel(x, y, is_dimention_wise=False):
     tiled_x = tf.tile(tf.reshape(x, tf.stack([x_size, 1, dim])), tf.stack([1, y_size, 1]))
     tiled_y = tf.tile(tf.reshape(y, tf.stack([1, y_size, dim])), tf.stack([x_size, 1, 1]))
     if is_dimention_wise:
-        return tf.exp(-tf.square(tiled_x - tiled_y)
+        return tf.exp(-tf.square(tiled_x - tiled_y))
     return tf.exp(-tf.reduce_mean(tf.square(tiled_x - tiled_y), axis=2) / tf.cast(dim, tf.float32))
 
 def compute_gaussian_entropy(z_mu, z_log_sigma_sq):
