@@ -78,6 +78,7 @@ class ConvPixelVAE(object):
     def __loss(self, reg):
         print("******   Compute Loss   ******")
         self.mmd, self.kld, self.mi, self.tc, self.dwkld = [None for i in range(5)]
+        self.gamma, self.dwmmd = 1, None ## hard coded, experimental
         self.loss_ae = mix_logistic_loss(self.x, self.mix_logistic_params, masks=self.masks)
         if reg is None:
             self.loss_reg = 0
@@ -91,5 +92,9 @@ class ConvPixelVAE(object):
         elif reg=='tc':
             self.mi, self.tc, self.dwkld = estimate_mi_tc_dwkld(self.z, self.z_mu, self.z_log_sigma_sq, N=self.N)
             self.loss_reg = self.mi + self.beta * self.tc + self.dwkld
+        elif reg=='tc-dwmmd':
+            self.mi, self.tc, self.dwkld = estimate_mi_tc_dwkld(self.z, self.z_mu, self.z_log_sigma_sq, N=self.N)
+            self.dwmmd = estimate_mmd(tf.random_normal(int_shape(self.z)), self.z, is_dimention_wise=True)
+            self.loss_reg = self.beta * self.tc + self.dwmmd * self.gamma
         print("reg:{0}, beta:{1}, lam:{2}".format(self.reg, self.beta, self.lam))
         self.loss = self.loss_ae + self.loss_reg

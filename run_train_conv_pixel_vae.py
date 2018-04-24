@@ -74,7 +74,20 @@ cfg.update({
     "masked": True,
 })
 
-
+cfg = cfg_default
+cfg.update({
+    "img_size": 32,
+    "data_set": "celeba32",
+    "z_dim": 32,
+    "save_dir": "/data/ziz/jxu/models/temp",
+    "beta": 5,
+    "reg": "tc-dwmmd",
+    "use_mode": "train",
+    "mask_type": "full",
+    "batch_size": 64,
+    "network_size": "large1",
+    "masked": False,
+})
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -198,6 +211,11 @@ if args.use_mode == 'train':
             record_dict['mmd'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
         elif args.reg=='kld':
             record_dict['kld'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
+        elif args.reg=='tc-dwmmd':
+            record_dict['tc reg'] = tf.add_n([v.tc for v in pvaes]) / args.nr_gpu
+            record_dict['dwmmd'] = tf.add_n([v.dwmmd for v in pvaes]) / args.nr_gpu
+        else:
+            raise Exception("unknown reg type")
         recorder = Recorder(dict=record_dict, config_str=str(json.dumps(vars(args), indent=4, separators=(',',':'))), log_file=args.save_dir+"/log_file")
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
@@ -315,12 +333,12 @@ with tf.Session(config=config) as sess:
         saver.restore(sess, ckpt_file)
 
     ## restore part of parameters
-    var_list = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
-    pretraining_dir = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1"
-    saver1 = tf.train.Saver(var_list=var_list)
-    ckpt_file = pretraining_dir + '/params_' + args.data_set + '.ckpt'
-    print('restoring parameters from', ckpt_file)
-    saver1.restore(sess, ckpt_file)
+    # var_list = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
+    # pretraining_dir = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1"
+    # saver1 = tf.train.Saver(var_list=var_list)
+    # ckpt_file = pretraining_dir + '/params_' + args.data_set + '.ckpt'
+    # print('restoring parameters from', ckpt_file)
+    # saver1.restore(sess, ckpt_file)
 
     fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
 

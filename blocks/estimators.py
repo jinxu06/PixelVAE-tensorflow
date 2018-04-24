@@ -3,12 +3,14 @@ import tensorflow as tf
 from tensorflow.contrib.framework.python.ops import arg_scope, add_arg_scope
 from blocks.helpers import int_shape, log_sum_exp
 
-def compute_kernel(x, y):
+def compute_kernel(x, y, is_dimention_wise=False):
     x_size = tf.shape(x)[0]
     y_size = tf.shape(y)[0]
     dim = tf.shape(x)[1]
     tiled_x = tf.tile(tf.reshape(x, tf.stack([x_size, 1, dim])), tf.stack([1, y_size, 1]))
     tiled_y = tf.tile(tf.reshape(y, tf.stack([1, y_size, dim])), tf.stack([x_size, 1, 1]))
+    if is_dimention_wise:
+        return tf.exp(-tf.square(tiled_x - tiled_y)
     return tf.exp(-tf.reduce_mean(tf.square(tiled_x - tiled_y), axis=2) / tf.cast(dim, tf.float32))
 
 def compute_gaussian_entropy(z_mu, z_log_sigma_sq):
@@ -24,10 +26,13 @@ def compute_gaussian_kld(z_mu, z_log_sigma_sq, output_mean=True):
     return kld
 
 
-def estimate_mmd(x, y):
-    x_kernel = compute_kernel(x, x)
-    y_kernel = compute_kernel(y, y)
-    xy_kernel = compute_kernel(x, y)
+def estimate_mmd(x, y, is_dimention_wise=False):
+    x_kernel = compute_kernel(x, x, is_dimention_wise)
+    y_kernel = compute_kernel(y, y, is_dimention_wise)
+    xy_kernel = compute_kernel(x, y, is_dimention_wise)
+    if is_dimention_wise:
+        mmd = tf.reduce_mean(x_kernel, axis=[0,1]) + tf.reduce_mean(y_kernel, axis=[0,1]) - 2 * tf.reduce_mean(xy_kernel, axis=[0,1])
+        return tf.reduce_sum(mmd)
     mmd = tf.reduce_mean(x_kernel) + tf.reduce_mean(y_kernel) - 2 * tf.reduce_mean(xy_kernel)
     return mmd
 
