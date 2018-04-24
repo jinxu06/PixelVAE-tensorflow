@@ -44,51 +44,36 @@ cfg_default = {
 #     "masked": False,
 # })
 
-cfg = cfg_default
-cfg.update({
-    "img_size": 32,
-    "data_set": "celeba32",
-    "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1",
-    "beta": 1e5,
-    "reg": "mmd",
-    "use_mode": "train",
-    "mask_type": "full",
-    "batch_size": 64,
-    "network_size": "large1",
-    "masked": False,
-})
-
-
 # cfg = cfg_default
 # cfg.update({
 #     "img_size": 32,
 #     "data_set": "celeba32",
 #     "z_dim": 32,
-#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_tc_b5_large",
-#     "beta": 5,
-#     "reg": "tc",
-#     "use_mode": "train",
-#     "mask_type": "full",
-#     "batch_size": 64,
-#     "network_size": "large",
-#     "masked": False,
-# })
-
-# cfg = cfg_default
-# cfg.update({
-#     "img_size": 32,
-#     "data_set": "celeba32",
-#     "z_dim": 32,
-#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_tc_b5_large1",
-#     "beta": 5,
-#     "reg": "tc",
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1",
+#     "beta": 1e5,
+#     "reg": "mmd",
 #     "use_mode": "train",
 #     "mask_type": "full",
 #     "batch_size": 64,
 #     "network_size": "large1",
 #     "masked": False,
 # })
+
+cfg = cfg_default
+cfg.update({
+    "img_size": 32,
+    "data_set": "celeba32",
+    "z_dim": 32,
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1_mask",
+    "beta": 1e5,
+    "reg": "mmd",
+    "use_mode": "train",
+    "mask_type": "random rec",
+    "batch_size": 64,
+    "network_size": "large1",
+    "masked": True,
+})
+
 
 
 
@@ -188,6 +173,9 @@ for i in range(args.nr_gpu):
 if args.use_mode == 'train':
     if "masked" in cfg and cfg['masked']:
         all_params = get_trainable_variables(["conv_pixel_cnn", "context_encoder"])
+        for p in all_params:
+            print(p.name)
+        quit()
     else:
         all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
     grads = []
