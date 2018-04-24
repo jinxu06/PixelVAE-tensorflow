@@ -78,7 +78,7 @@ class ConvPixelVAE(object):
     def __loss(self, reg):
         print("******   Compute Loss   ******")
         self.mmd, self.kld, self.mi, self.tc, self.dwkld = [None for i in range(5)]
-        self.gamma, self.dwmmd = 1e5, None ## hard coded, experimental
+        self.gamma, self.dwmmd = 1e3, None ## hard coded, experimental
         self.loss_ae = mix_logistic_loss(self.x, self.mix_logistic_params, masks=self.masks)
         if reg is None:
             self.loss_reg = 0
