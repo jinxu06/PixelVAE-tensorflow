@@ -114,9 +114,6 @@ def estimate_mi_tc_dwkld(z, z_mu, z_log_sigma_sq, N=2e5):
 
     lse_sum = tf.reduce_mean(log_sum_exp(tf.reduce_sum(log_probs, axis=-1)+ratio, axis=0))
     sum_lse = tf.reduce_mean(tf.reduce_sum(log_sum_exp(log_probs+ratio_b, axis=0), axis=-1))
-    print(N)
-    N = 2000
-    print(N)
     lse_sum -= tf.log(float(N))
     sum_lse -= tf.log(float(N)) * float(z_dim)
 

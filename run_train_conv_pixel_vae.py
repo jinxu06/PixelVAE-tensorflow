@@ -167,7 +167,7 @@ model_opt = {
     "reg": args.reg,
     "beta": args.beta,
     "lam": args.lam,
-    "N": 2000,#200000,
+    "N": 200000,
     "nonlinearity": get_nonlinearity(args.nonlinearity),
     "bn": True,
     "kernel_initializer": tf.contrib.layers.xavier_initializer(),
@@ -212,9 +212,7 @@ if args.use_mode == 'train':
         elif args.reg=='kld':
             record_dict['kld'] = tf.add_n([v.kld for v in pvaes]) / args.nr_gpu
         elif args.reg=='tc-dwmmd':
-            record_dict['mi reg'] = tf.add_n([v.mi for v in pvaes]) / args.nr_gpu
             record_dict['tc reg'] = tf.add_n([v.tc for v in pvaes]) / args.nr_gpu
-            record_dict['dwkld reg'] = tf.add_n([v.dwkld for v in pvaes]) / args.nr_gpu
             record_dict['dwmmd'] = tf.add_n([v.dwmmd for v in pvaes]) / args.nr_gpu
         else:
             raise Exception("unknown reg type")
