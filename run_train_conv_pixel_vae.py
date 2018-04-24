@@ -136,7 +136,10 @@ else:
         train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
     elif args.mask_type=="center rec":
         train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
-test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.)#CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
+if "masked" in cfg and cfg['masked']:
+    test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
+else:
+    test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.)
 
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -173,9 +176,6 @@ for i in range(args.nr_gpu):
 if args.use_mode == 'train':
     if "masked" in cfg and cfg['masked']:
         all_params = get_trainable_variables(["conv_pixel_cnn", "context_encoder"])
-        for p in all_params:
-            print(p.name)
-        quit()
     else:
         all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
     grads = []
@@ -314,12 +314,12 @@ with tf.Session(config=config) as sess:
         print('restoring parameters from', ckpt_file)
         saver.restore(sess, ckpt_file)
 
-    # restore part of parameters
-    # pretraining_dir = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd"
-    # saver1 = tf.train.Saver()
-    # ckpt_file = pretraining_dir + '/params_' + args.data_set + '.ckpt'
-    # print('restoring parameters from', ckpt_file)
-    # saver1.restore(sess, ckpt_file)
+    ## restore part of parameters
+    pretraining_dir = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1"
+    saver1 = tf.train.Saver()
+    ckpt_file = pretraining_dir + '/params_' + args.data_set + '.ckpt'
+    print('restoring parameters from', ckpt_file)
+    saver1.restore(sess, ckpt_file)
 
     fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
 
