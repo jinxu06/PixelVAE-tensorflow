@@ -100,6 +100,7 @@ def estimate_mi_tc_dwkld(z, z_mu, z_log_sigma_sq, N=2e5):
     z_sigma = tf.sqrt(tf.exp(z_log_sigma_sq))
     log_probs = []
     batch_size, z_dim = int_shape(z_mu)
+    print(batch_size, z_dim)
 
     z_b = tf.stack([z for i in range(batch_size)], axis=0)
     z_mu_b = tf.stack([z_mu for i in range(batch_size)], axis=1)
