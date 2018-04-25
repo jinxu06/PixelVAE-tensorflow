@@ -40,7 +40,7 @@ cfg.update({
     "use_mode": "train",
     "mask_type": "full",
     "batch_size": 64,
-    "network_size": "medium",
+    "network_size": "large",
     "masked": False,
 })
 
@@ -298,8 +298,8 @@ with tf.Session(config=config) as sess:
         saver.restore(sess, ckpt_file)
 
     # restore part of parameters
-    var_list = get_trainable_variables(["conv_encoder", "conv_decoder"])
-    pretraining_dir = "/data/ziz/jxu/models/vae_celeba32_tc_z32_b8"
+    var_list = get_trainable_variables(["conv_encoder"])
+    pretraining_dir = "/data/ziz/jxu/models/vae_celeba32_tc_z32_b6"
     saver1 = tf.train.Saver(var_list=var_list)
     ckpt_file = pretraining_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
