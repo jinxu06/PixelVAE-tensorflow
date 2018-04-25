@@ -59,35 +59,35 @@ cfg_default = {
 #     "masked": False,
 # })
 
-cfg = cfg_default
-cfg.update({
-    "img_size": 32,
-    "data_set": "celeba32",
-    "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1_mask",
-    "beta": 1e5,
-    "reg": "mmd",
-    "use_mode": "test",
-    "mask_type": "random rec",
-    "batch_size": 64,
-    "network_size": "large1",
-    "masked": True,
-})
-
 # cfg = cfg_default
 # cfg.update({
 #     "img_size": 32,
 #     "data_set": "celeba32",
 #     "z_dim": 32,
-#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_tc-dwmmd_medium",
-#     "beta": 5,
-#     "reg": "tc-dwmmd",
-#     "use_mode": "train",
-#     "mask_type": "full",
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1_mask",
+#     "beta": 1e5,
+#     "reg": "mmd",
+#     "use_mode": "test",
+#     "mask_type": "random rec",
 #     "batch_size": 64,
-#     "network_size": "medium",
-#     "masked": False,
+#     "network_size": "large1",
+#     "masked": True,
 # })
+
+cfg = cfg_default
+cfg.update({
+    "img_size": 32,
+    "data_set": "celeba32",
+    "z_dim": 32,
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_tc-dwmmd_medium",
+    "beta": 5,
+    "reg": "tc-dwmmd",
+    "use_mode": "test",
+    "mask_type": "full",
+    "batch_size": 104,
+    "network_size": "medium",
+    "masked": False,
+})
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -339,27 +339,26 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    REC = [10, 31, 28, 1]
-    mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
-    fill_region = mgen.gen(1)[0]
-    # CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
+    # REC = [10, 31, 28, 1]
+    # mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
+    # fill_region = mgen.gen(1)[0]
+    #
+    # data = next(test_data)
+    # test_data.reset()
+    # vdata = np.cast[np.float32]((data - 127.5) / 127.5)
+    # visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
+    #
+    #
+    # sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=mgen)
+    # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/show_mask_3.png", layout=[8,8])
 
-    data = next(test_data)
-    test_data.reset()
-    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
-    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
-
-
-    sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=mgen)
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/show_mask_3.png", layout=[8,8])
-
-    # img = []
-    # for i in [2, 3, 5, 40, 55]:
-    #     sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region)
-    #     view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
-    #     img.append(view.copy())
-    # img = np.concatenate(img, axis=1)
-    # from PIL import Image
-    # img = img.astype(np.uint8)
-    # img = Image.fromarray(img, 'RGB')
-    # img.save("/data/ziz/jxu/gpu-results/show_pvae_06.png")
+    img = []
+    for i in [2]:#, 3, 5, 40, 55]:
+        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=None)
+        view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
+        img.append(view.copy())
+    img = np.concatenate(img, axis=1)
+    from PIL import Image
+    img = img.astype(np.uint8)
+    img = Image.fromarray(img, 'RGB')
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_07.png")
