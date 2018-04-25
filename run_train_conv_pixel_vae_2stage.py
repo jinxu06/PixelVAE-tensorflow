@@ -147,7 +147,7 @@ if args.use_mode == 'train':
     if "masked" in cfg and cfg['masked']:
         all_params = get_trainable_variables(["conv_pixel_cnn", "context_encoder"])
     else:
-        all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
+        all_params = get_trainable_variables(["conv_pixel_cnn"])
     grads = []
     for i in range(args.nr_gpu):
         with tf.device('/gpu:%d' % i):
@@ -304,8 +304,6 @@ with tf.Session(config=config) as sess:
     ckpt_file = pretraining_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver1.restore(sess, ckpt_file)
-
-    quit()
 
     fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
 
