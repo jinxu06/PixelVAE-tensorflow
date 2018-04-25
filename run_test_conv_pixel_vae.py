@@ -268,7 +268,7 @@ def generate_samples(sess, data, fill_region=None):
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
-    print(test_mgen.gen(args.batch_size)[0])
+    print(test_mgen)
     quit()
 
     if masks[0] is not None:
