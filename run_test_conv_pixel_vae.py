@@ -304,10 +304,12 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = z_mu.copy() # np.random.normal(loc=z_mu, scale=z_sigma)
 
-    print(z_mu[0])
-    print(z_sigma[0])
-
+    z = np.random.normal(loc=z_mu, scale=z_sigma)
+    print(np.mean(z, 0))
+    print(np.std(z, 0))
     quit()
+
+
     for i in range(z.shape[0]):
         z[i] = z[0].copy()
     for i in range(args.z_dim):
