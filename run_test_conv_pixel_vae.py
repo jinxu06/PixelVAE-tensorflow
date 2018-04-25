@@ -343,10 +343,10 @@ with tf.Session(config=config) as sess:
     # mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
     # fill_region = mgen.gen(1)[0]
     #
-    # data = next(test_data)
-    # test_data.reset()
-    # vdata = np.cast[np.float32]((data - 127.5) / 127.5)
-    # visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
+    data = next(test_data)
+    test_data.reset()
+    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
+    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
     #
     #
     # sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=mgen)
