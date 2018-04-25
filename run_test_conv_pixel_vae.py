@@ -305,8 +305,11 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
     z = z_mu.copy() # np.random.normal(loc=z_mu, scale=z_sigma)
 
     z = np.random.normal(loc=z_mu, scale=z_sigma)
+    print(z.shape)
     print(np.mean(z, 0))
     print(np.std(z, 0))
+    print(np.mean(z, 1))
+    print(np.std(z, 1))
     quit()
 
 
