@@ -268,6 +268,10 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
+    print(z.shape)
+    print(z.mean(0))
+    print(z.std(0))
+    quit()
     #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
@@ -303,14 +307,6 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = z_mu.copy() # np.random.normal(loc=z_mu, scale=z_sigma)
-
-    z = np.random.normal(loc=z_mu, scale=z_sigma)
-    print(z.shape)
-    print(np.mean(z, 0))
-    print(np.std(z, 0))
-    print(np.mean(z, 1))
-    print(np.std(z, 1))
-    quit()
 
 
     for i in range(z.shape[0]):
@@ -359,16 +355,16 @@ with tf.Session(config=config) as sess:
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
     #
     #
-    # sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=mgen)
-    # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/show_mask_3.png", layout=[8,8])
+    sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=mgen)
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/show_mask_3.png", layout=[8,8])
 
-    img = []
-    for i in [2]:#, 3, 5, 40, 55]:
-        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=None)
-        view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
-        img.append(view.copy())
-    img = np.concatenate(img, axis=1)
-    from PIL import Image
-    img = img.astype(np.uint8)
-    img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_07.png")
+    # img = []
+    # for i in [2]:#, 3, 5, 40, 55]:
+    #     sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=None)
+    #     view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
+    #     img.append(view.copy())
+    # img = np.concatenate(img, axis=1)
+    # from PIL import Image
+    # img = img.astype(np.uint8)
+    # img = Image.fromarray(img, 'RGB')
+    # img.save("/data/ziz/jxu/gpu-results/show_pvae_07.png")
