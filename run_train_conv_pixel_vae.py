@@ -221,7 +221,9 @@ if args.use_mode == 'train':
 
 
 
-def make_feed_dict(data, is_training=True, dropout_p=0.5):
+def make_feed_dict(data, is_training=True, dropout_p=0.5, mgen=None):
+    if mgen is None:
+        mgen = train_mgen
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]: is_training for i in range(args.nr_gpu)}
@@ -229,17 +231,19 @@ def make_feed_dict(data, is_training=True, dropout_p=0.5):
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     feed_dict.update({ x_bars[i]:ds[i] for i in range(args.nr_gpu) })
     if masks[0] is not None:
-        feed_dict.update({masks[i]:train_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+        feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
     return feed_dict
 
-def sample_from_model(sess, data, fill_region=None):
+def sample_from_model(sess, data, fill_region=None, mgen=None):
+    if mgen is None:
+        mgen = test_mgen
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]: False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     if masks[0] is not None:
-        feed_dict.update({masks[i]:test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+        feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
@@ -252,7 +256,9 @@ def sample_from_model(sess, data, fill_region=None):
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
-def generate_samples(sess, data, fill_region=None):
+def generate_samples(sess, data, fill_region=None, mgen=None):
+    if mgen is None:
+        mgen = test_mgen
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
@@ -267,7 +273,7 @@ def generate_samples(sess, data, fill_region=None):
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
     if masks[0] is not None:
-        feed_dict.update({masks[i]:test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+        feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
@@ -282,7 +288,9 @@ def generate_samples(sess, data, fill_region=None):
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
-def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13, fill_region=None):
+def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13, fill_region=None, mgen=None):
+    if mgen is None:
+        mgen = test_mgen
     image = np.cast[np.float32]((image - 127.5) / 127.5)
     num_instances = num_traversal_step * args.z_dim
     assert num_instances <= args.nr_gpu * args.batch_size, "cannot feed all the instances into GPUs"
@@ -303,7 +311,7 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
     if masks[0] is not None:
-        feed_dict.update({masks[i]:test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+        feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]

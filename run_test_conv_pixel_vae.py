@@ -155,8 +155,6 @@ else:
     test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.)
 
 
-# test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
-
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
@@ -223,7 +221,9 @@ if args.use_mode == 'train':
 
 
 
-def make_feed_dict(data, is_training=True, dropout_p=0.5):
+def make_feed_dict(data, is_training=True, dropout_p=0.5, mgen=None):
+    if mgen is None:
+        mgen = train_mgen
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]: is_training for i in range(args.nr_gpu)}
@@ -231,17 +231,19 @@ def make_feed_dict(data, is_training=True, dropout_p=0.5):
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     feed_dict.update({ x_bars[i]:ds[i] for i in range(args.nr_gpu) })
     if masks[0] is not None:
-        feed_dict.update({masks[i]:train_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+        feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
     return feed_dict
 
-def sample_from_model(sess, data, fill_region=None):
+def sample_from_model(sess, data, fill_region=None, mgen=None):
+    if mgen is None:
+        mgen = test_mgen
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]: False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     if masks[0] is not None:
-        feed_dict.update({masks[i]:test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+        feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
@@ -254,7 +256,9 @@ def sample_from_model(sess, data, fill_region=None):
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
-def generate_samples(sess, data, fill_region=None):
+def generate_samples(sess, data, fill_region=None, mgen=None):
+    if mgen is None:
+        mgen = test_mgen
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
@@ -268,15 +272,11 @@ def generate_samples(sess, data, fill_region=None):
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
-    print(test_mgen)
-    quit()
-
     if masks[0] is not None:
-        feed_dict.update({masks[i]:test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+        feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
-    x_gen = [x_gen[i]*broadcast_masks_np(fill_region, num_channels=3, batch_size=args.batch_size) for i in range(args.nr_gpu)]
-    # [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
+    #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
 
     for yi in range(args.img_size):
         for xi in range(args.img_size):
@@ -288,7 +288,9 @@ def generate_samples(sess, data, fill_region=None):
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
-def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13, fill_region=None):
+def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13, fill_region=None, mgen=None):
+    if mgen is None:
+        mgen = test_mgen
     image = np.cast[np.float32]((image - 127.5) / 127.5)
     num_instances = num_traversal_step * args.z_dim
     assert num_instances <= args.nr_gpu * args.batch_size, "cannot feed all the instances into GPUs"
@@ -309,7 +311,7 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
     if masks[0] is not None:
-        feed_dict.update({masks[i]:test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+        feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
@@ -322,7 +324,6 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
                 for i in range(args.nr_gpu):
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)[:num_instances]
-
 
 
 initializer = tf.global_variables_initializer()
@@ -339,8 +340,8 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
     REC = [10, 31, 20, 1]
-    test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
-    fill_region = test_mgen.gen(1)[0]
+    mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
+    fill_region = mgen.gen(1)[0]
     # CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
 
     data = next(test_data)
@@ -349,7 +350,7 @@ with tf.Session(config=config) as sess:
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
 
 
-    sample_x = generate_samples(sess, data, fill_region=fill_region)
+    sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=mgen)
     visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/show_mask_2.png", layout=[8,8])
 
     # img = []

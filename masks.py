@@ -20,7 +20,6 @@ class CenterMaskGenerator(MaskGenerator):
         self.masks = np.ones((n, self.height, self.width))
         c_height = int(self.height * self.ratio)
         c_width = int(self.width * self.ratio)
-        print(c_height, c_width)
         height_offset = (self.height - c_height) // 2
         width_offset = (self.width - c_width) // 2
         self.masks[:, height_offset:height_offset+c_height, width_offset:width_offset+c_width] = 0
