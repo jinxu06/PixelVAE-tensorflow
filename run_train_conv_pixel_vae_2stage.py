@@ -40,7 +40,7 @@ cfg.update({
     "use_mode": "train",
     "mask_type": "full",
     "batch_size": 64,
-    "network_size": "large",
+    "network_size": "medium",
     "masked": False,
 })
 
