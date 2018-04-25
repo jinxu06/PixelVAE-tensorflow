@@ -74,20 +74,37 @@ cfg_default = {
 #     "masked": True,
 # })
 
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 32,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_tc-dwmmd_medium",
+#     "beta": 5,
+#     "reg": "tc-dwmmd",
+#     "use_mode": "test",
+#     "mask_type": "full",
+#     "batch_size": 104,
+#     "network_size": "medium",
+#     "masked": False,
+# })
+
 cfg = cfg_default
 cfg.update({
-    "img_size": 32,
+    "img_size": 64,
     "data_set": "celeba32",
     "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_tc-dwmmd_medium",
-    "beta": 5,
-    "reg": "tc-dwmmd",
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba64_z32_mmd",
+    "beta": 1e5,
+    "reg": "mmd",
     "use_mode": "test",
     "mask_type": "full",
-    "batch_size": 104,
+    "batch_size": 16,
     "network_size": "medium",
     "masked": False,
 })
+
+
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -345,19 +362,17 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    # REC = [10, 31, 28, 1]
-    # mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
-    # fill_region = mgen.gen(1)[0]
+    REC = [44, 64, 64, 0]#[10, 31, 28, 1]
+    mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
+    fill_region = mgen.gen(1)[0]
     #
     data = next(test_data)
     test_data.reset()
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
     #
-    mgen = None
-    fill_region = None
     sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=mgen)
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/show_mask_3.png", layout=[8,8])
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/show_mask_4.png", layout=[8,8])
 
     # img = []
     # for i in [2]:#, 3, 5, 40, 55]:
