@@ -154,6 +154,8 @@ if "masked" in cfg and cfg['masked']:
 else:
     test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.)
 
+REC = [10, 31, 20, 1]
+test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -332,8 +334,6 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    rec = [10, 31, 20, 1]
-    test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=rec)
     fill_region = test_mgen.gen(1)[0]
     # CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
 
