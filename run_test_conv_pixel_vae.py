@@ -5,7 +5,7 @@ import argparse
 import time
 import numpy as np
 import tensorflow as tf
-from blocks.helpers import Recorder, visualize_samples, get_nonlinearity, int_shape, get_trainable_variables
+from blocks.helpers import Recorder, visualize_samples, get_nonlinearity, int_shape, get_trainable_variables, broadcast_masks_np
 from blocks.optimizers import adam_updates
 import data.load_data as load_data
 from models.conv_pixel_vae import ConvPixelVAE
@@ -272,7 +272,8 @@ def generate_samples(sess, data, fill_region=None):
         feed_dict.update({masks[i]:test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
-    #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
+    x_gen = [x_gen[i]*broadcast_masks_np(fill_region, num_channels=3, batch_size=args.batch_size) for i in range(args.nr_gpu)]
+    # [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
 
     for yi in range(args.img_size):
         for xi in range(args.img_size):
@@ -343,9 +344,6 @@ with tf.Session(config=config) as sess:
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
 
-    data[:, REC[0]:REC[2], REC[3]:REC[1], :] = 0
-    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
-    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_mask.png", layout=[8,8])
 
     sample_x = generate_samples(sess, data, fill_region=fill_region)
     visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/show_mask_1.png", layout=[8,8])
