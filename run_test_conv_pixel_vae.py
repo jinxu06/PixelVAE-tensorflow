@@ -334,6 +334,7 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
+
     fill_region = test_mgen.gen(1)[0]
     # CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
 
@@ -342,7 +343,7 @@ with tf.Session(config=config) as sess:
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
 
-    data[:, rec[0]:rec[2], rec[3]:rec[1], :] = 0
+    data[:, REC[0]:REC[2], REC[3]:REC[1], :] = 0
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_mask.png", layout=[8,8])
 
