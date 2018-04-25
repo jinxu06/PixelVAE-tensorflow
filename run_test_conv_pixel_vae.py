@@ -333,7 +333,8 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
     rec = [10, 31, 20, 1]
-    fill_region = RectangleMaskGenerator(args.img_size, args.img_size, rec=rec).gen(1)[0]
+    test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=rec)
+    fill_region = test_mgen.gen(1)[0]
     # CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
 
     data = next(test_data)
@@ -344,7 +345,6 @@ with tf.Session(config=config) as sess:
     data[:, rec[0]:rec[2], rec[3]:rec[1], :] = 0
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_mask.png", layout=[8,8])
-
 
     sample_x = generate_samples(sess, data, fill_region=fill_region)
     visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/show_mask_1.png", layout=[8,8])
