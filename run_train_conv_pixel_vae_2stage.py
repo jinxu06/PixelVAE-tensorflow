@@ -144,9 +144,6 @@ for i in range(args.nr_gpu):
         model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], **model_opt)
 
 if args.use_mode == 'train':
-    for v in get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"]):
-        print(v.name)
-    quit()
     if "masked" in cfg and cfg['masked']:
         all_params = get_trainable_variables(["conv_pixel_cnn", "context_encoder"])
     else:
@@ -302,7 +299,7 @@ with tf.Session(config=config) as sess:
 
     # restore part of parameters
     var_list = get_trainable_variables(["conv_encoder", "conv_decoder"])
-    pretraining_dir = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1"
+    pretraining_dir = "/data/ziz/jxu/models/vae_celeba64_tc_z32_b8"
     saver1 = tf.train.Saver(var_list=var_list)
     ckpt_file = pretraining_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
