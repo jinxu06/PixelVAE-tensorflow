@@ -44,35 +44,35 @@ cfg_default = {
 #     "masked": False,
 # })
 
-cfg = cfg_default
-cfg.update({
-    "img_size": 32,
-    "data_set": "celeba32",
-    "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1",
-    "beta": 1e5,
-    "reg": "mmd",
-    "use_mode": "test",
-    "mask_type": "full",
-    "batch_size": 64,
-    "network_size": "large1",
-    "masked": False,
-})
-
 # cfg = cfg_default
 # cfg.update({
 #     "img_size": 32,
 #     "data_set": "celeba32",
 #     "z_dim": 32,
-#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1_mask",
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1",
 #     "beta": 1e5,
 #     "reg": "mmd",
 #     "use_mode": "test",
-#     "mask_type": "random rec",
+#     "mask_type": "full",
 #     "batch_size": 64,
 #     "network_size": "large1",
-#     "masked": True,
+#     "masked": False,
 # })
+
+cfg = cfg_default
+cfg.update({
+    "img_size": 32,
+    "data_set": "celeba32",
+    "z_dim": 32,
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1_mask",
+    "beta": 1e5,
+    "reg": "mmd",
+    "use_mode": "test",
+    "mask_type": "random rec",
+    "batch_size": 64,
+    "network_size": "large1",
+    "masked": True,
+})
 
 # cfg = cfg_default
 # cfg.update({
@@ -350,8 +350,8 @@ with tf.Session(config=config) as sess:
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
 
 
-    sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=None)
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/show_mask_2.png", layout=[8,8])
+    sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=mgen)
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/show_mask_3.png", layout=[8,8])
 
     # img = []
     # for i in [2, 3, 5, 40, 55]:
