@@ -44,40 +44,50 @@ cfg_default = {
 #     "masked": False,
 # })
 
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 32,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1",
+#     "beta": 1e5,
+#     "reg": "mmd",
+#     "use_mode": "train",
+#     "mask_type": "full",
+#     "batch_size": 64,
+#     "network_size": "large1",
+#     "masked": False,
+# })
+
 cfg = cfg_default
 cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
     "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1",
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1_mask",
     "beta": 1e5,
     "reg": "mmd",
     "use_mode": "test",
-    "mask_type": "full",
-    "batch_size": 104,
+    "mask_type": "random rec",
+    "batch_size": 64,
     "network_size": "large1",
-    "masked": False,
-    "sample_range": 1.0,
+    "masked": True,
 })
-
 
 # cfg = cfg_default
 # cfg.update({
 #     "img_size": 32,
 #     "data_set": "celeba32",
 #     "z_dim": 32,
-#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_tc_b5_large1",
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_tc-dwmmd_medium",
 #     "beta": 5,
-#     "reg": "tc",
-#     "use_mode": "test",
+#     "reg": "tc-dwmmd",
+#     "use_mode": "train",
 #     "mask_type": "full",
-#     "batch_size": 104,
-#     "network_size": "large1",
+#     "batch_size": 64,
+#     "network_size": "medium",
 #     "masked": False,
-#     "sample_range": 1.0,
 # })
-
-
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -121,7 +131,7 @@ batch_size = args.batch_size * args.nr_gpu
 data_set = load_data.CelebA(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
 if args.debug:
     train_data = data_set.train(shuffle=True, limit=batch_size*2)
-    eval_data = data_set.train(shuffle=True, limit=batch_size*1)
+    eval_data = data_set.train(shuffle=True, limit=batch_size*2)
     test_data = data_set.test(shuffle=False, limit=batch_size*1)
 else:
     train_data = data_set.train(shuffle=True, limit=-1)
@@ -139,7 +149,10 @@ else:
         train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
     elif args.mask_type=="center rec":
         train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
-test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.)#CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
+if "masked" in cfg and cfg['masked']:
+    test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
+else:
+    test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.)
 
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -197,7 +210,12 @@ if args.use_mode == 'train':
         elif args.reg=='mmd':
             record_dict['mmd'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
         elif args.reg=='kld':
-            record_dict['kld'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
+            record_dict['kld'] = tf.add_n([v.kld for v in pvaes]) / args.nr_gpu
+        elif args.reg=='tc-dwmmd':
+            record_dict['tc reg'] = tf.add_n([v.tc for v in pvaes]) / args.nr_gpu
+            record_dict['dwmmd'] = tf.add_n([v.dwmmd for v in pvaes]) / args.nr_gpu
+        else:
+            raise Exception("unknown reg type")
         recorder = Recorder(dict=record_dict, config_str=str(json.dumps(vars(args), indent=4, separators=(',',':'))), log_file=args.save_dir+"/log_file")
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
@@ -314,37 +332,30 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    fill_region = None #CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
+    rec = [10, 31, 20, 1]
+    fill_region = RectangleMaskGenerator(args.img_size, args.img_size, rec=rec).gen(1)[0]
+    # CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
 
     data = next(test_data)
     test_data.reset()
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
 
-    img = []
-    for i in [2, 3, 5, 40, 55]:
-        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region)
-        view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
-        img.append(view.copy())
-    img = np.concatenate(img, axis=1)
-    from PIL import Image
-    img = img.astype(np.uint8)
-    img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_06.png")
+    data[:, rec[0]:rec[2], rec[3]:rec[1], :] = 0
+    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
+    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_mask.png", layout=[8,8])
 
 
-    #
-    # fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
-    #
-    # max_num_epoch = 200
-    # for epoch in range(max_num_epoch+1):
-    #     tt = time.time()
-    #     for data in train_data:
-    #         feed_dict = make_feed_dict(data, is_training=True, dropout_p=0.5)
-    #         sess.run(train_step, feed_dict=feed_dict)
-    #
-    #     for data in eval_data:
-    #         feed_dict = make_feed_dict(data, is_training=False, dropout_p=0.)
-    #         recorder.evaluate(sess, feed_dict)
-    #
-    #     recorder.finish_epoch_and_display(time=time.time()-tt, log=True)
+    sample_x = generate_samples(sess, data, fill_region=fill_region)
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/show_mask_1.png", layout=[8,8])
+
+    # img = []
+    # for i in [2, 3, 5, 40, 55]:
+    #     sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region)
+    #     view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
+    #     img.append(view.copy())
+    # img = np.concatenate(img, axis=1)
+    # from PIL import Image
+    # img = img.astype(np.uint8)
+    # img = Image.fromarray(img, 'RGB')
+    # img.save("/data/ziz/jxu/gpu-results/show_pvae_06.png")
