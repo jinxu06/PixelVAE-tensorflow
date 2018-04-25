@@ -79,13 +79,13 @@ cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
     "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_tc-dwmmd",
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_tc-dwmmd_medium",
     "beta": 5,
     "reg": "tc-dwmmd",
     "use_mode": "train",
     "mask_type": "full",
     "batch_size": 64,
-    "network_size": "large1",
+    "network_size": "medium",
     "masked": False,
 })
 
