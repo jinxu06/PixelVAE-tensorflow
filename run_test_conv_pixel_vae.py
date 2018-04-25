@@ -99,9 +99,10 @@ cfg.update({
     "reg": "mmd",
     "use_mode": "test",
     "mask_type": "full",
-    "batch_size": 16,
+    "batch_size": 32, #16,
     "network_size": "medium",
     "masked": False,
+    "sample_range": 1.0,
 })
 
 
@@ -367,17 +368,17 @@ with tf.Session(config=config) as sess:
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
     #
-    mgen = None
-    sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=mgen)
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/show_mask_4.png", layout=[8,8])
+    # mgen = None
+    # sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=mgen)
+    # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/show_mask_4.png", layout=[8,8])
 
-    # img = []
-    # for i in [2]:#, 3, 5, 40, 55]:
-    #     sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=None)
-    #     view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
-    #     img.append(view.copy())
-    # img = np.concatenate(img, axis=1)
-    # from PIL import Image
-    # img = img.astype(np.uint8)
-    # img = Image.fromarray(img, 'RGB')
-    # img.save("/data/ziz/jxu/gpu-results/show_pvae_07.png")
+    img = []
+    for i in [2]: #, 3, 5, 40, 55]:
+        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=4, fill_region=fill_region)
+        view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
+        img.append(view.copy())
+    img = np.concatenate(img, axis=1)
+    from PIL import Image
+    img = img.astype(np.uint8)
+    img = Image.fromarray(img, 'RGB')
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_07.png")
