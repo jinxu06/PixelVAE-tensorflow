@@ -339,7 +339,7 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    REC = [10, 31, 20, 1]
+    REC = [10, 31, 28, 1]
     mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
     fill_region = mgen.gen(1)[0]
     # CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
