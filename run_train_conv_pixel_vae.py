@@ -59,35 +59,83 @@ cfg_default = {
 #     "masked": False,
 # })
 
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 32,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1_mask",
+#     "beta": 1e5,
+#     "reg": "mmd",
+#     "use_mode": "train",
+#     "mask_type": "random rec",
+#     "batch_size": 64,
+#     "network_size": "large1",
+#     "masked": True,
+# })
+#
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 32,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_tc-dwmmd_medium",
+#     "beta": 5,
+#     "reg": "tc-dwmmd",
+#     "use_mode": "train",
+#     "mask_type": "full",
+#     "batch_size": 64,
+#     "network_size": "medium",
+#     "masked": False,
+# })
+
+# 01
 cfg = cfg_default
 cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
-    "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1_mask",
+    "z_dim": 24,
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_01",
     "beta": 1e5,
     "reg": "mmd",
-    "use_mode": "train",
-    "mask_type": "random rec",
-    "batch_size": 64,
-    "network_size": "large1",
-    "masked": True,
-})
-
-cfg = cfg_default
-cfg.update({
-    "img_size": 32,
-    "data_set": "celeba32",
-    "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_tc-dwmmd_medium",
-    "beta": 5,
-    "reg": "tc-dwmmd",
     "use_mode": "train",
     "mask_type": "full",
     "batch_size": 64,
     "network_size": "medium",
     "masked": False,
 })
+
+# # 02
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 24,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_02",
+#     "beta": 5e5,
+#     "reg": "mmd",
+#     "use_mode": "train",
+#     "mask_type": "full",
+#     "batch_size": 64,
+#     "network_size": "medium",
+#     "masked": False,
+# })
+#
+# # 03
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 24,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_03",
+#     "beta": 1e4,
+#     "reg": "mmd",
+#     "use_mode": "train",
+#     "mask_type": "full",
+#     "batch_size": 64,
+#     "network_size": "medium",
+#     "masked": False,
+# })
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
