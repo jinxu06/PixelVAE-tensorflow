@@ -138,20 +138,38 @@ cfg_default = {
 # })
 #
 # # 03
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 24,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large1_03",
+#     "beta": 5e5,
+#     "reg": "mmd",
+#     "use_mode": "train",
+#     "mask_type": "full",
+#     "batch_size": 64,
+#     "network_size": "large1",
+#     "masked": False,
+# })
+
 cfg = cfg_default
 cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
     "z_dim": 24,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large1_03",
-    "beta": 5e5,
-    "reg": "mmd",
+    "save_dir": "/data/ziz/jxu/models/temp",
+    "beta": 5,
+    "reg": "mmd-tc",
     "use_mode": "train",
     "mask_type": "full",
     "batch_size": 64,
-    "network_size": "large1",
+    "network_size": "medium",
     "masked": False,
 })
+
+
+
 
 
 
@@ -278,6 +296,9 @@ if args.use_mode == 'train':
             record_dict['kld'] = tf.add_n([v.kld for v in pvaes]) / args.nr_gpu
         elif args.reg=='tc-dwmmd':
             record_dict['tc reg'] = tf.add_n([v.tc for v in pvaes]) / args.nr_gpu
+            record_dict['dwmmd'] = tf.add_n([v.dwmmd for v in pvaes]) / args.nr_gpu
+        elif args.reg=='mmd-tc':
+            record_dict['mmdtc'] = tf.add_n([v.mmdtc for v in pvaes]) / args.nr_gpu
             record_dict['dwmmd'] = tf.add_n([v.dwmmd for v in pvaes]) / args.nr_gpu
         else:
             raise Exception("unknown reg type")
