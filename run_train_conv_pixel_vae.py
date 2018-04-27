@@ -298,8 +298,8 @@ if args.use_mode == 'train':
             record_dict['tc reg'] = tf.add_n([v.tc for v in pvaes]) / args.nr_gpu
             record_dict['dwmmd'] = tf.add_n([v.dwmmd for v in pvaes]) / args.nr_gpu
         elif args.reg=='mmd-tc':
-            record_dict['mmdtc'] = tf.add_n([v.mmdtc for v in pvaes]) / args.nr_gpu
-            record_dict['dwmmd'] = tf.add_n([v.dwmmd for v in pvaes]) / args.nr_gpu
+            record_dict['mmd'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
+            record_dict['tc'] = tf.add_n([v.tc for v in pvaes]) / args.nr_gpu
         else:
             raise Exception("unknown reg type")
         recorder = Recorder(dict=record_dict, config_str=str(json.dumps(vars(args), indent=4, separators=(',',':'))), log_file=args.save_dir+"/log_file")
