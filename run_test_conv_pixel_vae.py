@@ -89,20 +89,35 @@ cfg_default = {
 #     "masked": False,
 # })
 
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 64,
+#     "data_set": "celeba32",
+#     "z_dim": 32,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba64_z32_mmd",
+#     "beta": 1e5,
+#     "reg": "mmd",
+#     "use_mode": "test",
+#     "mask_type": "full",
+#     "batch_size": 32, #16,
+#     "network_size": "medium",
+#     "masked": False,
+#     "sample_range": 1.0,
+# })
+
 cfg = cfg_default
 cfg.update({
-    "img_size": 64,
+    "img_size": 32,
     "data_set": "celeba32",
-    "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba64_z32_mmd",
+    "z_dim": 24,
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_01",
     "beta": 1e5,
     "reg": "mmd",
     "use_mode": "test",
     "mask_type": "full",
-    "batch_size": 32, #16,
+    "batch_size": 84,
     "network_size": "medium",
     "masked": False,
-    "sample_range": 1.0,
 })
 
 
@@ -359,7 +374,7 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    REC = [44, 64, 64, 0]#[10, 31, 28, 1]
+    REC = [0, 32, 32, 0] #[10, 31, 28, 1]
     mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
     fill_region = mgen.gen(1)[0]
     #
@@ -374,11 +389,11 @@ with tf.Session(config=config) as sess:
 
     img = []
     for i in [2]: #, 3, 5, 40, 55]:
-        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=4, fill_region=fill_region)
+        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_07.png")
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_10.png")
