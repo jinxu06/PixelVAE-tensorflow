@@ -118,7 +118,9 @@ cfg.update({
     "batch_size": 84,
     "network_size": "medium",
     "masked": False,
+    "sample_range":1.0,
 })
+
 
 
 
@@ -388,7 +390,7 @@ with tf.Session(config=config) as sess:
     # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/show_mask_4.png", layout=[8,8])
 
     img = []
-    for i in [2]: #, 3, 5, 40, 55]:
+    for i in [2,30]: #[2, 3, 5, 40, 55]:
         sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
