@@ -121,6 +121,23 @@ cfg.update({
     "sample_range":1.0,
 })
 
+# 02
+cfg = cfg_default
+cfg.update({
+    "img_size": 32,
+    "data_set": "celeba32",
+    "z_dim": 24,
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_02",
+    "beta": 5e5,
+    "reg": "mmd",
+    "use_mode": "test",
+    "mask_type": "full",
+    "batch_size": 84,
+    "network_size": "medium",
+    "masked": False,
+    "sample_range": 1.0,
+})
+
 
 
 
@@ -398,4 +415,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_10.png")
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_11.png")
