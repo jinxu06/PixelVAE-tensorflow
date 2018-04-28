@@ -116,26 +116,28 @@ cfg.update({
     "reg": "mmd",
     "use_mode": "test",
     "mask_type": "full",
-    "batch_size": 84,
+    "batch_size": 168,
     "network_size": "large",
     "masked": False,
+    "sample_range": 1.0,
 })
 
-# # 02
-# cfg = cfg_default
-# cfg.update({
-#     "img_size": 32,
-#     "data_set": "celeba32",
-#     "z_dim": 24,
-#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large_02",
-#     "beta": 1e6,
-#     "reg": "mmd",
-#     "use_mode": "test",
-#     "mask_type": "full",
-#     "batch_size": 84,
-#     "network_size": "large",
-#     "masked": False,
-# })
+# 02
+cfg = cfg_default
+cfg.update({
+    "img_size": 32,
+    "data_set": "celeba32",
+    "z_dim": 24,
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large_02",
+    "beta": 1e6,
+    "reg": "mmd",
+    "use_mode": "test",
+    "mask_type": "full",
+    "batch_size": 168,
+    "network_size": "large",
+    "masked": False,
+    "sample_range":1.0,
+})
 #
 # # 03
 # cfg = cfg_default
@@ -422,7 +424,7 @@ with tf.Session(config=config) as sess:
     # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/show_mask_4.png", layout=[8,8])
 
     img = []
-    for i in [2,30]: #[2, 3, 5, 40, 55]:
+    for i in [2,3,30]: #[2, 3, 5, 40, 55]:
         sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
@@ -430,4 +432,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_12.png")
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_1_02.png")
