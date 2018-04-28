@@ -13,7 +13,7 @@ import data.load_data as load_data
 # print("TensorFlow version: {}".format(tf.VERSION))
 # print("Eager execution: {}".format(tf.executing_eagerly()))
 
-data_set = load_data.CelebA(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
+data_set = load_data.CelebA(data_dir="/data/ziz/not-backed-up/jxu/CelebA", batch_size=100, img_size=64)
 test_data = data_set.test(shuffle=False)
 
 data = test_data.next(256)
