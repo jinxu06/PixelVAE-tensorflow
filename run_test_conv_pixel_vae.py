@@ -105,38 +105,53 @@ cfg_default = {
 #     "sample_range": 1.0,
 # })
 
+# 01
 cfg = cfg_default
 cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
     "z_dim": 24,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_01",
-    "beta": 1e5,
-    "reg": "mmd",
-    "use_mode": "test",
-    "mask_type": "full",
-    "batch_size": 84,
-    "network_size": "medium",
-    "masked": False,
-    "sample_range":1.0,
-})
-
-# 02
-cfg = cfg_default
-cfg.update({
-    "img_size": 32,
-    "data_set": "celeba32",
-    "z_dim": 24,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_02",
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large_01",
     "beta": 5e5,
     "reg": "mmd",
     "use_mode": "test",
     "mask_type": "full",
     "batch_size": 84,
-    "network_size": "medium",
+    "network_size": "large",
     "masked": False,
-    "sample_range": 1.0,
 })
+
+# # 02
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 24,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large_02",
+#     "beta": 1e6,
+#     "reg": "mmd",
+#     "use_mode": "test",
+#     "mask_type": "full",
+#     "batch_size": 84,
+#     "network_size": "large",
+#     "masked": False,
+# })
+#
+# # 03
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 24,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large1_03",
+#     "beta": 5e5,
+#     "reg": "mmd",
+#     "use_mode": "test",
+#     "mask_type": "full",
+#     "batch_size": 84,
+#     "network_size": "large1",
+#     "masked": False,
+# })
 
 
 
