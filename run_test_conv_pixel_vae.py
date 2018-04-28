@@ -123,21 +123,21 @@ cfg.update({
 })
 
 # 02
-cfg = cfg_default
-cfg.update({
-    "img_size": 32,
-    "data_set": "celeba32",
-    "z_dim": 24,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large_02",
-    "beta": 1e6,
-    "reg": "mmd",
-    "use_mode": "test",
-    "mask_type": "full",
-    "batch_size": 168,
-    "network_size": "large",
-    "masked": False,
-    "sample_range":1.0,
-})
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 24,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large_02",
+#     "beta": 1e6,
+#     "reg": "mmd",
+#     "use_mode": "test",
+#     "mask_type": "full",
+#     "batch_size": 168,
+#     "network_size": "large",
+#     "masked": False,
+#     "sample_range":1.0,
+# })
 #
 # # 03
 # cfg = cfg_default
@@ -432,4 +432,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_1_02.png")
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_1_01.png")
