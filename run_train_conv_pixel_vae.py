@@ -153,20 +153,20 @@ cfg_default = {
 #     "masked": False,
 # })
 
-cfg = cfg_default
-cfg.update({
-    "img_size": 32,
-    "data_set": "celeba32",
-    "z_dim": 24,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd-tc",
-    "beta": 5,
-    "reg": "mmd-tc",
-    "use_mode": "train",
-    "mask_type": "full",
-    "batch_size": 64,
-    "network_size": "medium",
-    "masked": False,
-})
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 24,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd-tc",
+#     "beta": 5,
+#     "reg": "mmd-tc",
+#     "use_mode": "train",
+#     "mask_type": "full",
+#     "batch_size": 64,
+#     "network_size": "medium",
+#     "masked": False,
+# })
 
 
 
