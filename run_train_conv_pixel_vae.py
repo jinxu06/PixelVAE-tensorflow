@@ -176,7 +176,7 @@ cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
     "z_dim": 24,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large1_03",
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large1_elu",
     "beta": 5e5,
     "reg": "mmd",
     "use_mode": "train",
