@@ -170,6 +170,8 @@ cfg.update({
 #     "masked": False,
 # })
 
+cfg['sample_range'] = 1.0
+
 
 
 
