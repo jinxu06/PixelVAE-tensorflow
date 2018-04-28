@@ -22,6 +22,6 @@ data = np.cast[np.float32]((data - 127.5) / 127.5)
 
 image = data[16*9:16*9+1]
 corrupted_image = image.copy()
-corrupted_image[:, 50:100, 40:80, :] = 0.
+corrupted_image[:, 50:110, 40:90, :] = 0.
 visualize_samples(image, os.path.join("/data/ziz/jxu/gpu-results", "image_example.png"), layout=(1, 1))
 visualize_samples(corrupted_image, os.path.join("/data/ziz/jxu/gpu-results", "corrupted_image_example.png"), layout=(1, 1))
