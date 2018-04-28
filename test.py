@@ -19,4 +19,9 @@ test_data = data_set.test(shuffle=False)
 
 data = test_data.next(256)
 data = np.cast[np.float32]((data - 127.5) / 127.5)
-visualize_samples(data, os.path.join("/data/ziz/jxu/gpu-results", "examples.png"), layout=(16, 16))
+
+image = data[16*9:16*9+1]
+corrupted_image = image.copy()
+corrupted_image[:, 50:100, 40:80, :]
+visualize_samples(image, os.path.join("/data/ziz/jxu/gpu-results", "image_example.png"), layout=(1, 1))
+visualize_samples(corrupted_image, os.path.join("/data/ziz/jxu/gpu-results", "corrupted_image_example.png"), layout=(1, 1))
