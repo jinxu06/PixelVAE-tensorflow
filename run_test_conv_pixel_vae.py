@@ -170,22 +170,22 @@ cfg.update({
 #     "masked": False,
 # })
 
-# tc
+
+
 cfg = cfg_default
 cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
     "z_dim": 24,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_tc5_large1_res1",
-    "beta": 5,
-    "reg": "tc",
-    "use_mode": "test",
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large1_elu",
+    "beta": 5e5,
+    "reg": "mmd",
+    "use_mode": "train",
     "mask_type": "full",
-    "batch_size": 84,
+    "batch_size": 64,
     "network_size": "large1",
     "masked": False,
-    "nonlinearity": "relu",
-    "nr_resnet": 1,
+    "nonlinearity": "elu",
 })
 
 
