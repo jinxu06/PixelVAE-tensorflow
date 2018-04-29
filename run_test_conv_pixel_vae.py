@@ -177,7 +177,7 @@ cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
     "z_dim": 24,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large1_elu",
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large1_bn_elu",
     "beta": 5e5,
     "reg": "mmd",
     "use_mode": "test",
@@ -468,4 +468,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_res1.png")
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_bn.png")
