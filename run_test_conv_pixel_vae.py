@@ -189,7 +189,7 @@ cfg.update({
 })
 
 
-cfg['sample_range'] = 1.0
+cfg['sample_range'] = 2.0
 
 
 
@@ -446,7 +446,7 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    REC = [10, 26, 20, 6]#[0, 32, 32, 0] #[10, 31, 28, 1]
+    REC = [8, 26, 20, 6]#[0, 32, 32, 0] #[10, 31, 28, 1]
     mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
     fill_region = mgen.gen(1)[0]
     #
