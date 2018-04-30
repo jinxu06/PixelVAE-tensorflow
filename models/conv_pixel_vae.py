@@ -16,7 +16,7 @@ class ConvPixelVAE(object):
     def __init__(self, counters={}):
         self.counters = counters
 
-    def build_graph(self, x, x_bar, is_training, dropout_p, z_dim, masks=None, use_mode="test", network_size="medium", reg='mmd', N=2e5, sample_range=1.0, beta=1., lam=0., nonlinearity=tf.nn.elu, bn=True, kernel_initializer=None, kernel_regularizer=None, nr_resnet=1, nr_filters=100, nr_logistic_mix=10):
+    def build_graph(self, x, x_bar, is_training, dropout_p, z_dim, masks=None, input_masks=None, use_mode="test", network_size="medium", reg='mmd', N=2e5, sample_range=1.0, beta=1., lam=0., nonlinearity=tf.nn.elu, bn=True, kernel_initializer=None, kernel_regularizer=None, nr_resnet=1, nr_filters=100, nr_logistic_mix=10):
         self.z_dim = z_dim
         self.use_mode = use_mode
         self.nonlinearity = nonlinearity
@@ -31,16 +31,17 @@ class ConvPixelVAE(object):
         self.nr_resnet = nr_resnet
         self.nr_filters = nr_filters
         self.nr_logistic_mix = nr_logistic_mix
-        self.__model(x, x_bar, is_training, dropout_p, masks, network_size=network_size)
+        self.__model(x, x_bar, is_training, dropout_p, masks, input_masks, network_size=network_size)
         self.__loss(self.reg)
 
-    def __model(self, x, x_bar, is_training, dropout_p, masks, network_size="medium"):
+    def __model(self, x, x_bar, is_training, dropout_p, masks, input_masks, network_size="medium"):
         print("******   Building Graph   ******")
         self.x = x
         self.x_bar = x_bar
         self.is_training = is_training
         self.dropout_p = dropout_p
         self.masks = masks
+        self.input_masks = input_masks
         if int_shape(x)[1]==64:
             conv_encoder = conv_encoder_64_medium
             conv_decoder = conv_decoder_64_medium
@@ -57,7 +58,11 @@ class ConvPixelVAE(object):
             else:
                 raise Exception("unknown network type")
         with arg_scope([conv_encoder, conv_decoder, context_encoder, cond_pixel_cnn], nonlinearity=self.nonlinearity, bn=self.bn, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
-            self.z_mu, self.z_log_sigma_sq = conv_encoder(self.x, self.z_dim)
+            inputs = self.x
+            if self.input_masks is not None:
+                inputs = inputs * broadcast_masks_tf(self.input_masks, num_channels=3)
+                inputs = tf.concat([inputs, broadcast_masks_tf(self.input_masks, num_channels=1)], axis=-1)
+            self.z_mu, self.z_log_sigma_sq = conv_encoder(inputs, self.z_dim)
             sigma = tf.exp(self.z_log_sigma_sq / 2.)
             if self.use_mode=='train':
                 self.z = gaussian_sampler(self.z_mu, sigma)

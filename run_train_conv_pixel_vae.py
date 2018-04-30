@@ -203,7 +203,19 @@ cfg.update({
     "nonlinearity": "elu",
 })
 
+#################
 
+## MMD (Masking)
+
+## KLD
+
+## TC
+
+## TC-MMD
+
+# -MI --- distribution of means and stds
+
+##################
 
 
 

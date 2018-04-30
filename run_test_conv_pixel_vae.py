@@ -446,7 +446,7 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    REC = [0, 32, 32, 0] #[10, 31, 28, 1]
+    REC = [20, 32, 32, 0]#[0, 32, 32, 0] #[10, 31, 28, 1]
     mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
     fill_region = mgen.gen(1)[0]
     #
@@ -468,4 +468,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_elu7.png")
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_elu7_completion.png")
