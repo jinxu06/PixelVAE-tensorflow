@@ -225,6 +225,23 @@ cfg.update({
 
 ## MMD (Masking)
 
+cfg = cfg_default
+cfg.update({
+    "img_size": 32,
+    "data_set": "celeba32",
+    "z_dim": 32,
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu_5",
+    "beta": 5e5,
+    "reg": "mmd",
+    "use_mode": "train",
+    "mask_type": "full",
+    "batch_size": 64,
+    "network_size": "medium",
+    "masked": False,
+    "nonlinearity": "elu",
+    "use_input_masks": True,
+})
+
 ## KLD
 
 ## TC
@@ -307,7 +324,7 @@ else:
 
 
 input_masks = [None for i in range(args.nr_gpu)]
-input_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=1./16, max_ratio=1./2)
+input_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=1./16, max_ratio=.75)
 input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[8, 31, 18, 1])
 if "use_input_masks" in cfg and cfg["use_input_masks"]:
     input_masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
