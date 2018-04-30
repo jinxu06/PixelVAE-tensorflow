@@ -5,7 +5,7 @@ import argparse
 import time
 import numpy as np
 import tensorflow as tf
-from blocks.helpers import Recorder, visualize_samples, get_nonlinearity, int_shape, get_trainable_variables, broadcast_masks_tf
+from blocks.helpers import Recorder, visualize_samples, get_nonlinearity, int_shape, get_trainable_variables
 from blocks.optimizers import adam_updates
 import data.load_data as load_data
 from models.conv_pixel_vae import ConvPixelVAE
@@ -405,7 +405,7 @@ def sample_from_model(sess, data, fill_region=None, mgen=None):
     if masks[0] is not None:
         feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
     if input_masks[0] is not None:
-        feed_dict.update({input_test_masks[i]:input_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+        feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
@@ -437,7 +437,7 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
     if masks[0] is not None:
         feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
     if input_masks[0] is not None:
-        feed_dict.update({input_test_masks[i]:input_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+        feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
@@ -477,7 +477,7 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
     if masks[0] is not None:
         feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
     if input_masks[0] is not None:
-        feed_dict.update({input_test_masks[i]:input_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+        feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
