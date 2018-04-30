@@ -465,7 +465,7 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    REC = [8, 26, 20, 6]#[0, 32, 32, 0] #[10, 31, 28, 1]
+    REC = [20, 32, 32, 0]#[8, 26, 20, 6]#[0, 32, 32, 0] #[10, 31, 28, 1]
     mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
     fill_region = mgen.gen(1)[0]
     #
@@ -478,10 +478,10 @@ with tf.Session(config=config) as sess:
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     # visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
 
-    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_masked.png", layout=[8,8])
+    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_masked_mouth.png", layout=[8,8])
 
     sample_x = generate_samples(sess, data, fill_region=fill_region)
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/mask_recons.png", layout=[8,8])
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/mask_recons_mouth.png", layout=[8,8])
 
 
     # img = []
