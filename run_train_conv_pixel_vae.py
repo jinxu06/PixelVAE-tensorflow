@@ -203,25 +203,27 @@ cfg.update({
     "nonlinearity": "elu",
 })
 
-#################
 
-## MMD (Masking)
 cfg = cfg_default
 cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
-    "z_dim": 24,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large1_elu_8",
-    "beta": 8e5,
+    "z_dim": 32,
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu_5",
+    "beta": 5e5,
     "reg": "mmd",
     "use_mode": "train",
     "mask_type": "full",
     "batch_size": 64,
-    "network_size": "large1",
+    "network_size": "medium",
     "masked": False,
     "nonlinearity": "elu",
-    "use_input_masks": True,
+    "use_input_masks": False,
 })
+
+#################
+
+## MMD (Masking)
 
 ## KLD
 
@@ -514,7 +516,8 @@ with tf.Session(config=config) as sess:
     # print('restoring parameters from', ckpt_file)
     # saver1.restore(sess, ckpt_file)
 
-    fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
+    # fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
+    fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0).gen(1)[0]
 
     max_num_epoch = 200
     for epoch in range(max_num_epoch+1):
