@@ -189,11 +189,7 @@ cfg.update({
     "use_input_masks": True,
 })
 
-
 cfg['sample_range'] = 1.0
-
-
-
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -265,7 +261,7 @@ input_masks = [None for i in range(args.nr_gpu)]
 input_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=1./16, max_ratio=.75)
 #input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[8, 31, 18, 1])
 #input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[20, 31, 32, 1])
-input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[31, 31, 32, 1])
+input_test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.)
 
 if "use_input_masks" in cfg and cfg["use_input_masks"]:
     input_masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
