@@ -445,6 +445,8 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
+    if input_masks[0] is not None:
+        feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
     z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
@@ -455,8 +457,7 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
 
     if masks[0] is not None:
         feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
-    if input_masks[0] is not None:
-        feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
@@ -482,6 +483,8 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
+    if input_masks[0] is not None:
+        feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
     z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
@@ -495,8 +498,7 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
 
     if masks[0] is not None:
         feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
-    if input_masks[0] is not None:
-        feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
@@ -509,7 +511,6 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
                 for i in range(args.nr_gpu):
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)[:num_instances]
-
 
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
