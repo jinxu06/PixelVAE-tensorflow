@@ -190,7 +190,7 @@ cfg.update({
 })
 
 
-cfg['sample_range'] = 1.0
+cfg['sample_range'] = 3.0
 
 
 
