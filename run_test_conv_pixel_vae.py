@@ -470,7 +470,7 @@ with tf.Session(config=config) as sess:
     #
     fill_region = RectangleMaskGenerator(args.img_size, args.img_size, rec=[20, 31, 32, 1]).gen(1)[0]
     data = next(test_data)
-    data *= broadcast_masks_np(fill_region, 3, data.shape[0]).astype(np.uint8)
+    #data *= broadcast_masks_np(fill_region, 3, data.shape[0]).astype(np.uint8)
 
 
     test_data.reset()
