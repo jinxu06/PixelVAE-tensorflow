@@ -176,20 +176,21 @@ cfg = cfg_default
 cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
-    "z_dim": 24,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large1_elu_7",
-    "beta": 7e5,
+    "z_dim": 32,
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu_5",
+    "beta": 5e5,
     "reg": "mmd",
     "use_mode": "test",
     "mask_type": "full",
-    "batch_size": 84,
-    "network_size": "large1",
+    "batch_size": 64,
+    "network_size": "medium",
     "masked": False,
     "nonlinearity": "elu",
+    "use_input_masks": True,
 })
 
 
-cfg['sample_range'] = 2.0
+cfg['sample_range'] = 1.0
 
 
 
@@ -260,6 +261,12 @@ else:
     test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.)
 
 
+input_masks = [None for i in range(args.nr_gpu)]
+input_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=1./16, max_ratio=.75)
+input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[8, 31, 18, 1])
+if "use_input_masks" in cfg and cfg["use_input_masks"]:
+    input_masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
+
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
@@ -289,7 +296,7 @@ model = tf.make_template('model', ConvPixelVAE.build_graph)
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], **model_opt)
+        model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], input_masks=input_masks[i], **model_opt)
 
 if args.use_mode == 'train':
     if "masked" in cfg and cfg['masked']:
@@ -319,6 +326,9 @@ if args.use_mode == 'train':
         elif args.reg=='tc-dwmmd':
             record_dict['tc reg'] = tf.add_n([v.tc for v in pvaes]) / args.nr_gpu
             record_dict['dwmmd'] = tf.add_n([v.dwmmd for v in pvaes]) / args.nr_gpu
+        elif args.reg=='mmd-tc':
+            record_dict['mmd'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
+            record_dict['tc'] = tf.add_n([v.tc for v in pvaes]) / args.nr_gpu
         else:
             raise Exception("unknown reg type")
         recorder = Recorder(dict=record_dict, config_str=str(json.dumps(vars(args), indent=4, separators=(',',':'))), log_file=args.save_dir+"/log_file")
@@ -337,6 +347,8 @@ def make_feed_dict(data, is_training=True, dropout_p=0.5, mgen=None):
     feed_dict.update({ x_bars[i]:ds[i] for i in range(args.nr_gpu) })
     if masks[0] is not None:
         feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+    if input_masks[0] is not None:
+        feed_dict.update({input_masks[i]:input_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
     return feed_dict
 
 def sample_from_model(sess, data, fill_region=None, mgen=None):
@@ -349,6 +361,8 @@ def sample_from_model(sess, data, fill_region=None, mgen=None):
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     if masks[0] is not None:
         feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+    if input_masks[0] is not None:
+        feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
@@ -379,6 +393,8 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
 
     if masks[0] is not None:
         feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+    if input_masks[0] is not None:
+        feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
@@ -408,8 +424,6 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = z_mu.copy() # np.random.normal(loc=z_mu, scale=z_sigma)
-
-
     for i in range(z.shape[0]):
         z[i] = z[0].copy()
     for i in range(args.z_dim):
@@ -419,6 +433,8 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
 
     if masks[0] is not None:
         feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+    if input_masks[0] is not None:
+        feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
@@ -433,6 +449,7 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
     return np.concatenate(x_gen, axis=0)[:num_instances]
 
 
+
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
 
@@ -441,6 +458,8 @@ config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
 
     sess.run(initializer)
+
+
 
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
@@ -454,18 +473,19 @@ with tf.Session(config=config) as sess:
     test_data.reset()
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
-    #
-    # mgen = None
-    # sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=mgen)
-    # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/show_mask_4.png", layout=[8,8])
 
-    img = []
-    for i in [2,3,30]: #[2, 3, 5, 40, 55]:
-        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region)
-        view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
-        img.append(view.copy())
-    img = np.concatenate(img, axis=1)
-    from PIL import Image
-    img = img.astype(np.uint8)
-    img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_elu7_eye_completion.png")
+    fill_region = input_test_mgen.gen(1)[0]
+    sample_x = generate_samples(sess, data, fill_region=fill_region)
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/mask_recons.png", layout=[8,8])
+
+
+    # img = []
+    # for i in [2,3,30]: #[2, 3, 5, 40, 55]:
+    #     sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region)
+    #     view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
+    #     img.append(view.copy())
+    # img = np.concatenate(img, axis=1)
+    # from PIL import Image
+    # img = img.astype(np.uint8)
+    # img = Image.fromarray(img, 'RGB')
+    # img.save("/data/ziz/jxu/gpu-results/show_pvae_elu7_eye_completion.png")
