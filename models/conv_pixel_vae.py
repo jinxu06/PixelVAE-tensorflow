@@ -6,7 +6,7 @@ from blocks.layers import conv2d, deconv2d, dense
 from blocks.samplers import gaussian_sampler, mix_logistic_sampler
 from blocks.estimators import estimate_mi_tc_dwkld, estimate_mmd, compute_gaussian_kld
 from blocks.losses import mix_logistic_loss
-from blocks.helpers import int_shape
+from blocks.helpers import int_shape, broadcast_masks_tf
 from blocks.components import conv_encoder_64_medium, conv_decoder_64_medium, conv_encoder_32_medium, conv_decoder_32_medium, conv_encoder_32_large, conv_decoder_32_large, conv_encoder_32_large1, conv_decoder_32_large1
 from blocks.components import cond_pixel_cnn, context_encoder
 
