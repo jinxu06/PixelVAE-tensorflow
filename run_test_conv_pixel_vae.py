@@ -261,7 +261,7 @@ input_masks = [None for i in range(args.nr_gpu)]
 input_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=1./16, max_ratio=.75)
 #input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[8, 31, 18, 1])
 #input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[20, 31, 32, 1])
-input_test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.)
+input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[20, 31, 32, 1])
 
 if "use_input_masks" in cfg and cfg["use_input_masks"]:
     input_masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
@@ -477,10 +477,10 @@ with tf.Session(config=config) as sess:
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     # visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
 
-    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_masked_mouth_1.png", layout=[8,8])
+    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_masked_mouth.png", layout=[8,8])
 
     sample_x = generate_samples(sess, data, fill_region=fill_region)
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/mask_recons_mouth_1.png", layout=[8,8])
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/mask_recons_mouth.png", layout=[8,8])
 
 
     # img = []
