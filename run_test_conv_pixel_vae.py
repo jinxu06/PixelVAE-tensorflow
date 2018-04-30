@@ -471,7 +471,7 @@ with tf.Session(config=config) as sess:
     #
     fill_region = input_test_mgen.gen(1)[0]
     data = next(test_data)
-    data *= broadcast_masks_np(fill_region, 3, data.shape[0])
+    data *= broadcast_masks_np(fill_region, 3, data.shape[0]).astype(np.uint8)
 
 
     test_data.reset()
