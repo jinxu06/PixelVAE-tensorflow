@@ -5,7 +5,7 @@ import argparse
 import time
 import numpy as np
 import tensorflow as tf
-from blocks.helpers import Recorder, visualize_samples, get_nonlinearity, int_shape, get_trainable_variables
+from blocks.helpers import Recorder, visualize_samples, get_nonlinearity, int_shape, get_trainable_variables, broadcast_masks_tf
 from blocks.optimizers import adam_updates
 import data.load_data as load_data
 from models.conv_pixel_vae import ConvPixelVAE
