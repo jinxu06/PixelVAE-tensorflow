@@ -476,8 +476,8 @@ with tf.Session(config=config) as sess:
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
 
 
-    sample_x = generate_samples(sess, data, fill_region=fill_region)
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/mask_recons_mouth.png", layout=[8,8])
+    # sample_x = generate_samples(sess, data, fill_region=fill_region)
+    # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/mask_recons_mouth.png", layout=[8,8])
 
     img = []
     for i in [2,3,30]: #[2, 3, 5, 40, 55]:
