@@ -477,7 +477,7 @@ with tf.Session(config=config) as sess:
     vdata *= broadcast_masks_np(fill_region, 3, vdata.shape[0])
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_masked.png", layout=[8,8])
 
-    sample_x = generate_samples(sess, data, fill_region=fill_region)
+    sample_x = generate_samples(sess, vdata, fill_region=fill_region)
     visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/mask_recons.png", layout=[8,8])
 
 
