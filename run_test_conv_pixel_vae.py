@@ -469,15 +469,18 @@ with tf.Session(config=config) as sess:
     mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
     fill_region = mgen.gen(1)[0]
     #
+    fill_region = input_test_mgen.gen(1)[0]
     data = next(test_data)
+    data *= broadcast_masks_np(fill_region, 3, data.shape[0])
+
+
     test_data.reset()
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     # visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
-    fill_region = input_test_mgen.gen(1)[0]
-    vdata *= broadcast_masks_np(fill_region, 3, vdata.shape[0])
+
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_masked.png", layout=[8,8])
 
-    sample_x = generate_samples(sess, vdata, fill_region=fill_region)
+    sample_x = generate_samples(sess, data, fill_region=fill_region)
     visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/mask_recons.png", layout=[8,8])
 
 
