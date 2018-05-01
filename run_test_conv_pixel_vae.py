@@ -182,7 +182,7 @@ cfg.update({
     "reg": "mmd",
     "use_mode": "test",
     "mask_type": "full",
-    "batch_size": 64,
+    "batch_size": 104,
     "network_size": "medium",
     "masked": False,
     "nonlinearity": "elu",
