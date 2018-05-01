@@ -189,39 +189,39 @@ cfg.update({
     "use_input_masks": True,
 })
 
-cfg = cfg_default
-cfg.update({
-    "img_size": 32,
-    "data_set": "celeba32",
-    "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1_elu_5",
-    "beta": 5e5,
-    "reg": "mmd",
-    "use_mode": "test",
-    "mask_type": "full",
-    "batch_size": 104,
-    "network_size": "large1",
-    "masked": False,
-    "nonlinearity": "elu",
-    "use_input_masks": True,
-})
-
-cfg = cfg_default
-cfg.update({
-    "img_size": 32,
-    "data_set": "celeba32",
-    "z_dim": 24,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large1_elu_5_mask",
-    "beta": 5e5,
-    "reg": "mmd",
-    "use_mode": "test",
-    "mask_type": "full",
-    "batch_size": 104,
-    "network_size": "large1",
-    "masked": False,
-    "nonlinearity": "elu",
-    "use_input_masks": True,
-})
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 32,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_large1_elu_5",
+#     "beta": 5e5,
+#     "reg": "mmd",
+#     "use_mode": "test",
+#     "mask_type": "full",
+#     "batch_size": 104,
+#     "network_size": "large1",
+#     "masked": False,
+#     "nonlinearity": "elu",
+#     "use_input_masks": True,
+# })
+#
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 24,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z24_mmd_large1_elu_5_mask",
+#     "beta": 5e5,
+#     "reg": "mmd",
+#     "use_mode": "test",
+#     "mask_type": "full",
+#     "batch_size": 104,
+#     "network_size": "large1",
+#     "masked": False,
+#     "nonlinearity": "elu",
+#     "use_input_masks": True,
+# })
 
 cfg['sample_range'] = 1.0
 
@@ -295,7 +295,7 @@ input_masks = [None for i in range(args.nr_gpu)]
 input_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=1./16, max_ratio=.75)
 #input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[8, 31, 18, 1])
 #input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[20, 31, 32, 1])
-input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[20, 31, 32, 1])
+input_test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.) 
 
 #CenterMaskGenerator(args.img_size, args.img_size, ratio=0.) #RectangleMaskGenerator(args.img_size, args.img_size, rec=[20, 31, 32, 1])
 
@@ -524,4 +524,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_mask_mouth_masked_2.png")
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_mask_mouth_unmasked.png")
