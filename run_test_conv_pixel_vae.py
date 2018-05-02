@@ -312,7 +312,7 @@ input_masks = [None for i in range(args.nr_gpu)]
 input_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=1./16, max_ratio=.75)
 #input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[8, 31, 18, 1])
 #input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[20, 31, 32, 1])
-input_test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.)
+input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[20, 31, 32, 1])
 
 #CenterMaskGenerator(args.img_size, args.img_size, ratio=0.) #RectangleMaskGenerator(args.img_size, args.img_size, rec=[20, 31, 32, 1])
 
