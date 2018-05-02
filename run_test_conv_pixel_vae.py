@@ -543,9 +543,10 @@ with tf.Session(config=config) as sess:
 
 
     sample_x = generate_samples(sess, data, fill_region=fill_region)
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/generate_mouth_noise_unmask.png", layout=[8,8])
+    # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/generate_mouth_noise_unmask.png", layout=[8,8])
 
-    quit()
+    data = np.rint(sample_x * 127.5 + 127.5)
+
 
     img = []
     for i in [2,3,30]: #[2, 3, 5, 40, 55]:
@@ -556,4 +557,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_mask_mouth_noise_unmask.png")
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_mask_mouth_noise_masked.png")
