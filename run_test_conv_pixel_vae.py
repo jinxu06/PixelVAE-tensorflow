@@ -327,7 +327,8 @@ else:
 
 input_masks = [None for i in range(args.nr_gpu)]
 input_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=1./16, max_ratio=.75)
-input_test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.)
+input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[20, 31, 32, 1])
+# CenterMaskGenerator(args.img_size, args.img_size, ratio=0.)
 # RectangleMaskGenerator(args.img_size, args.img_size, rec=[20, 31, 32, 1])
 
 if "use_input_masks" in cfg and cfg["use_input_masks"]:
@@ -541,8 +542,10 @@ with tf.Session(config=config) as sess:
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
 
 
-    # sample_x = generate_samples(sess, data, fill_region=fill_region)
-    # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/mask_recons_mouth.png", layout=[8,8])
+    sample_x = generate_samples(sess, data, fill_region=fill_region)
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/generate_mouth_noise_unmask.png", layout=[8,8])
+
+    quit()
 
     img = []
     for i in [2,3,30]: #[2, 3, 5, 40, 55]:
