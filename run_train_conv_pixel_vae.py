@@ -494,9 +494,6 @@ if args.use_mode == 'train':
         all_params = get_trainable_variables(["conv_pixel_cnn", "context_encoder"])
     elif 'pixelvae' in cfg['phase']:
         all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
-    for p in all_params:
-        print(p.name)
-    quit()
     grads = []
     for i in range(args.nr_gpu):
         with tf.device('/gpu:%d' % i):
