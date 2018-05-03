@@ -362,7 +362,7 @@ cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
     "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/temp",
+    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise_inpainting",
     "beta": 5e5,
     "reg": "mmd",
     "use_mode": "train",
@@ -434,7 +434,8 @@ if args.mask_type=="none":
 else:
     masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
     if args.mask_type=="random rec":
-        train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.125, max_ratio=1.0)
+        train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=1./16, max_ratio=.75)
+        # RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.125, max_ratio=1.0)
     elif args.mask_type=="full":
         train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
     elif args.mask_type=="center rec":
