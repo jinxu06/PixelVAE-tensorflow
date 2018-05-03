@@ -327,10 +327,10 @@ else:
 
 input_masks = [None for i in range(args.nr_gpu)]
 input_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=1./16, max_ratio=.75)
-input_test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.)
+input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[9, 27, 21, 5])
 # CenterMaskGenerator(args.img_size, args.img_size, ratio=0.)
 # RectangleMaskGenerator(args.img_size, args.img_size, rec=[22, 28, 32, 4])
-# RectangleMaskGenerator(args.img_size, args.img_size, rec=[11, 25, 21, 7])
+# RectangleMaskGenerator(args.img_size, args.img_size, rec=[9, 27, 21, 5])
 
 if "use_input_masks" in cfg and cfg["use_input_masks"]:
     input_masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
@@ -535,9 +535,9 @@ with tf.Session(config=config) as sess:
     mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
     fill_region = mgen.gen(1)[0]
     #
-    fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0).gen(1)[0]
+    fill_region = RectangleMaskGenerator(args.img_size, args.img_size, rec=[9, 27, 21, 5]).gen(1)[0]
     # RectangleMaskGenerator(args.img_size, args.img_size, rec=[22, 28, 32, 4])
-    # RectangleMaskGenerator(args.img_size, args.img_size, rec=[11, 25, 21, 7])
+    # RectangleMaskGenerator(args.img_size, args.img_size, rec=[9, 27, 21, 5])
     data = next(test_data)
 
     test_data.reset()
@@ -560,4 +560,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_mask_mouth_noise_temp_all.png")
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_mask_mouth_noise_temp_eye.png")
