@@ -257,6 +257,24 @@ cfg.update({
     "use_input_masks": True,
 })
 
+cfg = cfg_default
+cfg.update({
+    "img_size": 32,
+    "data_set": "svhn",
+    "data_dir": "/data/ziz/not-backed-up/jxu/SVHN",
+    "z_dim": 32,
+    "save_dir": "/data/ziz/jxu/models/pvae_svhn_z32_mmd_medium_elu5_noise",
+    "beta": 5e5,
+    "reg": "mmd",
+    "use_mode": "test",
+    "mask_type": "full",
+    "batch_size": 64,
+    "network_size": "medium",
+    "masked": False,
+    "nonlinearity": "elu",
+    "use_input_masks": True,
+})
+
 cfg['sample_range'] = 1.0
 
 
@@ -298,7 +316,10 @@ if not os.path.exists(args.save_dir):
 
 tf.set_random_seed(args.seed)
 batch_size = args.batch_size * args.nr_gpu
-data_set = load_data.CelebA(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
+if 'celeba' in args.data_set:
+    data_set = load_data.CelebA(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
+elif 'svhn' in args.data_set:
+    data_set = load_data.SVHN(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
 if args.debug:
     train_data = data_set.train(shuffle=True, limit=batch_size*2)
     eval_data = data_set.train(shuffle=True, limit=batch_size*2)
@@ -327,12 +348,8 @@ else:
 
 input_masks = [None for i in range(args.nr_gpu)]
 input_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=1./16, max_ratio=.75)
-input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[0, 32, 10, 0])
-# CenterMaskGenerator(args.img_size, args.img_size, ratio=0.)
-# RectangleMaskGenerator(args.img_size, args.img_size, rec=[22, 28, 32, 4])
-# RectangleMaskGenerator(args.img_size, args.img_size, rec=[9, 27, 21, 5])
-# RectangleMaskGenerator(args.img_size, args.img_size, rec=[0, 32, 10, 0])
-
+input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[9, 27, 21, 5])
+#RectangleMaskGenerator(args.img_size, args.img_size, rec=[8, 31, 18, 1])
 if "use_input_masks" in cfg and cfg["use_input_masks"]:
     input_masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
 
@@ -536,7 +553,7 @@ with tf.Session(config=config) as sess:
     mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
     fill_region = mgen.gen(1)[0]
     #
-    fill_region = RectangleMaskGenerator(args.img_size, args.img_size, rec=[0, 32, 10, 0]).gen(1)[0]
+    fill_region = RectangleMaskGenerator(args.img_size, args.img_size, rec=[9, 27, 21, 5]).gen(1)[0]
     # RectangleMaskGenerator(args.img_size, args.img_size, rec=[22, 28, 32, 4])
     # RectangleMaskGenerator(args.img_size, args.img_size, rec=[9, 27, 21, 5])
     # RectangleMaskGenerator(args.img_size, args.img_size, rec=[0, 32, 10, 0])
@@ -555,11 +572,11 @@ with tf.Session(config=config) as sess:
 
     img = []
     for i in [2,3,35]: #[2, 3, 5, 40, 55]:
-        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region)
+        sample_x = latent_traversal(sess, data[i], traversal_range=[-3, 3], num_traversal_step=2, fill_region=fill_region)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_mask_mouth_noise_temp_hair.png")
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_mask_mouth_temp.png")
