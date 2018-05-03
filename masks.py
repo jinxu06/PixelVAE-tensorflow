@@ -84,7 +84,7 @@ def get_generator(name, size):
     elif name=='hair':
         return RectangleMaskGenerator(size, size, rec=[0, 32, 10, 0])
     elif name=='random rec':
-        return RandomRectangleMaskGenerator(size, size, min_ratio=1./8, max_ratio=(1-1./8))
+        return RandomRectangleMaskGenerator(size, size, min_ratio=1./8, max_ratio=(1.-1./8))
 
 
 
