@@ -78,13 +78,13 @@ def get_generator(name, size):
     elif name=='center':
         return CenterMaskGenerator(size, size, ratio=0.5)
     elif name=='eye':
-        return RectangleMaskGenerator(args.img_size, args.img_size, rec=[9, 27, 21, 5])
+        return RectangleMaskGenerator(size, size, rec=[9, 27, 21, 5])
     elif name=='mouth':
-        return RectangleMaskGenerator(args.img_size, args.img_size, rec=[22, 28, 32, 4])
+        return RectangleMaskGenerator(size, size, rec=[22, 28, 32, 4])
     elif name=='hair':
-        return RectangleMaskGenerator(args.img_size, args.img_size, rec=[0, 32, 10, 0])
+        return RectangleMaskGenerator(size, size, rec=[0, 32, 10, 0])
     elif name=='random rec':
-        return RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=1./8, max_ratio=(1-1./8))
+        return RandomRectangleMaskGenerator(size, size, min_ratio=1./8, max_ratio=(1-1./8))
 
 
 
