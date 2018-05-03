@@ -459,7 +459,7 @@ def make_feed_dict(data, is_training=True, dropout_p=0.5, mgen=None):
     feed_dict.update({ x_bars[i]:ds[i] for i in range(args.nr_gpu) })
     if masks[0] is not None:
         masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
-        feed_dict.update({masks[i]:masks_np[-1] for i in range(args.nr_gpu)})
+        feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
     if input_masks[0] is not None:
         if 'context' in cfg['phase']:
             feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
@@ -477,7 +477,7 @@ def sample_from_model(sess, data, fill_region=None, mgen=None):
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     if masks[0] is not None:
         masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
-        feed_dict.update({masks[i]:masks_np[-1] for i in range(args.nr_gpu)})
+        feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
     if input_masks[0] is not None:
         if 'context' in cfg['phase']:
             feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
@@ -505,7 +505,7 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
     feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
     if masks[0] is not None:
         masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
-        feed_dict.update({masks[i]:masks_np[-1] for i in range(args.nr_gpu)})
+        feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
 
     if input_masks[0] is not None:
         if 'context' in cfg['phase']:
@@ -546,7 +546,7 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
     feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
     if masks[0] is not None:
         masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
-        feed_dict.update({masks[i]:masks_np[-1] for i in range(args.nr_gpu)})
+        feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
     if input_masks[0] is not None:
         if 'context' in cfg['phase']:
             feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
@@ -611,7 +611,7 @@ with tf.Session(config=config) as sess:
 
     img = []
     for i in [2,3,35]: #[2, 3, 5, 40, 55]:
-        sample_x = latent_traversal(sess, data[i], traversal_range=[-3, 3], num_traversal_step=2, fill_region=fill_region)
+        sample_x = latent_traversal(sess, data[i], traversal_range=[-5, 5], num_traversal_step=10, fill_region=fill_region)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
