@@ -9,7 +9,7 @@ from blocks.helpers import Recorder, visualize_samples, get_nonlinearity, int_sh
 from blocks.optimizers import adam_updates
 import data.load_data as load_data
 from models.conv_pixel_vae import ConvPixelVAE
-from masks import RandomRectangleMaskGenerator, RectangleMaskGenerator, CenterMaskGenerator
+from masks import RandomRectangleMaskGenerator, RectangleMaskGenerator, CenterMaskGenerator, get_generator
 
 parser = argparse.ArgumentParser()
 
@@ -311,7 +311,7 @@ cfg.update({
 })
 
 ## masked
-cfg = cfg_default
+cfg = cfg_default.copy()
 cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
@@ -338,7 +338,7 @@ cfg.update({
 
 ##################
 
-# cfg = cfg_default
+# cfg = cfg_default.copy()
 # cfg.update({
 #     "img_size": 32,
 #     "data_set": "svhn",
@@ -357,7 +357,7 @@ cfg.update({
 # })
 
 
-cfg = cfg_default
+cfg = cfg_default.copy()
 cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
@@ -434,26 +434,26 @@ if args.mask_type=="none":
 else:
     masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
     if args.mask_type=="random rec":
-        train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=1./16, max_ratio=.75)
-        # RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.125, max_ratio=1.0)
+        train_mgen = get_generator('random rec', args.img_size)
     elif args.mask_type=="full":
-        train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
-    elif args.mask_type=="center rec":
-        train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
-if "phase" in cfg and 'pixelvae' in cfg['phase']:
-    test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.)
-elif "phase" in cfg and 'context' in cfg['phase']:
-    test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
+        train_mgen = get_generator('full', args.img_size)
+    elif args.mask_type=="center":
+        train_mgen = get_generator('center', args.img_size)
+
+if 'pixelvae' in cfg['phase']:
+    test_mgen = get_generator('full', args.img_size)
+elif 'context' in cfg['phase']:
+    test_mgen = get_generator('center', args.img_size)
 else:
     raise Exception("unknown phase")
 
 
 input_masks = [None for i in range(args.nr_gpu)]
-if "phase" in cfg and 'mask' in cfg['phase']:
+if 'mask' in cfg['phase']:
     input_masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
     if 'pixelvae' in cfg['phase']:
-        input_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=1./16, max_ratio=.75)
-        input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[8, 31, 18, 1])
+        input_mgen = get_generator('random rec', args.img_size)
+        input_test_mgen = get_generator('eye', args.img_size)
     elif 'context' in cfg['phase']:
         input_mgen = train_mgen
         input_test_mgen = test_mgen
@@ -490,10 +490,13 @@ for i in range(args.nr_gpu):
         model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], input_masks=input_masks[i], **model_opt)
 
 if args.use_mode == 'train':
-    if "phase" in cfg and 'context' in cfg['phase']:
+    if 'context' in cfg['phase']:
         all_params = get_trainable_variables(["conv_pixel_cnn", "context_encoder"])
-    elif "phase" in cfg and 'pixelvae' in cfg['phase']:
+    elif 'pixelvae' in cfg['phase']:
         all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
+    for p in all_params:
+        print(p.name)
+    quit()
     grads = []
     for i in range(args.nr_gpu):
         with tf.device('/gpu:%d' % i):
@@ -668,7 +671,7 @@ with tf.Session(config=config) as sess:
         print('restoring parameters from', ckpt_file)
         saver.restore(sess, ckpt_file)
 
-    if 'phase' in cfg and 'context' in cfg['phase']:
+    if 'context' in cfg['phase']:
         # restore part of parameters
         var_list = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
         saver1 = tf.train.Saver(var_list=var_list)
@@ -676,8 +679,8 @@ with tf.Session(config=config) as sess:
         print('restoring parameters from', ckpt_file)
         saver1.restore(sess, ckpt_file)
 
-    # fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5).gen(1)[0]
-    fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0).gen(1)[0]
+    fill_region = get_generator('center', args.img_size).gen(1)[0]
+    # fill_region = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0).gen(1)[0]
 
     max_num_epoch = 200
     for epoch in range(max_num_epoch+1):
