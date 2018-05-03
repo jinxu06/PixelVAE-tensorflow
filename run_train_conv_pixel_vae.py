@@ -342,6 +342,7 @@ cfg = cfg_default
 cfg.update({
     "img_size": 32,
     "data_set": "svhn",
+    "data_dir": "/data/ziz/not-backed-up/jxu/SVHN",
     "z_dim": 32,
     "save_dir": "/data/ziz/jxu/models/pvae_svhn_z32_mmd_medium_elu5_noise",
     "beta": 5e5,
