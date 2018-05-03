@@ -310,24 +310,6 @@ cfg.update({
     "use_input_masks": True,
 })
 
-## masked
-cfg = cfg_default
-cfg.update({
-    "img_size": 32,
-    "data_set": "celeba32",
-    "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise_masked",
-    "beta": 5e5,
-    "reg": "mmd",
-    "use_mode": "train",
-    "mask_type": "full",
-    "batch_size": 64,
-    "network_size": "medium",
-    "masked": True,
-    "nonlinearity": "elu",
-    "use_input_masks": True,
-})
-
 ## KLD
 
 ## TC
@@ -337,23 +319,6 @@ cfg.update({
 # -MI --- distribution of means and stds
 
 ##################
-
-cfg = cfg_default
-cfg.update({
-    "img_size": 32,
-    "data_set": "svhn",
-    "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_svhn_z32_mmd_medium_elu5_noise",
-    "beta": 5e5,
-    "reg": "mmd",
-    "use_mode": "train",
-    "mask_type": "full",
-    "batch_size": 64,
-    "network_size": "medium",
-    "masked": False,
-    "nonlinearity": "elu",
-    "use_input_masks": True,
-})
 
 
 
@@ -399,10 +364,7 @@ if not os.path.exists(args.save_dir):
 
 tf.set_random_seed(args.seed)
 batch_size = args.batch_size * args.nr_gpu
-if 'celeba' in args.data_set:
-    data_set = load_data.CelebA(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
-elif 'svhn' in args.data_set:
-    data_set = load_data.SVHN(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
+data_set = load_data.CelebA(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
 if args.debug:
     train_data = data_set.train(shuffle=True, limit=batch_size*2)
     eval_data = data_set.train(shuffle=True, limit=batch_size*2)
