@@ -280,6 +280,7 @@ cfg = cfg_default
 cfg.update({
     "img_size": 32,
     "data_set": "celeba32",
+    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
     "z_dim": 32,
     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise_inpainting",
     "beta": 5e5,
