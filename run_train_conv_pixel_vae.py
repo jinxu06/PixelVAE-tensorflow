@@ -539,6 +539,8 @@ def make_feed_dict(data, is_training=True, dropout_p=0.5, mgen=None):
     if masks[0] is not None:
         masks_np.append(mgen.gen(args.batch_size))
         feed_dict.update({masks[i]:masks_np[-1] for i in range(args.nr_gpu)})
+    print(masks)
+    print(masks_np)
     if input_masks[0] is not None:
         if 'context' in cfg['phase']:
             feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
