@@ -357,21 +357,39 @@ cfg.update({
 # })
 
 
+# cfg = cfg_default.copy()
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "z_dim": 32,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise_inpainting",
+#     "beta": 5e5,
+#     "reg": "mmd",
+#     "use_mode": "train",
+#     "mask_type": "random rec",
+#     "batch_size": 64,
+#     "network_size": "medium",
+#     "nonlinearity": "elu",
+#     "phase": "context-mask", # "pixelvae", "pixelvae-mask", "context", "context-mask"
+#     "load_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise",
+# })
+
 cfg = cfg_default.copy()
 cfg.update({
     "img_size": 32,
-    "data_set": "celeba32",
+    "data_set": "svhn",
+    "data_dir": "/data/ziz/not-backed-up/jxu/SVHN",
     "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise_inpainting",
+    "save_dir": "/data/ziz/jxu/models/pvae_svhn_z32_mmd_medium_elu5_noise",
     "beta": 5e5,
     "reg": "mmd",
     "use_mode": "train",
-    "mask_type": "random rec",
+    "mask_type": "full",
     "batch_size": 64,
     "network_size": "medium",
     "nonlinearity": "elu",
-    "phase": "context-mask", # "pixelvae", "pixelvae-mask", "context", "context-mask"
-    "load_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise",
+    "phase": "pixelvae-mask", # "pixelvae", "pixelvae-mask", "context", "context-mask"
+    #"load_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise",
 })
 
 
