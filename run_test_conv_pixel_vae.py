@@ -534,7 +534,7 @@ with tf.Session(config=config) as sess:
     mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=REC)
     fill_region = mgen.gen(1)[0]
     #
-    fill_region = RectangleMaskGenerator(args.img_size, args.img_size, rec=[20, 31, 32, 1]).gen(1)[0]
+    fill_region = RectangleMaskGenerator(args.img_size, args.img_size, rec=[22, 28, 32, 4]).gen(1)[0]
     data = next(test_data)
 
     test_data.reset()
@@ -557,4 +557,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_mask_mouth_noise_temp_1.png")
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_mask_mouth_noise_temp_2.png")

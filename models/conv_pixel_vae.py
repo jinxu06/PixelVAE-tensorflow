@@ -60,8 +60,8 @@ class ConvPixelVAE(object):
         with arg_scope([conv_encoder, conv_decoder, context_encoder, cond_pixel_cnn], nonlinearity=self.nonlinearity, bn=self.bn, kernel_initializer=self.kernel_initializer, kernel_regularizer=self.kernel_regularizer, is_training=self.is_training, counters=self.counters):
             inputs = self.x
             if self.input_masks is not None:
-                inputs = inputs #* broadcast_masks_tf(self.input_masks, num_channels=3)
-                #inputs += tf.random_uniform(int_shape(inputs), -1, 1) * (1-broadcast_masks_tf(self.input_masks, num_channels=3))
+                inputs = inputs * broadcast_masks_tf(self.input_masks, num_channels=3)
+                inputs += tf.random_uniform(int_shape(inputs), -1, 1) * (1-broadcast_masks_tf(self.input_masks, num_channels=3))
                 inputs = tf.concat([inputs, broadcast_masks_tf(self.input_masks, num_channels=1)], axis=-1)
             self.z_mu, self.z_log_sigma_sq = conv_encoder(inputs, self.z_dim)
             sigma = tf.exp(self.z_log_sigma_sq / 2.)
