@@ -370,7 +370,7 @@ cfg.update({
     "batch_size": 64,
     "network_size": "medium",
     "nonlinearity": "elu",
-    "phase": "pixelvae-mask", # "pixelvae", "pixelvae-mask", "context", "context-mask"
+    "phase": "context-mask", # "pixelvae", "pixelvae-mask", "context", "context-mask"
     "load_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise",
 })
 
