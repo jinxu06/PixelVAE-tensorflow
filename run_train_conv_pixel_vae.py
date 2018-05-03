@@ -366,7 +366,7 @@ cfg.update({
     "beta": 5e5,
     "reg": "mmd",
     "use_mode": "train",
-    "mask_type": "full",
+    "mask_type": "random rec",
     "batch_size": 64,
     "network_size": "medium",
     "nonlinearity": "elu",
