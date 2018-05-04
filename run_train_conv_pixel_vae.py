@@ -173,13 +173,13 @@ cfg_default = {
 # config = {"nonlinearity": "elu"}
 # cfg = get_config(config=config, name=None, suffix="_double_check", load_dir=None, dataset='celeba', size=32, mode='train', phase='ce', use_mask_for="input output")
 
-# kld
-config = {"nonlinearity": "elu", "nr_resnet":1, "reg":'kld', "beta":1.0}
-cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
-
-# # tc
-# config = {"nonlinearity": "elu", "nr_resnet":1, "reg":"tc", "beta":5.0}
+# # kld
+# config = {"nonlinearity": "elu", "nr_resnet":1, "reg":'kld', "beta":1.0}
 # cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
+
+# tc
+config = {"nonlinearity": "elu", "nr_resnet":1, "reg":"tc", "beta":5.0}
+cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
 
 
 
