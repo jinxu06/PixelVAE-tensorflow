@@ -395,9 +395,8 @@ cfg.update({
 
 
 
-config = {}
+config = {"nonlinearity": "elu"}
 cfg = get_config(config=config, name="temp", suffix="", load_dir="", dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
-quit()
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
 # data I/O
