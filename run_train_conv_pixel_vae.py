@@ -242,7 +242,7 @@ dropout_ps = [tf.placeholder(tf.float32, shape=()) for i in range(args.nr_gpu)]
 
 pvaes = [ConvPixelVAE(counters={}) for i in range(args.nr_gpu)]
 model_opt = {
-    "mode": args.mode,
+    "use_mode": args.mode,
     "z_dim": args.z_dim,
     "reg": args.reg,
     "beta": args.beta,
