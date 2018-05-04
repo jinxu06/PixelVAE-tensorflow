@@ -420,7 +420,6 @@ parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to us
 # new features
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
 parser.add_argument('-um', '--use_mode', type=str, default=cfg['use_mode'], help='')
-parser.add_argument('-mt', '--mask_type', type=str, default=cfg['mask_type'], help='')
 
 args = parser.parse_args()
 if args.use_mode == 'test':
