@@ -9,7 +9,7 @@ from blocks.helpers import Recorder, visualize_samples, get_nonlinearity, int_sh
 from blocks.optimizers import adam_updates
 import data.load_data as load_data
 from models.conv_pixel_vae import ConvPixelVAE
-from masks import RandomRectangleMaskGenerator, RectangleMaskGenerator, CenterMaskGenerator
+from masks import RandomRectangleMaskGenerator, RectangleMaskGenerator, CenterMaskGenerator, get_generator
 
 parser = argparse.ArgumentParser()
 
