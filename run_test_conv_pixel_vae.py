@@ -49,7 +49,7 @@ cfg.update({
 
 
 
-cfg['sample_range'] = 1.0
+cfg['sample_range'] = 3.0
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -375,4 +375,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_mask_hair_temp.png")
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_mask_hair_temp_3.0.png")
