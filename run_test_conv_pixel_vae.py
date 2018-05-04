@@ -29,22 +29,40 @@ cfg_default = {
 }
 
 
-cfg = cfg_default
+# cfg = cfg_default
+# cfg.update({
+#     "img_size": 32,
+#     "data_set": "celeba32",
+#     "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+#     "z_dim": 32,
+#     "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise_inpainting",
+#     "beta": 5e5,
+#     "reg": "mmd",
+#     "use_mode": "test",
+#     "mask_type": "random rec",
+#     "batch_size": 64,
+#     "network_size": "medium",
+#     "nonlinearity": "elu",
+#     "phase": "context-mask", # "pixelvae", "pixelvae-mask", "context", "context-mask"
+#     "load_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise",
+# })
+
+cfg = cfg_default.copy()
 cfg.update({
     "img_size": 32,
-    "data_set": "celeba32",
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
+    "data_set": "svhn",
+    "data_dir": "/data/ziz/not-backed-up/jxu/SVHN",
     "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise_inpainting",
+    "save_dir": "/data/ziz/jxu/models/pvae_svhn_z32_mmd_medium_elu5_noise",
     "beta": 5e5,
     "reg": "mmd",
     "use_mode": "test",
-    "mask_type": "random rec",
-    "batch_size": 64,
+    "mask_type": "full",
+    "batch_size": 104,
     "network_size": "medium",
     "nonlinearity": "elu",
-    "phase": "context-mask", # "pixelvae", "pixelvae-mask", "context", "context-mask"
-    "load_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise",
+    "phase": "pixelvae-mask", # "pixelvae", "pixelvae-mask", "context", "context-mask"
+    #"load_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise",
 })
 
 cfg['sample_range'] = 1.0
@@ -126,7 +144,8 @@ if 'mask' in cfg['phase']:
     input_masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
     if 'pixelvae' in cfg['phase']:
         input_mgen = get_generator('random rec', args.img_size)
-        input_test_mgen = get_generator('eye', args.img_size)
+        # input_test_mgen = get_generator('eye', args.img_size)
+        input_test_mgen = get_generator('transparent', args.img_size)
     elif 'context' in cfg['phase']:
         input_mgen = train_mgen
         input_test_mgen = test_mgen
@@ -341,7 +360,7 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    fill_region = RectangleMaskGenerator(args.img_size, args.img_size, rec=[9, 27, 21, 5]).gen(1)[0]
+    fill_region = get_generator('full', args.img_size).gen(1)[0]
     # RectangleMaskGenerator(args.img_size, args.img_size, rec=[22, 28, 32, 4])
     # RectangleMaskGenerator(args.img_size, args.img_size, rec=[9, 27, 21, 5])
     # RectangleMaskGenerator(args.img_size, args.img_size, rec=[0, 32, 10, 0])
@@ -365,4 +384,5 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_mask_eye_temp.png")
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_svhn.png")
+    #img.save("/data/ziz/jxu/gpu-results/show_pvae_mask_eye_temp.png")
