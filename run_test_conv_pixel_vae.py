@@ -10,6 +10,7 @@ from blocks.optimizers import adam_updates
 import data.load_data as load_data
 from models.conv_pixel_vae import ConvPixelVAE
 from masks import RandomRectangleMaskGenerator, RectangleMaskGenerator, CenterMaskGenerator, get_generator
+from configs import get_config
 
 parser = argparse.ArgumentParser()
 
