@@ -100,7 +100,7 @@ def get_generator(name, size):
     elif name=='mouth':
         return RectangleMaskGenerator(size, size, rec=[22, 28, 32, 4])
     elif name=='hair':
-        return MultiRectangleMaskGenerator(size, size, recs=[[4, 32, 10, 0], [4, 6, 18, 0], [4, 32, 18, 26]])
+        return MultiRectangleMaskGenerator(size, size, recs=[[0, 32, 6, 0], [0, 6, 30, 0], [0, 32, 30, 26]])
     elif name=='random rec':
         return RandomRectangleMaskGenerator(size, size, min_ratio=1./8, max_ratio=(1.-1./8))
 
