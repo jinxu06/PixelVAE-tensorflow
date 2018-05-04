@@ -169,17 +169,17 @@ cfg_default = {
 # })
 
 
-# # double check mmd
-# config = {"nonlinearity": "elu"}
-# cfg = get_config(config=config, name=None, suffix="_double_check", load_dir=None, dataset='celeba', size=32, mode='train', phase='ce', use_mask_for="input output")
+# double check mmd
+config = {"nonlinearity": "elu"}
+cfg = get_config(config=config, name=None, suffix="_double_check", load_dir=None, dataset='celeba', size=32, mode='train', phase='ce', use_mask_for="input output")
 
 # # kld
 # config = {"nonlinearity": "elu", "nr_resnet":1, "reg":'kld', "beta":1.0}
 # cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
 
-# tc
-config = {"nonlinearity": "elu", "nr_resnet":1, "reg":"tc", "beta":5.0}
-cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
+# # tc
+# config = {"nonlinearity": "elu", "nr_resnet":1, "reg":"tc", "beta":5.0}
+# cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
 
 
 
@@ -466,7 +466,7 @@ with tf.Session(config=config) as sess:
     elif args.phase=='ce':
         fill_region = sample_mgen.gen(1)[0]
 
-    max_num_epoch = 5
+    max_num_epoch = 200
     for epoch in range(max_num_epoch+1):
         tt = time.time()
         for data in train_data:
