@@ -16,6 +16,7 @@ def get_default():
         "reg": "mmd",
         "beta": 5e5,
     })
+    return cfg
 
 def use_dataset(cfg, dataset, size):
     cfg.update({
