@@ -352,7 +352,9 @@ with tf.Session(config=config) as sess:
     data = next(test_data)
 
     # data[:, 9:21, 5:27, :] = 0
-    data[:, 0:10, 0:32, :] = 0
+    # data[:, 0:10, 0:32, :] = 0
+    from blocks.helpers import broadcast_masks_np
+    data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
 
 
     test_data.reset()

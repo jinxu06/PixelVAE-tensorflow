@@ -39,6 +39,22 @@ class RectangleMaskGenerator(MaskGenerator):
         self.masks[:, top:bottom, left:right] = 0
         return self.masks
 
+class MultiRectangleMaskGenerator(MaskGenerator):
+
+    def __init__(self, height, width,  recs=None):
+        super().__init__(height, width)
+        if recs is None:
+            rec = int(0.25*self.height), int(0.75*self.width), int(0.75*self.height), int(0.25*self.width)
+            recs = [rec]
+        self.recs = recs
+
+    def gen(self, n):
+        self.masks = np.ones((n, self.height, self.width))
+        for rec in self.recs:
+            top, right, bottom, left = rec
+            self.masks[:, top:bottom, left:right] = 0
+        return self.masks
+
 
 class RandomRectangleMaskGenerator(MaskGenerator):
 
@@ -70,6 +86,8 @@ class RandomRectangleMaskGenerator(MaskGenerator):
 
 
 
+
+
 def get_generator(name, size):
     if name=='full':
         return CenterMaskGenerator(size, size, ratio=1.0)
@@ -82,7 +100,7 @@ def get_generator(name, size):
     elif name=='mouth':
         return RectangleMaskGenerator(size, size, rec=[22, 28, 32, 4])
     elif name=='hair':
-        return RectangleMaskGenerator(size, size, rec=[0, 32, 10, 0])
+        return RectangleMaskGenerator(size, size, recs=[[4, 32, 10, 0], [4, 6, 18, 0], [4, 32, 18, 26]])
     elif name=='random rec':
         return RandomRectangleMaskGenerator(size, size, min_ratio=1./8, max_ratio=(1.-1./8))
 
