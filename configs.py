@@ -60,7 +60,7 @@ def get_config(config={}, name=None, suffix="", load_dir="", dataset='celeba', s
     })
     cfg.update({"save_dir":get_save_dir(cfg, name=name, suffix=suffix)})
     if os.path.exists(cfg['save_dir']):
-        overwrite = raw_input("overwrite?:")
+        overwrite = input("overwrite?:")
         if not (overwrite=='y' or overwrite=='Y'):
             quit()
     if print:
