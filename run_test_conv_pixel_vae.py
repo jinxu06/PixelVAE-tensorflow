@@ -119,7 +119,7 @@ if 'pixelvae' in cfg['phase']:
     test_mgen = get_generator('full', args.img_size)
 elif 'context' in cfg['phase']:
     #test_mgen = get_generator('center', args.img_size)
-    test_mgen = get_generator('hair', args.img_size)
+    test_mgen = get_generator('eye', args.img_size)
 else:
     raise Exception("unknown phase")
 
@@ -345,7 +345,7 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    fill_region = get_generator('hair', args.img_size).gen(1)[0]
+    fill_region = get_generator('eye', args.img_size).gen(1)[0]
     # RectangleMaskGenerator(args.img_size, args.img_size, rec=[22, 28, 32, 4])
     # RectangleMaskGenerator(args.img_size, args.img_size, rec=[9, 27, 21, 5])
     # RectangleMaskGenerator(args.img_size, args.img_size, rec=[0, 32, 10, 0])
@@ -375,4 +375,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_mask_hair_temp_2.0.png")
+    img.save("/data/ziz/jxu/gpu-results/show_pvae_mask_eye_temp_2.0.png")
