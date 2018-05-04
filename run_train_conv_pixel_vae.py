@@ -454,7 +454,7 @@ with tf.Session(config=config) as sess:
     elif args.phase=='ce':
         fill_region = sample_mgen.gen(1)[0]
 
-    ckpt_file = "data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise" + '/params_' + args.data_set + '.ckpt'
+    ckpt_file = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise" + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
