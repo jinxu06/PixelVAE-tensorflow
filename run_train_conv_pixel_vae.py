@@ -169,7 +169,7 @@ cfg_default = {
 # })
 
 config = {"nonlinearity": "elu"}
-cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='train', phase='ce', use_mask_for="input output")
+cfg = get_config(config=config, name=None, suffix="_double_check", load_dir=None, dataset='celeba', size=32, mode='train', phase='ce', use_mask_for="input output")
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
 # data I/O
@@ -454,16 +454,12 @@ with tf.Session(config=config) as sess:
     elif args.phase=='ce':
         fill_region = sample_mgen.gen(1)[0]
 
-    ckpt_file = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise_inpainting" + '/params_' + args.data_set + '.ckpt'
-    print('restoring parameters from', ckpt_file)
-    saver.restore(sess, ckpt_file)
-
     max_num_epoch = 5
     for epoch in range(max_num_epoch+1):
         tt = time.time()
-        # for data in train_data:
-        #     feed_dict = make_feed_dict(data, is_training=True, dropout_p=0.5)
-        #     sess.run(train_step, feed_dict=feed_dict)
+        for data in train_data:
+            feed_dict = make_feed_dict(data, is_training=True, dropout_p=0.5)
+            sess.run(train_step, feed_dict=feed_dict)
 
         for data in eval_data:
             feed_dict = make_feed_dict(data, is_training=False, dropout_p=0.)
