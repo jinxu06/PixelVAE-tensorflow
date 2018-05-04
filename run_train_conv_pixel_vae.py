@@ -419,7 +419,7 @@ parser.add_argument('-sr', '--sample_range', type=float, default=cfg['sample_ran
 parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to use')
 # new features
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
-parser.add_argument('-um', '--use_mode', type=str, default=cfg['use_mode'], help='')
+parser.add_argument('-um', '--use_mode', type=str, default=cfg['mode'], help='')
 
 args = parser.parse_args()
 if args.use_mode == 'test':
