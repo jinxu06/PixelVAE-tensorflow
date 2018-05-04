@@ -107,22 +107,29 @@ if args.mask_type=="none":
 else:
     masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
     if args.mask_type=="random rec":
-        train_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=0.125, max_ratio=1.0)
+        train_mgen = get_generator('random rec', args.img_size)
     elif args.mask_type=="full":
-        train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.0)
-    elif args.mask_type=="center rec":
-        train_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
-if "masked" in cfg and cfg['masked']:
-    test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=0.5)
+        train_mgen = get_generator('full', args.img_size)
+    elif args.mask_type=="center":
+        train_mgen = get_generator('center', args.img_size)
+
+if 'pixelvae' in cfg['phase']:
+    test_mgen = get_generator('full', args.img_size)
+elif 'context' in cfg['phase']:
+    test_mgen = get_generator('center', args.img_size)
 else:
-    test_mgen = CenterMaskGenerator(args.img_size, args.img_size, ratio=1.)
+    raise Exception("unknown phase")
 
 
 input_masks = [None for i in range(args.nr_gpu)]
-input_mgen = RandomRectangleMaskGenerator(args.img_size, args.img_size, min_ratio=1./16, max_ratio=.75)
-input_test_mgen = RectangleMaskGenerator(args.img_size, args.img_size, rec=[8, 31, 18, 1])
-if "use_input_masks" in cfg and cfg["use_input_masks"]:
+if 'mask' in cfg['phase']:
     input_masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
+    if 'pixelvae' in cfg['phase']:
+        input_mgen = get_generator('random rec', args.img_size)
+        input_test_mgen = get_generator('eye', args.img_size)
+    elif 'context' in cfg['phase']:
+        input_mgen = train_mgen
+        input_test_mgen = test_mgen
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -156,9 +163,9 @@ for i in range(args.nr_gpu):
         model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], input_masks=input_masks[i], **model_opt)
 
 if args.use_mode == 'train':
-    if "masked" in cfg and cfg['masked']:
+    if 'context' in cfg['phase']:
         all_params = get_trainable_variables(["conv_pixel_cnn", "context_encoder"])
-    else:
+    elif 'pixelvae' in cfg['phase']:
         all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
     grads = []
     for i in range(args.nr_gpu):
@@ -203,9 +210,13 @@ def make_feed_dict(data, is_training=True, dropout_p=0.5, mgen=None):
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     feed_dict.update({ x_bars[i]:ds[i] for i in range(args.nr_gpu) })
     if masks[0] is not None:
-        feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+        masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
+        feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
     if input_masks[0] is not None:
-        feed_dict.update({input_masks[i]:input_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+        if 'context' in cfg['phase']:
+            feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
+        elif 'pixelvae' in cfg['phase']:
+            feed_dict.update({input_masks[i]:input_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
     return feed_dict
 
 def sample_from_model(sess, data, fill_region=None, mgen=None):
@@ -217,9 +228,13 @@ def sample_from_model(sess, data, fill_region=None, mgen=None):
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     if masks[0] is not None:
-        feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+        masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
+        feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
     if input_masks[0] is not None:
-        feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+        if 'context' in cfg['phase']:
+            feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
+        elif 'pixelvae' in cfg['phase']:
+            feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
@@ -240,8 +255,15 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
+    if masks[0] is not None:
+        masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
+        feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
+
     if input_masks[0] is not None:
-        feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+        if 'context' in cfg['phase']:
+            feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
+        elif 'pixelvae' in cfg['phase']:
+            feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
     z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
@@ -249,10 +271,6 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
     #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
-
-    if masks[0] is not None:
-        feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
-
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
@@ -278,8 +296,14 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
+    if masks[0] is not None:
+        masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
+        feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
     if input_masks[0] is not None:
-        feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+        if 'context' in cfg['phase']:
+            feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
+        elif 'pixelvae' in cfg['phase']:
+            feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
     z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
@@ -290,10 +314,6 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
         z[i*num_traversal_step:(i+1)*num_traversal_step, i] = np.linspace(start=traversal_range[0], stop=traversal_range[1], num=num_traversal_step)
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
-
-    if masks[0] is not None:
-        feed_dict.update({masks[i]:mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
-
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
@@ -306,7 +326,6 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
                 for i in range(args.nr_gpu):
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)[:num_instances]
-
 
 
 initializer = tf.global_variables_initializer()
