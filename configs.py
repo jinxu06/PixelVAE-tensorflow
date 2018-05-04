@@ -4,7 +4,7 @@ def get_default():
     cfg = {}
     cfg.update({
         "nonlinearity": "relu",
-        "batch_size": 32,
+        "batch_size": 64,
         "learning_rate": 0.0001,
         "lam": 0.0,
         "nr_resnet": 5,
@@ -39,7 +39,12 @@ def get_save_dir(cfg, name=None, suffix="_"):
         name = "checkpoints_{0}_{1}_{2}_{3}_{4}".format(cfg['data_set'], cfg['reg'], cfg['beta'], cfg['nr_resnet'], cfg['phase'])
     return base + name
 
-def get_config(config={}, name=None, suffix="", load_dir="", dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output"):
+def print_config(cfg):
+    print("Configuration:")
+    for key in cfg:
+        print("--> {0}:{1}".format(key, cfg[key]))
+
+def get_config(config={}, name=None, suffix="", load_dir="", dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output", print=True):
     # mode: train | test
     # phase: pvae | ce
     # use_mask_for: input output | input | output | none
@@ -57,4 +62,6 @@ def get_config(config={}, name=None, suffix="", load_dir="", dataset='celeba', s
         overwrite = raw_input("overwrite?:")
         if not (overwrite=='y' or overwrite=='Y'):
             quit()
+    if print:
+        print_config(cfg)
     return cfg
