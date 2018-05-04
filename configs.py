@@ -45,7 +45,7 @@ def print_config(cfg):
     for key in cfg:
         print("--> {0}:{1}".format(key, cfg[key]))
 
-def get_config(config={}, name=None, suffix="", load_dir="", dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output", print=True):
+def get_config(config={}, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output", print=True):
     # mode: train | test
     # phase: pvae | ce
     # use_mask_for: input output | input | output | none
@@ -63,6 +63,10 @@ def get_config(config={}, name=None, suffix="", load_dir="", dataset='celeba', s
         overwrite = input("overwrite?:")
         if not (overwrite=='y' or overwrite=='Y'):
             quit()
+    if load_dir is None:
+        cfg_cp = cfg.copy()
+        cfg_cp['phase'] = 'ce'
+        cfg['load_dir'] = get_save_dir(cfg_cp, name=name, suffix=suffix)
     if print:
         print_config(cfg)
     return cfg

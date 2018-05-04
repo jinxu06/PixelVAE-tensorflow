@@ -169,7 +169,7 @@ cfg_default = {
 # })
 
 config = {"nonlinearity": "elu"}
-cfg = get_config(config=config, name=None, suffix="", load_dir="", dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
+cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='train', phase='ce', use_mask_for="input output")
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
 # data I/O
@@ -454,7 +454,7 @@ with tf.Session(config=config) as sess:
     elif args.phase=='ce':
         fill_region = sample_mgen.gen(1)[0]
 
-    ckpt_file = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise" + '/params_' + args.data_set + '.ckpt'
+    ckpt_file = "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise_inpainting" + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
