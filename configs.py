@@ -38,7 +38,7 @@ def get_save_dir(cfg, name=None, suffix="_"):
     base = "/data/ziz/jxu/save_dirs/"
     if name is None:
         name = "checkpoints_{0}_{1}_{2}_{3}_{4}_{5}".format(cfg['data_set'], cfg["z_dim"], cfg['reg'], cfg['beta'], cfg['nr_resnet'], cfg['phase'])
-    return base + name
+    return base + name + suffix
 
 def print_config(cfg):
     print("Configuration:")
