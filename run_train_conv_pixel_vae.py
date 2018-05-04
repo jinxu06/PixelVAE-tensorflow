@@ -393,8 +393,6 @@ cfg.update({
     #"load_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise",
 })
 
-
-
 config = {"nonlinearity": "elu"}
 cfg = get_config(config=config, name="temp", suffix="", load_dir="", dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
 
