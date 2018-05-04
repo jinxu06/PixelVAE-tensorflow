@@ -471,7 +471,7 @@ with tf.Session(config=config) as sess:
             saver.save(sess, args.save_dir + '/params_' + args.data_set + '.ckpt')
             data = next(test_data)
             test_data.reset()
-            sample_x = sample_from_model(sess, data, fill_region=fill_region, mgen=mgen)
+            sample_x = sample_from_model(sess, data, fill_region=fill_region, mgen=sample_mgen)
             visualize_samples(sample_x, os.path.join(args.save_dir,'%s_vae_sample%d.png' % (args.data_set, epoch)), layout=(4, 4))
             print("------------ saved")
             sys.stdout.flush()
