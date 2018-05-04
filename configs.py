@@ -66,7 +66,7 @@ def get_config(config={}, name=None, suffix="", load_dir=None, dataset='celeba',
     if load_dir is None:
         cfg_cp = cfg.copy()
         cfg_cp['phase'] = 'pvae'
-        cfg['load_dir'] = get_save_dir(cfg_cp, name=name, suffix=suffix)
+        cfg['load_dir'] = get_save_dir(cfg_cp, name=name, suffix="")
     if print:
         print_config(cfg)
     return cfg

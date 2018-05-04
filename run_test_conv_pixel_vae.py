@@ -13,44 +13,8 @@ from masks import RandomRectangleMaskGenerator, RectangleMaskGenerator, CenterMa
 
 parser = argparse.ArgumentParser()
 
-cfg_default = {
-    "img_size": 64,
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "data_set": "celeba64",
-    "nonlinearity":"relu",
-    "batch_size": 32,
-    "learning_rate": 0.0001,
-    "lam": 0.0,
-    "save_interval": 10,
-    "nr_resnet": 5,
-    "nr_filters": 100,
-    "nr_logistic_mix": 10,
-    "sample_range": 3.0,
-}
-
-
-cfg = cfg_default
-cfg.update({
-    "img_size": 32,
-    "data_set": "celeba32",
-    "data_dir": "/data/ziz/not-backed-up/jxu/CelebA",
-    "z_dim": 32,
-    "save_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise_inpainting",
-    "beta": 5e5,
-    "reg": "mmd",
-    "use_mode": "test",
-    "mask_type": "random rec",
-    "batch_size": 64,
-    "network_size": "medium",
-    "nonlinearity": "elu",
-    "phase": "context-mask", # "pixelvae", "pixelvae-mask", "context", "context-mask"
-    "load_dir": "/data/ziz/jxu/models/pvae_celeba32_z32_mmd_medium_elu5_noise",
-})
-
-
-
-cfg['sample_range'] = 3.0
-
+config = {"nonlinearity": "elu", "batch_size": 104}
+cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
 # data I/O
@@ -75,11 +39,14 @@ parser.add_argument('-sr', '--sample_range', type=float, default=cfg['sample_ran
 parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to use')
 # new features
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
-parser.add_argument('-um', '--use_mode', type=str, default=cfg['use_mode'], help='')
-parser.add_argument('-mt', '--mask_type', type=str, default=cfg['mask_type'], help='')
+parser.add_argument('-um', '--mode', type=str, default=cfg['mode'], help='')
+parser.add_argument('-umf', '--use_mask_for', type=str, default=cfg['use_mask_for'], help='')
+parser.add_argument('-ns', '--network_size', type=str, default=cfg['network_size'], help='')
+parser.add_argument('-ld', '--load_dir', type=str, default=cfg['load_dir'], help='')
+parser.add_argument('-p', '--phase', type=str, default=cfg['phase'], help='')
 
 args = parser.parse_args()
-if args.use_mode == 'test':
+if args.mode == 'test':
     args.debug = True
 
 args.nr_gpu = len(args.gpus.split(","))
@@ -104,36 +71,14 @@ else:
     test_data = data_set.test(shuffle=False, limit=-1)
 
 # masks
-if args.mask_type=="none":
+if "output" not in args.use_mask_for:
     masks = [None for i in range(args.nr_gpu)]
 else:
     masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
-    if args.mask_type=="random rec":
-        train_mgen = get_generator('random rec', args.img_size)
-    elif args.mask_type=="full":
-        train_mgen = get_generator('full', args.img_size)
-    elif args.mask_type=="center":
-        train_mgen = get_generator('center', args.img_size)
-
-if 'pixelvae' in cfg['phase']:
-    test_mgen = get_generator('full', args.img_size)
-elif 'context' in cfg['phase']:
-    #test_mgen = get_generator('center', args.img_size)
-    test_mgen = get_generator('eye', args.img_size)
+if "input" not in args.use_mask_for:
+    input_masks = [None for i in range(args.nr_gpu)]
 else:
-    raise Exception("unknown phase")
-
-
-input_masks = [None for i in range(args.nr_gpu)]
-if 'mask' in cfg['phase']:
     input_masks = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size)) for i in range(args.nr_gpu)]
-    if 'pixelvae' in cfg['phase']:
-        input_mgen = get_generator('random rec', args.img_size)
-        input_test_mgen = get_generator('eye', args.img_size)
-        #input_test_mgen = get_generator('transparent', args.img_size)
-    elif 'context' in cfg['phase']:
-        input_mgen = train_mgen
-        input_test_mgen = test_mgen
 
 xs = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
 x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args.img_size, 3)) for i in range(args.nr_gpu)]
@@ -142,7 +87,7 @@ dropout_ps = [tf.placeholder(tf.float32, shape=()) for i in range(args.nr_gpu)]
 
 pvaes = [ConvPixelVAE(counters={}) for i in range(args.nr_gpu)]
 model_opt = {
-    "use_mode": args.use_mode,
+    "use_mode": args.mode,
     "z_dim": args.z_dim,
     "reg": args.reg,
     "beta": args.beta,
@@ -156,7 +101,7 @@ model_opt = {
     "nr_filters": args.nr_filters,
     "nr_logistic_mix": args.nr_logistic_mix,
     "sample_range": args.sample_range,
-    "network_size": cfg['network_size'],
+    "network_size": args.network_size,
 }
 
 
@@ -166,10 +111,10 @@ for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], input_masks=input_masks[i], **model_opt)
 
-if args.use_mode == 'train':
-    if 'context' in cfg['phase']:
+if args.mode == 'train':
+    if args.phase=='ce':
         all_params = get_trainable_variables(["conv_pixel_cnn", "context_encoder"])
-    elif 'pixelvae' in cfg['phase']:
+    elif args.phase=='pvae':
         all_params = get_trainable_variables(["conv_encoder", "conv_decoder", "conv_pixel_cnn"])
     grads = []
     for i in range(args.nr_gpu):
@@ -206,39 +151,39 @@ if args.use_mode == 'train':
 
 def make_feed_dict(data, is_training=True, dropout_p=0.5, mgen=None):
     if mgen is None:
-        mgen = train_mgen
+        mgen = get_generator('random rec', args.img_size)
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]: is_training for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: dropout_p for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     feed_dict.update({ x_bars[i]:ds[i] for i in range(args.nr_gpu) })
-    if masks[0] is not None:
-        masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
-        feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
-    if input_masks[0] is not None:
-        if 'context' in cfg['phase']:
-            feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
-        elif 'pixelvae' in cfg['phase']:
-            feed_dict.update({input_masks[i]:input_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+    masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
+    if "output" in args.use_mask_for:
+        if args.phase=='pvae':
+            feed_dict.update({masks[i]:np.zeros_like(masks_np[i]) for i in range(args.nr_gpu)})
+        elif args.phase=='ce':
+            feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
+    if "input" in args.use_mask_for:
+        feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
     return feed_dict
 
 def sample_from_model(sess, data, fill_region=None, mgen=None):
     if mgen is None:
-        mgen = test_mgen
+        mgen = get_generator('random_rec', args.img_size)
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]: False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
-    if masks[0] is not None:
-        masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
-        feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
-    if input_masks[0] is not None:
-        if 'context' in cfg['phase']:
-            feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
-        elif 'pixelvae' in cfg['phase']:
-            feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+    masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
+    if "output" in args.use_mask_for:
+        if args.phase=='pvae':
+            feed_dict.update({masks[i]:np.zeros_like(masks_np[i]) for i in range(args.nr_gpu)})
+        elif args.phase=='ce':
+            feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
+    if "input" in args.use_mask_for:
+        feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
 
     x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
     #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
@@ -252,22 +197,19 @@ def sample_from_model(sess, data, fill_region=None, mgen=None):
     return np.concatenate(x_gen, axis=0)
 
 def generate_samples(sess, data, fill_region=None, mgen=None):
-    if mgen is None:
-        mgen = test_mgen
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
-    if masks[0] is not None:
-        masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
-        feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
-
-    if input_masks[0] is not None:
-        if 'context' in cfg['phase']:
-            feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
-        elif 'pixelvae' in cfg['phase']:
-            feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+    masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
+    if "output" in args.use_mask_for:
+        if args.phase=='pvae':
+            feed_dict.update({masks[i]:np.zeros_like(masks_np[i]) for i in range(args.nr_gpu)})
+        elif args.phase=='ce':
+            feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
+    if "input" in args.use_mask_for:
+        feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
     z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
@@ -290,8 +232,6 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
     return np.concatenate(x_gen, axis=0)
 
 def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13, fill_region=None, mgen=None):
-    if mgen is None:
-        mgen = test_mgen
     image = np.cast[np.float32]((image - 127.5) / 127.5)
     num_instances = num_traversal_step * args.z_dim
     assert num_instances <= args.nr_gpu * args.batch_size, "cannot feed all the instances into GPUs"
@@ -300,14 +240,14 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
-    if masks[0] is not None:
-        masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
-        feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
-    if input_masks[0] is not None:
-        if 'context' in cfg['phase']:
-            feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
-        elif 'pixelvae' in cfg['phase']:
-            feed_dict.update({input_masks[i]:input_test_mgen.gen(args.batch_size) for i in range(args.nr_gpu)})
+    masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
+    if "output" in args.use_mask_for:
+        if args.phase=='pvae':
+            feed_dict.update({masks[i]:np.zeros_like(masks_np[i]) for i in range(args.nr_gpu)})
+        elif args.phase=='ce':
+            feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
+    if "input" in args.use_mask_for:
+        feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
     z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
@@ -345,17 +285,12 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    fill_region = get_generator('eye', args.img_size).gen(1)[0]
-    # RectangleMaskGenerator(args.img_size, args.img_size, rec=[22, 28, 32, 4])
-    # RectangleMaskGenerator(args.img_size, args.img_size, rec=[9, 27, 21, 5])
-    # RectangleMaskGenerator(args.img_size, args.img_size, rec=[0, 32, 10, 0])
+    sample_mgen = get_generator('eye', args.img_size)
+    fill_region = sample_mgen.gen(1)[0]
     data = next(test_data)
 
-    # data[:, 9:21, 5:27, :] = 0
-    # data[:, 0:10, 0:32, :] = 0
     from blocks.helpers import broadcast_masks_np
     data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
-
 
     test_data.reset()
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
@@ -367,12 +302,12 @@ with tf.Session(config=config) as sess:
     ## data = np.rint(sample_x * 127.5 + 127.5)
 
     img = []
-    for i in [2,3,35]: #[2, 3, 5, 40, 55]:
-        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region)
+    for i in [2]: #[2,3,35]: #[2, 3, 5, 40, 55]:
+        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_pvae_mask_eye_temp_3.0.png")
+    img.save("/data/ziz/jxu/gpu-results/show_eye_completion.png")
