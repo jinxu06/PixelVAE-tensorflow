@@ -419,10 +419,10 @@ parser.add_argument('-sr', '--sample_range', type=float, default=cfg['sample_ran
 parser.add_argument('-s', '--seed', type=int, default=1, help='Random seed to use')
 # new features
 parser.add_argument('-d', '--debug', dest='debug', action='store_true', help='Under debug mode?')
-parser.add_argument('-um', '--use_mode', type=str, default=cfg['mode'], help='')
+parser.add_argument('-um', '--mode', type=str, default=cfg['mode'], help='')
 
 args = parser.parse_args()
-if args.use_mode == 'test':
+if args.mode == 'test':
     args.debug = True
 
 args.nr_gpu = len(args.gpus.split(","))
@@ -483,7 +483,7 @@ dropout_ps = [tf.placeholder(tf.float32, shape=()) for i in range(args.nr_gpu)]
 
 pvaes = [ConvPixelVAE(counters={}) for i in range(args.nr_gpu)]
 model_opt = {
-    "use_mode": args.use_mode,
+    "mode": args.mode,
     "z_dim": args.z_dim,
     "reg": args.reg,
     "beta": args.beta,
@@ -507,7 +507,7 @@ for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
         model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], input_masks=input_masks[i], **model_opt)
 
-if args.use_mode == 'train':
+if args.mode == 'train':
     if 'context' in cfg['phase']:
         all_params = get_trainable_variables(["conv_pixel_cnn", "context_encoder"])
     elif 'pixelvae' in cfg['phase']:
