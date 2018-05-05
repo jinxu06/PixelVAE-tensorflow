@@ -334,10 +334,6 @@ if args.mode == 'train':
 def generate_random_indices(batch_size, z_dim):
     return np.stack([np.random.permutation(np.arange(batch_size)) for i in range(z_dim)], axis=1)
 
-
-print(generate_random_indices(4, 3))
-quit()
-
 def make_feed_dict(data, is_training=True, dropout_p=0.5, mgen=None):
     if mgen is None:
         mgen = get_generator('random rec', args.img_size)
