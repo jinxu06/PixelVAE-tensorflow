@@ -16,7 +16,9 @@ class ConvPixelVAE(object):
     def __init__(self, counters={}):
         self.counters = counters
 
-    def build_graph(self, x, x_bar, is_training, dropout_p, z_dim, masks=None, input_masks=None, use_mode="test", network_size="medium", reg='mmd', N=2e5, sample_range=1.0, beta=1., lam=0., nonlinearity=tf.nn.elu, bn=True, kernel_initializer=None, kernel_regularizer=None, nr_resnet=1, nr_filters=100, nr_logistic_mix=10):
+    def build_graph(self, x, x_bar, is_training, dropout_p, z_dim, masks=None, input_masks=None, use_mode="test", random_indices=None, network_size="medium", reg='mmd', N=2e5, sample_range=1.0, beta=1., lam=0., nonlinearity=tf.nn.elu, bn=True, kernel_initializer=None, kernel_regularizer=None, nr_resnet=1, nr_filters=100, nr_logistic_mix=10):
+        self.random_indices = random_indices
+
         self.z_dim = z_dim
         self.use_mode = use_mode
         self.nonlinearity = nonlinearity
@@ -107,7 +109,7 @@ class ConvPixelVAE(object):
             self.loss_reg = self.beta * self.tc + self.dwmmd * self.gamma
         elif reg=='mmd-tc':
             self.mmd = estimate_mmd(tf.random_normal(int_shape(self.z)), self.z)
-            self.mmdtc = estimate_mmdtc(self.z, self.z)
+            self.mmdtc = estimate_mmdtc(self.z, self.z, self.random_indices)
             self.loss_reg =  (self.mmd + self.beta * self.mmdtc) * 1e5
 
         print("reg:{0}, beta:{1}, lam:{2}".format(self.reg, self.beta, self.lam))

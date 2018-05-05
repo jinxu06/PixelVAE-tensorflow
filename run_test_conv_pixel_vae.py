@@ -112,6 +112,7 @@ model_opt = {
     "nr_logistic_mix": args.nr_logistic_mix,
     "sample_range": args.sample_range,
     "network_size": args.network_size,
+    "random_indices": random_indices,
 }
 
 
@@ -297,6 +298,13 @@ with tf.Session(config=config) as sess:
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
+
+
+    ##
+    data = test_data.next(100)
+    sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=)
+    quit()
+    ##
 
     sample_mgen = get_generator('mouth', args.img_size)
     fill_region = sample_mgen.gen(1)[0]

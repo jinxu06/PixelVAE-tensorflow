@@ -266,6 +266,8 @@ x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 dropout_ps = [tf.placeholder(tf.float32, shape=()) for i in range(args.nr_gpu)]
 
+random_indices = [tf.placeholder_with_default(np.zeros((args.batch_size, args.z_dim)), shape=(args.batch_size, args.z_dim)) for i in range(args.nr_gpu)] ###
+
 pvaes = [ConvPixelVAE(counters={}) for i in range(args.nr_gpu)]
 model_opt = {
     "use_mode": args.mode,
@@ -290,7 +292,7 @@ model = tf.make_template('model', ConvPixelVAE.build_graph)
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], input_masks=input_masks[i], **model_opt)
+        model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], input_masks=input_masks[i], random_indices=random_indices[i], **model_opt)
 
 if args.mode == 'train':
     if args.phase=='ce':
