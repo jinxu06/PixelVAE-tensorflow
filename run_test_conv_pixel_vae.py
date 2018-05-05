@@ -255,7 +255,7 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
             feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
     if "input" in args.use_mask_for:
         if transparent_input_mask:
-            feed_dict.update({input_masks[i]:np.ones(masks_np[i]) for i in range(args.nr_gpu)})
+            feed_dict.update({input_masks[i]:np.ones_like(masks_np[i]) for i in range(args.nr_gpu)})
         else:
             feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
     z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
