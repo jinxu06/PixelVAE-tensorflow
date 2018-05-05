@@ -191,9 +191,9 @@ cfg_default = {
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
 
 
-# # large network, bn before nonlinearity, beta 1d5
+# # large network, mmd-tc
 config = {"nonlinearity": "elu", "network_size":"large", "beta":5, 'reg':'mmd-tc'}
-cfg = get_config(config=config, name="temp", suffix="", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
+cfg = get_config(config=config, name=None, suffix="_test", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
 
 
 
