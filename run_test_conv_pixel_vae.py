@@ -14,6 +14,8 @@ from configs import get_config
 
 parser = argparse.ArgumentParser()
 
+transparent_input_mask = True
+
 config = {"nonlinearity": "elu", "batch_size": 104, "sample_range":1.}
 cfg = get_config(config=config, name=None, suffix="_double_check", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
 
@@ -252,7 +254,10 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
         elif args.phase=='ce':
             feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
     if "input" in args.use_mask_for:
-        feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
+        if transparent_input_mask:
+            feed_dict.update({input_masks[i]:np.ones(masks_np[i]) for i in range(args.nr_gpu)})
+        else:
+            feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
     z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
@@ -294,8 +299,8 @@ with tf.Session(config=config) as sess:
     fill_region = sample_mgen.gen(1)[0]
     data = next(test_data)
 
-    from blocks.helpers import broadcast_masks_np
-    data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
+    #from blocks.helpers import broadcast_masks_np
+    #data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
 
     test_data.reset()
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
@@ -315,4 +320,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_mouth_completion.png")
+    img.save("/data/ziz/jxu/gpu-results/show_mouth_completion_1.png")
