@@ -69,7 +69,7 @@ elif 'svhn' in args.data_set:
 if args.debug:
     train_data = data_set.train(shuffle=True, limit=batch_size*2)
     eval_data = data_set.train(shuffle=True, limit=batch_size*2)
-    test_data = data_set.test(shuffle=False, limit=batch_size*1)
+    test_data = data_set.test(shuffle=False, limit=-1)
 else:
     train_data = data_set.train(shuffle=True, limit=-1)
     eval_data = data_set.train(shuffle=True, limit=batch_size*10)
@@ -297,8 +297,8 @@ with tf.Session(config=config) as sess:
     fill_region = sample_mgen.gen(1)[0]
     data = next(test_data)
 
-    # from blocks.helpers import broadcast_masks_np
-    # data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
+    from blocks.helpers import broadcast_masks_np
+    data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
     #
     # sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
     # data = np.rint(sample_x * 127.5 + 127.5)
@@ -313,7 +313,7 @@ with tf.Session(config=config) as sess:
     ## data = np.rint(sample_x * 127.5 + 127.5)
 
     img = []
-    for i in [2, 3, 5, 40, 55]:
+    for i in [7, 27]:#[2, 3, 5, 40, 55]:
         sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen, transparent_input_mask=False)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
@@ -321,4 +321,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/mouth_completion_ori.png")
+    img.save("/data/ziz/jxu/gpu-results/mouth_completion_noise_std1.png")
