@@ -37,8 +37,11 @@ def estimate_mmd(x, y, is_dimention_wise=False):
     return mmd
 
 def estimate_mmdtc(x, y):
+    batch_size, z_dim = int_shape(y)
     ys = tf.unstack(y, axis=1)
-    ys = [tf.random_shuffle(y) for y in ys]
+    indices = tf.random_shuffle([tf.range(start=0, limit=batch_size, delta=1) for k in range(z_dim)])
+    for i in range(z_dim):
+        ys[i] = tf.gather(ys[i], indices)
     y = tf.stack(ys, axis=1)
     return estimate_mmd(x, y)
 

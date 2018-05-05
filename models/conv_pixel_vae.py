@@ -107,7 +107,7 @@ class ConvPixelVAE(object):
             self.loss_reg = self.beta * self.tc + self.dwmmd * self.gamma
         elif reg=='mmd-tc':
             self.mmd = estimate_mmd(tf.random_normal(int_shape(self.z)), self.z)
-            self.mmdtc = estimate_mmdtc(tf.random_normal(int_shape(self.z)), self.z)
+            self.mmdtc = estimate_mmdtc(self.z, self.z)
             self.loss_reg =  (self.mmd + self.beta * self.mmdtc) * 1e5
 
         print("reg:{0}, beta:{1}, lam:{2}".format(self.reg, self.beta, self.lam))
