@@ -332,7 +332,7 @@ if args.mode == 'train':
 
 
 def generate_random_indices(batch_size, z_dim):
-    return np.stack([np.random.shuffle(np.arange(batch_size)) for i in range(z_dim)], axis=1)
+    return np.stack([np.random.shuffle(np.arange(batch_size)) for i in range(z_dim)]).T
 
 def make_feed_dict(data, is_training=True, dropout_p=0.5, mgen=None):
     if mgen is None:
