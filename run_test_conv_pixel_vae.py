@@ -302,6 +302,10 @@ with tf.Session(config=config) as sess:
     #from blocks.helpers import broadcast_masks_np
     #data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
 
+    sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
+    data = np.rint(sample_x * 127.5 + 127.5)
+
+
     test_data.reset()
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
@@ -320,4 +324,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/show_mouth_completion_1.png")
+    img.save("/data/ziz/jxu/gpu-results/show_mouth_completion_2.png")
