@@ -293,7 +293,7 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    sample_mgen = get_generator('eye', args.img_size)
+    sample_mgen = get_generator('mouth', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     data = next(test_data)
 
@@ -314,12 +314,12 @@ with tf.Session(config=config) as sess:
     ## data = np.rint(sample_x * 127.5 + 127.5)
 
     img = []
-    for i in [2, 3, 5, 40, 55]:
-        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen, transparent_input_mask=True)
+    for i in [2,3]: #[2, 3, 5, 40, 55]:
+        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen, transparent_input_mask=False)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/eye_completion.png")
+    img.save("/data/ziz/jxu/gpu-results/mouth_completion.png")
