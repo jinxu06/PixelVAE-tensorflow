@@ -297,11 +297,11 @@ with tf.Session(config=config) as sess:
     fill_region = sample_mgen.gen(1)[0]
     data = next(test_data)
 
-    # from blocks.helpers import broadcast_masks_np
-    # data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
-    #
-    # sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
-    # data = np.rint(sample_x * 127.5 + 127.5)
+    from blocks.helpers import broadcast_masks_np
+    data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
+
+    sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
+    data = np.rint(sample_x * 127.5 + 127.5)
 
     test_data.reset()
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
@@ -321,4 +321,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/mouth_completion_ori.png")
+    img.save("/data/ziz/jxu/gpu-results/mouth_completion_gen.png")
