@@ -331,6 +331,8 @@ if args.mode == 'train':
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
 
+def generate_random_indices(batch_size, z_dim):
+    return np.stack([np.random.shuffle(np.arange(batch_size)) for i in range(z_dim)], axis=1)
 
 def make_feed_dict(data, is_training=True, dropout_p=0.5, mgen=None):
     if mgen is None:
@@ -341,6 +343,7 @@ def make_feed_dict(data, is_training=True, dropout_p=0.5, mgen=None):
     feed_dict.update({dropout_ps[i]: dropout_p for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     feed_dict.update({ x_bars[i]:ds[i] for i in range(args.nr_gpu) })
+    feed_dict.update({ random_indices[i]:generate_random_indices(args.batch_size, args.z_dim) for i in range(args.nr_gpu) })
     masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
     if "output" in args.use_mask_for:
         if args.phase=='pvae':
