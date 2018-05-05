@@ -112,7 +112,6 @@ model_opt = {
     "nr_logistic_mix": args.nr_logistic_mix,
     "sample_range": args.sample_range,
     "network_size": args.network_size,
-    "random_indices": random_indices,
 }
 
 

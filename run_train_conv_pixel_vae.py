@@ -266,7 +266,7 @@ x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 dropout_ps = [tf.placeholder(tf.float32, shape=()) for i in range(args.nr_gpu)]
 
-random_indices = [tf.placeholder_with_default(np.zeros((args.batch_size, args.z_dim)), shape=(args.batch_size, args.z_dim)) for i in range(args.nr_gpu)] ###
+random_indices = [tf.placeholder_with_default(np.zeros((args.batch_size, args.z_dim), dtype=np.int32), shape=(args.batch_size, args.z_dim)) for i in range(args.nr_gpu)] ###
 
 pvaes = [ConvPixelVAE(counters={}) for i in range(args.nr_gpu)]
 model_opt = {
