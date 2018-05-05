@@ -14,8 +14,6 @@ from configs import get_config
 
 parser = argparse.ArgumentParser()
 
-transparent_input_mask = True
-
 config = {"nonlinearity": "elu", "batch_size": 104, "sample_range":1.}
 cfg = get_config(config=config, name=None, suffix="_double_check", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
 
@@ -238,7 +236,7 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
-def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13, fill_region=None, mgen=None):
+def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13, fill_region=None, mgen=None, transparent_input_mask=False):
     image = np.cast[np.float32]((image - 127.5) / 127.5)
     num_instances = num_traversal_step * args.z_dim
     assert num_instances <= args.nr_gpu * args.batch_size, "cannot feed all the instances into GPUs"
@@ -295,7 +293,7 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    sample_mgen = get_generator('mouth', args.img_size)
+    sample_mgen = get_generator('eye', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     data = next(test_data)
 
@@ -317,11 +315,11 @@ with tf.Session(config=config) as sess:
 
     img = []
     for i in [2, 3, 5, 40, 55]:
-        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen)
+        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen, transparent_input_mask=True)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/mouth_completion.png")
+    img.save("/data/ziz/jxu/gpu-results/eye_completion.png")
