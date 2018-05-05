@@ -17,10 +17,10 @@ from blocks.helpers import visualize_samples
 data_set = load_data.CelebA(data_dir="/data/ziz/not-backed-up/jxu/CelebA", batch_size=100, img_size=32)
 test_data = data_set.test(shuffle=False)
 
-data = test_data.next(256)
+data = test_data.next(400)
 data = np.cast[np.float32]((data - 127.5) / 127.5)
 
-visualize_samples(data, os.path.join("/data/ziz/jxu/gpu-results", "test_images.png"), layout=(1, 1))
+visualize_samples(data, os.path.join("/data/ziz/jxu/gpu-results", "test_images.png"), layout=(20, 20))
 
 # image = data[16*9:16*9+1]
 # corrupted_image = image.copy()
