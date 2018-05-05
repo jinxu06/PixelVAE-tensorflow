@@ -184,7 +184,7 @@ cfg_default = {
 
 # # large network, bn before nonlinearity
 config = {"nonlinearity": "elu", "network_size":"large"}
-cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
