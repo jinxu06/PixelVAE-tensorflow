@@ -14,12 +14,12 @@ from configs import get_config
 
 parser = argparse.ArgumentParser()
 
-config = {"nonlinearity": "elu", "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="_double_check", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
+# config = {"nonlinearity": "elu", "batch_size": 104, "sample_range":1.}
+# cfg = get_config(config=config, name=None, suffix="_double_check", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
 
 #
-# config = {"nonlinearity": "elu", "batch_size": 104, "sample_range":1.}
-# cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
+config = {"nonlinearity": "elu", "batch_size": 104, "sample_range":1.}
+cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
 # data I/O
