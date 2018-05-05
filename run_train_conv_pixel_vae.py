@@ -231,7 +231,7 @@ elif 'svhn' in args.data_set:
 if args.debug:
     train_data = data_set.train(shuffle=True, limit=batch_size*2)
     eval_data = data_set.train(shuffle=True, limit=batch_size*2)
-    test_data = data_set.test(shuffle=False, limit=batch_size*1)
+    test_data = data_set.test(shuffle=False, limit=-1)
 else:
     train_data = data_set.train(shuffle=True, limit=-1)
     eval_data = data_set.train(shuffle=True, limit=batch_size*10)
