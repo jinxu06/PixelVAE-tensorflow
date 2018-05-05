@@ -333,7 +333,7 @@ if args.mode == 'train':
 
 def generate_random_indices(batch_size, z_dim):
     return np.stack([np.random.shuffle(np.arange(batch_size)) for i in range(z_dim)]).T
-ind = generate_random_indices(args.batch_size, z_dim)
+ind = generate_random_indices(args.batch_size, args.z_dim)
 print(ind)
 print(ind.shape)
 quit()
