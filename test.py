@@ -14,14 +14,16 @@ from blocks.helpers import visualize_samples
 # print("TensorFlow version: {}".format(tf.VERSION))
 # print("Eager execution: {}".format(tf.executing_eagerly()))
 
-data_set = load_data.CelebA(data_dir="/data/ziz/not-backed-up/jxu/CelebA", batch_size=100, img_size=128)
+data_set = load_data.CelebA(data_dir="/data/ziz/not-backed-up/jxu/CelebA", batch_size=100, img_size=32)
 test_data = data_set.test(shuffle=False)
 
 data = test_data.next(256)
 data = np.cast[np.float32]((data - 127.5) / 127.5)
 
-image = data[16*9:16*9+1]
-corrupted_image = image.copy()
-corrupted_image[:, 50:110, 40:90, :] = 0.
-visualize_samples(image, os.path.join("/data/ziz/jxu/gpu-results", "image_example.png"), layout=(1, 1))
-visualize_samples(corrupted_image, os.path.join("/data/ziz/jxu/gpu-results", "corrupted_image_example.png"), layout=(1, 1))
+visualize_samples(data, os.path.join("/data/ziz/jxu/gpu-results", "test_images.png"), layout=(1, 1))
+
+# image = data[16*9:16*9+1]
+# corrupted_image = image.copy()
+# corrupted_image[:, 50:110, 40:90, :] = 0.
+# visualize_samples(image, os.path.join("/data/ziz/jxu/gpu-results", "image_example.png"), layout=(1, 1))
+# visualize_samples(corrupted_image, os.path.join("/data/ziz/jxu/gpu-results", "corrupted_image_example.png"), layout=(1, 1))
