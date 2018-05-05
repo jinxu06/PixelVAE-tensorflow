@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser()
 # cfg = get_config(config=config, name=None, suffix="_double_check", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
 
 #
-config = {"nonlinearity": "elu", "batch_size": 104, "sample_range":1.}
+config = {"nonlinearity": "elu", "batch_size": 104, "sample_range":3.}
 cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -313,7 +313,7 @@ with tf.Session(config=config) as sess:
     ## data = np.rint(sample_x * 127.5 + 127.5)
 
     img = []
-    for i in [2, 3, 5, 40, 55]:
+    for i in [2, 3]:#[2, 3, 5, 40, 55]:
         sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen, transparent_input_mask=False)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
@@ -321,4 +321,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/mouth_completion_noise.png")
+    img.save("/data/ziz/jxu/gpu-results/mouth_completion_noise_std3.png")
