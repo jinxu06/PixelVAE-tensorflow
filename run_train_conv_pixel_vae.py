@@ -182,8 +182,12 @@ cfg_default = {
 # cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
 
 
-# # large network, bn before nonlinearity
-config = {"nonlinearity": "elu", "network_size":"large", "beta":1e5}
+# # # large network, bn before nonlinearity, beta 1d5
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":1e5}
+# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
+
+# # large network, bn before nonlinearity, beta 5e5
+config = {"nonlinearity": "elu", "network_size":"large", "beta":5e5}
 cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
 
 
