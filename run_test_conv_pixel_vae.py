@@ -293,7 +293,7 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
-    sample_mgen = get_generator('mouth', args.img_size)
+    sample_mgen = get_generator('eye', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     data = next(test_data)
 
@@ -305,7 +305,7 @@ with tf.Session(config=config) as sess:
 
     test_data.reset()
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
-    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
+    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original_eye.png", layout=[8,8])
 
     #sample_x = generate_samples(sess, data, fill_region=fill_region)
     # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/generate_mouth_noise_unmask.png", layout=[8,8])
@@ -321,4 +321,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/mouth_completion.png")
+    img.save("/data/ziz/jxu/gpu-results/eye_completion.png")
