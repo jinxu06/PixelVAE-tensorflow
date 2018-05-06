@@ -17,9 +17,9 @@ parser = argparse.ArgumentParser()
 # config = {"nonlinearity": "elu", "batch_size": 104, "sample_range":1.}
 # cfg = get_config(config=config, name=None, suffix="_double_check", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
 
-#
-config = {"nonlinearity": "elu", "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
+# #
+# config = {"nonlinearity": "elu", "batch_size": 104, "sample_range":1.}
+# cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 # # kld
 # config = {"nonlinearity": "elu", "nr_resnet":1, "reg":'kld', "beta":1.0, "batch_size": 32, "sample_range":1.}
@@ -33,6 +33,13 @@ cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='ce
 # # large network, bn before nonlinearity, beta 5e5
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":5e5, "batch_size": 104, "sample_range":1.}
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
+
+
+
+# # large network, mmd-tc
+config = {"nonlinearity": "elu", "network_size":"large", "beta":5, 'reg':'mmd-tc', "batch_size": 104, "sample_range":1.}
+cfg = get_config(config=config, name=None, suffix="_test", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
+
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -104,6 +111,8 @@ x_bars = [tf.placeholder(tf.float32, shape=(args.batch_size, args.img_size, args
 is_trainings = [tf.placeholder(tf.bool, shape=()) for i in range(args.nr_gpu)]
 dropout_ps = [tf.placeholder(tf.float32, shape=()) for i in range(args.nr_gpu)]
 
+random_indices = [tf.placeholder_with_default(np.zeros((args.batch_size, args.z_dim), dtype=np.int32), shape=(args.batch_size, args.z_dim)) for i in range(args.nr_gpu)] ###
+
 pvaes = [ConvPixelVAE(counters={}) for i in range(args.nr_gpu)]
 model_opt = {
     "use_mode": args.mode,
@@ -128,7 +137,7 @@ model = tf.make_template('model', ConvPixelVAE.build_graph)
 
 for i in range(args.nr_gpu):
     with tf.device('/gpu:%d' % i):
-        model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], input_masks=input_masks[i], **model_opt)
+        model(pvaes[i], xs[i], x_bars[i], is_trainings[i], dropout_ps[i], masks=masks[i], input_masks=input_masks[i], random_indices=random_indices[i], **model_opt)
 
 if args.mode == 'train':
     if args.phase=='ce':
@@ -160,13 +169,15 @@ if args.mode == 'train':
             record_dict['dwmmd'] = tf.add_n([v.dwmmd for v in pvaes]) / args.nr_gpu
         elif args.reg=='mmd-tc':
             record_dict['mmd'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
-            record_dict['tc'] = tf.add_n([v.tc for v in pvaes]) / args.nr_gpu
+            record_dict['mmdtc'] = tf.add_n([v.mmdtc for v in pvaes]) / args.nr_gpu
         else:
             raise Exception("unknown reg type")
         recorder = Recorder(dict=record_dict, config_str=str(json.dumps(vars(args), indent=4, separators=(',',':'))), log_file=args.save_dir+"/log_file")
         train_step = adam_updates(all_params, grads[0], lr=args.learning_rate)
 
 
+def generate_random_indices(batch_size, z_dim):
+    return np.stack([np.random.permutation(np.arange(batch_size)) for i in range(z_dim)], axis=1)
 
 def make_feed_dict(data, is_training=True, dropout_p=0.5, mgen=None):
     if mgen is None:
@@ -177,6 +188,7 @@ def make_feed_dict(data, is_training=True, dropout_p=0.5, mgen=None):
     feed_dict.update({dropout_ps[i]: dropout_p for i in range(args.nr_gpu)})
     feed_dict.update({ xs[i]:ds[i] for i in range(args.nr_gpu) })
     feed_dict.update({ x_bars[i]:ds[i] for i in range(args.nr_gpu) })
+    feed_dict.update({ random_indices[i]:generate_random_indices(args.batch_size, args.z_dim) for i in range(args.nr_gpu) })
     masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
     if "output" in args.use_mask_for:
         if args.phase=='pvae':
@@ -250,7 +262,7 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
-def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13, fill_region=None, mgen=None, transparent_input_mask=False):
+def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13, fill_region=None, mgen=None):
     image = np.cast[np.float32]((image - 127.5) / 127.5)
     num_instances = num_traversal_step * args.z_dim
     assert num_instances <= args.nr_gpu * args.batch_size, "cannot feed all the instances into GPUs"
@@ -266,10 +278,7 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
         elif args.phase=='ce':
             feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
     if "input" in args.use_mask_for:
-        if transparent_input_mask:
-            feed_dict.update({input_masks[i]:np.ones_like(masks_np[i]) for i in range(args.nr_gpu)})
-        else:
-            feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
+        feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
     z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
@@ -292,7 +301,7 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
                 for i in range(args.nr_gpu):
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)[:num_instances]
-
+    
 
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
@@ -336,4 +345,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/mouth_completion_noise_medium.png")
+    img.save("/data/ziz/jxu/gpu-results/mouth_completion_tcmmd.png")
