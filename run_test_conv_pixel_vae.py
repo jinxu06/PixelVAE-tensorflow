@@ -301,7 +301,7 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
                 for i in range(args.nr_gpu):
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)[:num_instances]
-    
+
 
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
@@ -338,7 +338,7 @@ with tf.Session(config=config) as sess:
 
     img = []
     for i in [7, 27]:#[2, 3, 5, 40, 55]:
-        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen, transparent_input_mask=False)
+        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
