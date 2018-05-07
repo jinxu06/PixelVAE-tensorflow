@@ -25,18 +25,18 @@ parser = argparse.ArgumentParser()
 # config = {"nonlinearity": "elu", "nr_resnet":1, "reg":'kld', "beta":1.0, "batch_size": 32, "sample_range":1.}
 # cfg = get_config(config=config, name=None, suffix="", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
-# large network, bn before nonlinearity, beta 1d5
-config = {"nonlinearity": "elu", "network_size":"large", "beta":1e5, "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
+# # large network, bn before nonlinearity, beta 1d5
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":1e5, "batch_size": 104, "sample_range":1.}
+# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 # # large network, bn before nonlinearity, beta 5e5
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":5e5, "batch_size": 104, "sample_range":1.}
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 
-# # # large network, mmd-tc
-# config = {"nonlinearity": "elu", "network_size":"large", "beta":5, 'reg':'mmd-tc', "batch_size": 104, "sample_range":1.}
-# cfg = get_config(config=config, name=None, suffix="_test", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
+# # large network, mmd-tc
+config = {"nonlinearity": "elu", "network_size":"large", "beta":5, 'reg':'mmd-tc', "batch_size": 104, "sample_range":1.}
+cfg = get_config(config=config, name=None, suffix="_test", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 
 
