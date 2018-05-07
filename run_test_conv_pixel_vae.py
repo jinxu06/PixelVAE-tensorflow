@@ -33,7 +33,7 @@ parser = argparse.ArgumentParser()
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":5e5, "batch_size": 104, "sample_range":1.}
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
-config = {"nonlinearity": "elu", "network_size":"large", "beta":5e5}
+config = {"nonlinearity": "elu", "network_size":"large", "beta":5e5, "batch_size": 104, "sample_range":1.}
 #load_dir = "/data/ziz/jxu/save_dirs/checkpoints_celeba32_32_mmd_500000.0_5_pvae_large"
 cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
 
