@@ -321,8 +321,8 @@ with tf.Session(config=config) as sess:
     fill_region = get_generator('full', args.img_size).gen(1)[0]
     data = next(test_data)
 
-    from blocks.helpers import broadcast_masks_np
-    data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
+    # from blocks.helpers import broadcast_masks_np
+    # data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
     #
     # sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
     # data = np.rint(sample_x * 127.5 + 127.5)
