@@ -199,10 +199,15 @@ cfg_default = {
 # cfg = get_config(config=config, name=None, suffix="_test", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
 
 
-## ce phase, beta 5e5
-config = {"nonlinearity": "elu", "network_size":"large", "beta":5e5}
-load_dir = "/data/ziz/jxu/save_dirs/checkpoints_celeba32_32_mmd_500000.0_5_pvae_large"
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=load_dir, dataset='celeba', size=32, mode='train', phase='ce', use_mask_for="input output")
+# ## ce phase, beta 5e5
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":5e5}
+# load_dir = "/data/ziz/jxu/save_dirs/checkpoints_celeba32_32_mmd_500000.0_5_pvae_large"
+# cfg = get_config(config=config, name=None, suffix="_large", load_dir=load_dir, dataset='celeba', size=32, mode='train', phase='ce', use_mask_for="input output")
+
+# # large network, mmd-tc, beta 0.1
+config = {"nonlinearity": "elu", "network_size":"large", "beta":0.1, 'reg':'mmd-tc'}
+cfg = get_config(config=config, name=None, suffix="_test", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
+
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
