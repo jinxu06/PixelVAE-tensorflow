@@ -51,13 +51,13 @@ parser = argparse.ArgumentParser()
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":1e6,  "batch_size": 104, "sample_range":3.}
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
-# large network, bn before nonlinearity, beta 5e6, nr_resnet 5
-config = {"nonlinearity": "elu", "network_size":"large", "beta":5e6, "nr_resnet":5, "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
+# # large network, bn before nonlinearity, beta 5e6, nr_resnet 5
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":5e6, "nr_resnet":5, "batch_size": 104, "sample_range":1.}
+# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
-# # large network, bn before nonlinearity, beta 2e6, nr_resnet 5
-# config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5}
-# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
+# large network, bn before nonlinearity, beta 2e6, nr_resnet 5
+config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "batch_size": 104, "sample_range":1.}
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -366,4 +366,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/mouth_completion_b5e6.png")
+    img.save("/data/ziz/jxu/gpu-results/mouth_completion_b2e6.png")
