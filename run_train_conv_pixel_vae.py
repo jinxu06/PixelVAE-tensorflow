@@ -212,13 +212,18 @@ cfg_default = {
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":1e6, "nr_resnet":3}
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
 
-# large network, bn before nonlinearity, beta 5e6, nr_resnet 5
-config = {"nonlinearity": "elu", "network_size":"large", "beta":5e6, "nr_resnet":5}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
+# # large network, bn before nonlinearity, beta 5e6, nr_resnet 5
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":5e6, "nr_resnet":5}
+# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
 
 # # large network, bn before nonlinearity, beta 2e6, nr_resnet 5
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5}
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
+
+# large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
+config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.00005}
+load_dir = "/data/ziz/jxu/save_dirs/checkpoints_celeba32_32_mmd_2000000.0_5_pvae_large"
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=load_dir, dataset='celeba', size=32, mode='train', phase='ce', use_mask_for="input output")
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
