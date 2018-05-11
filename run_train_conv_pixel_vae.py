@@ -236,13 +236,13 @@ cfg_default = {
 # cfg = get_config(config=config, name=None, suffix="_large_1", load_dir=load_dir, dataset='celeba', size=32, mode='train', phase='ce', use_mask_for="input output")
 
 
-# kld, large network, bn before nonlinearity nr_resnet 5
-config = {"nonlinearity": "elu", "network_size":"large", "beta":1.0, "nr_resnet":1, "reg":"kld"}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
-
-# # tc, beta 5, large network, bn before nonlinearity nr_resnet 5
-# config = {"nonlinearity": "elu", "network_size":"large", "beta":5.0, "nr_resnet":1, "reg":"tc"}
+# # kld, large network, bn before nonlinearity nr_resnet 1
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":1.0, "nr_resnet":1, "reg":"kld"}
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
+
+# tc, beta 5, large network, bn before nonlinearity nr_resnet 1
+config = {"nonlinearity": "elu", "network_size":"large", "beta":5.0, "nr_resnet":1, "reg":"tc"}
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
 
 
 
