@@ -463,7 +463,6 @@ with tf.Session(config=config) as sess:
     visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/eye_gt.png", layout=(len(img_ids), 3))
     quit()
 
-
     img = []
     for i in img_ids: #[5, 7, 8, 18, 27, 44, 74, 77]:
         sample_x = controllable_completion(sess, data[i], zid=21, traversal_range=[-6, 6], num_traversal_step=6, fill_region=fill_region, mgen=sample_mgen)
