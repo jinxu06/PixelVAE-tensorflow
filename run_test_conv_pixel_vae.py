@@ -371,4 +371,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/full_completion_b2e6_ce.png")
+    img.save("/data/ziz/jxu/gpu-results/full_completion_b2e6_pvae.png")
