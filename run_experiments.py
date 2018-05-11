@@ -349,16 +349,17 @@ with tf.Session(config=config) as sess:
     # get test data
     data = next(test_data)
     test_data.reset()
+    # mask generator
+    sample_mgen = get_generator('center', args.img_size)
+    fill_region = sample_mgen.gen(1)[0]
     # mask data
     from blocks.helpers import broadcast_masks_np
     data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
     # ground truth
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
-    
+
     # ordinary inpainting
-    sample_mgen = get_generator('center', args.img_size)
-    fill_region = sample_mgen.gen(1)[0]
     sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
     visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/center_ord_completion.png", layout=(10,10))
     quit()
