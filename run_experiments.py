@@ -448,8 +448,8 @@ with tf.Session(config=config) as sess:
 
     # CSI
     img = []
-    for i in [7]: #[5, 7, 8, 18, 27, 44, 74, 77]:
-        sample_x = controllable_completion(sess, data[i], zid=25, traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen)
+    for i in [5, 7, 8, 18, 27, 44, 74, 77]:
+        sample_x = controllable_completion(sess, data[i], zid=9, traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen)
         view = visualize_samples(sample_x, None, layout=(1, sample_x.shape[0]))
         img.append(view.copy())
     img = np.concatenate(img, axis=0)
