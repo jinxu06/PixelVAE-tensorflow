@@ -275,7 +275,7 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
-    z[:, 25] = 5.
+    z[:, 26] = 5.
     #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
@@ -362,7 +362,7 @@ with tf.Session(config=config) as sess:
 
     # ordinary inpainting
     sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/mouth_completion_lip.png", layout=(10,10))
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/mouth_completion_open.png", layout=(10,10))
     quit()
 
 
