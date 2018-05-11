@@ -443,8 +443,10 @@ with tf.Session(config=config) as sess:
     # random masks
     # random_masks = get_generator('random rec', args.img_size).gen(args.batch_size*args.nr_gpu)
     # data = data.astype(np.float32) * broadcast_masks_np(random_masks, 3)
-    data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
     masked_data = np.cast[np.float32]((data - 127.5) / 127.5)
+    masked_data = masked_data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
+    data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
+
 
     # ordinary inpainting
     ord_samples = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
@@ -458,7 +460,7 @@ with tf.Session(config=config) as sess:
         img_arr.append(gt_data[i])
         img_arr.append(masked_data[i])
         img_arr.append(ord_samples[i])
-    visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/temp.png", layout=(len(img_ids), 3))
+    visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/eye_gt.png", layout=(len(img_ids), 3))
     quit()
 
 
