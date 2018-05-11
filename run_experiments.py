@@ -393,12 +393,13 @@ with tf.Session(config=config) as sess:
     fill_region = sample_mgen.gen(1)[0]
     # random masks
     random_masks = get_generator('random rec', args.img_size).gen(args.batch_size*args.nr_gpu)
-    data = data.astype(np.float32) * broadcast_masks_np(random_masks, 3)
+    #data = data.astype(np.float32) * broadcast_masks_np(random_masks, 3)
     # mask data
     # data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
     # ground truth
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
-    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[10,10])
+    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_gt.png", layout=[10,10])
+    quit()
 
     # ordinary inpainting
     # sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
