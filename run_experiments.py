@@ -454,7 +454,7 @@ with tf.Session(config=config) as sess:
     # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/random_rec_completion.png", layout=(10,10))
 
     # CSI
-    img_ids = [5, 18, 44, 74, 77]
+    img_ids = [7, 18, 44, 74, 77]
     # img_arr = []
     # for i in img_ids:
     #     img_arr.append(gt_data[i])
