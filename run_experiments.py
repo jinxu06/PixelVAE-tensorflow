@@ -438,7 +438,7 @@ with tf.Session(config=config) as sess:
     test_data.reset()
     gt_data = np.cast[np.float32]((data - 127.5) / 127.5)
     # mask generator
-    sample_mgen = get_generator('nose', args.img_size)
+    sample_mgen = get_generator('eye', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     # random masks
     # random_masks = get_generator('random rec', args.img_size).gen(args.batch_size*args.nr_gpu)
@@ -472,7 +472,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/nose_completion_ce.png")
+    img.save("/data/ziz/jxu/gpu-results/eyebrow_completion_ce.png")
     quit()
 
 
