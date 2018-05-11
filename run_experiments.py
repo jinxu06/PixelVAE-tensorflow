@@ -361,7 +361,7 @@ with tf.Session(config=config) as sess:
 
     # ordinary inpainting
     sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/hair_completion.png", layout=(10,10))
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/hair_completion_1.png", layout=(10,10))
     quit()
 
 
