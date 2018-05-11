@@ -429,7 +429,7 @@ with tf.Session(config=config) as sess:
     data = next(test_data)
     test_data.reset()
     # mask generator
-    sample_mgen = get_generator('mouth', args.img_size)
+    sample_mgen = get_generator('nose', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     # random masks
     # random_masks = get_generator('random rec', args.img_size).gen(args.batch_size*args.nr_gpu)
@@ -448,16 +448,15 @@ with tf.Session(config=config) as sess:
 
     # CSI
     img = []
-    for i in [5,7,8]: #[5, 7, 8, 18, 27, 44, 74, 77]:
+    for i in [7]: #[5, 7, 8, 18, 27, 44, 74, 77]:
         sample_x = controllable_completion(sess, data[i], zid=25, traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen)
         view = visualize_samples(sample_x, None, layout=(1, sample_x.shape[0]))
         img.append(view.copy())
     img = np.concatenate(img, axis=0)
-    print(img.shape)
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/mouth_completion_temp.png")
+    img.save("/data/ziz/jxu/gpu-results/nose_completion_temp.png")
     quit()
 
 
