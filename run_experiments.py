@@ -363,7 +363,7 @@ def controllable_completion(sess, image, zid, traversal_range=[-6, 6], num_trave
     z = z_mu.copy() # np.random.normal(loc=z_mu, scale=z_sigma)
     for i in range(z.shape[0]):
         z[i] = z[0].copy()
-    z[:num_traversal_step, i] = np.linspace(start=traversal_range[0], stop=traversal_range[1], num=num_traversal_step)
+    z[:num_traversal_step, zid] = np.linspace(start=traversal_range[0], stop=traversal_range[1], num=num_traversal_step)
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
