@@ -449,30 +449,30 @@ with tf.Session(config=config) as sess:
 
 
     # ordinary inpainting
-    ord_samples = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
+    # ord_samples = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
     ## sample_x = random_completion(sess, data, random_masks=random_masks)
     # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/random_rec_completion.png", layout=(10,10))
 
     # CSI
     img_ids = [5, 18, 44, 74, 77]
-    img_arr = []
-    for i in img_ids:
-        img_arr.append(gt_data[i])
-        img_arr.append(masked_data[i])
-        img_arr.append(ord_samples[i])
-    visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/nose_gt.png", layout=(len(img_ids), 3))
-    quit()
+    # img_arr = []
+    # for i in img_ids:
+    #     img_arr.append(gt_data[i])
+    #     img_arr.append(masked_data[i])
+    #     img_arr.append(ord_samples[i])
+    # visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/nose_gt.png", layout=(len(img_ids), 3))
+    # quit()
 
     img = []
     for i in img_ids: #[5, 7, 8, 18, 27, 44, 74, 77]:
-        sample_x = controllable_completion(sess, data[i], zid=21, traversal_range=[-6, 6], num_traversal_step=6, fill_region=fill_region, mgen=sample_mgen)
+        sample_x = controllable_completion(sess, data[i], zid=8, traversal_range=[-6, 6], num_traversal_step=6, fill_region=fill_region, mgen=sample_mgen)
         view = visualize_samples(sample_x, None, layout=(1, sample_x.shape[0]))
         img.append(view.copy())
     img = np.concatenate(img, axis=0)
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/eyebrow_completion_ce.png")
+    img.save("/data/ziz/jxu/gpu-results/nose_completion_ce.png")
     quit()
 
 
