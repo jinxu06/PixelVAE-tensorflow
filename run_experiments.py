@@ -331,6 +331,47 @@ def random_completion(sess, data, random_masks):
                 x_gen[i][:, yi, xi, :] = (1-m) * x_hats[i][:, yi, xi, :] + m * x_gen[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
+def controllable_completion(sess, image, zid, traversal_range=[-6, 6], num_traversal_step=13, fill_region=None, mgen=None):
+    image = np.cast[np.float32]((image - 127.5) / 127.5)
+    num_instances = num_traversal_step
+    assert num_instances <= args.nr_gpu * args.batch_size, "cannot feed all the instances into GPUs"
+    data = np.stack([image.copy() for i in range(args.nr_gpu * args.batch_size)], axis=0)
+    ds = np.split(data, args.nr_gpu)
+    feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
+    feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
+    feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
+    masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
+    if "output" in args.use_mask_for:
+        if args.phase=='pvae':
+            feed_dict.update({masks[i]:np.zeros_like(masks_np[i]) for i in range(args.nr_gpu)})
+        elif args.phase=='ce':
+            feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
+    if "input" in args.use_mask_for:
+        feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
+    z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
+
+    z = z_mu.copy() # np.random.normal(loc=z_mu, scale=z_sigma)
+    for i in range(z.shape[0]):
+        z[i] = z[0].copy()
+    for i in range(args.z_dim):
+    z[:num_traversal_step, i] = np.linspace(start=traversal_range[0], stop=traversal_range[1], num=num_traversal_step)
+    z = np.split(z, args.nr_gpu)
+    feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
+
+    x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
+    #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
+    for yi in range(args.img_size):
+        for xi in range(args.img_size):
+            if fill_region is None or fill_region[yi, xi]==0:
+                print(yi, xi)
+                feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
+                x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+                for i in range(args.nr_gpu):
+                    x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
+    return np.concatenate(x_gen, axis=0)[:num_instances]
+
 def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13, fill_region=None, mgen=None):
     image = np.cast[np.float32]((image - 127.5) / 127.5)
     num_instances = num_traversal_step * args.z_dim
@@ -392,20 +433,32 @@ with tf.Session(config=config) as sess:
     sample_mgen = get_generator('mouth', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     # random masks
-    random_masks = get_generator('random rec', args.img_size).gen(args.batch_size*args.nr_gpu)
-    #data = data.astype(np.float32) * broadcast_masks_np(random_masks, 3)
+    # random_masks = get_generator('random rec', args.img_size).gen(args.batch_size*args.nr_gpu)
+    # data = data.astype(np.float32) * broadcast_masks_np(random_masks, 3)
     # mask data
-    # data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
+    data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
     # ground truth
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
-    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_gt.png", layout=[10,10])
-    quit()
+    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_mask.png", layout=[10,10])
 
     # ordinary inpainting
     # sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
-    sample_x = random_completion(sess, data, random_masks=random_masks)
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/random_rec_completion.png", layout=(10,10))
+    # ## sample_x = random_completion(sess, data, random_masks=random_masks)
+    # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/random_rec_completion.png", layout=(10,10))
+
+    # CSI
+    img = []
+    for i in [5,7,8]: #[5, 7, 8, 18, 27, 44, 74, 77]:
+        sample_x = controllable_completion(sess, data[i], zid=25, traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen)
+        view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
+        img.append(view.copy())
+    img = np.concatenate(img, axis=0)
+    from PIL import Image
+    img = img.astype(np.uint8)
+    img = Image.fromarray(img, 'RGB')
+    img.save("/data/ziz/jxu/gpu-results/mouth_completion_temp.png")
     quit()
+
 
     # latent traversal
     img = []
