@@ -306,7 +306,7 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
         if args.phase=='pvae':
             feed_dict.update({masks[i]:np.zeros_like(masks_np[i]) for i in range(args.nr_gpu)})
         elif args.phase=='ce':
-            feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
+            feed_dict.update({masks[i]:np.zeros_like(masks_np[i]) for i in range(args.nr_gpu)}) ###
     if "input" in args.use_mask_for:
         feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
     z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
@@ -348,26 +348,19 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
 
-    sample_mgen = get_generator('eye', args.img_size)
-    fill_region = sample_mgen.gen(1)[0]
-    # sample_mgen = get_generator('transparent', args.img_size)
-    # fill_region = get_generator('center', args.img_size).gen(1)[0]
+    # sample_mgen = get_generator('eye', args.img_size)
+    # fill_region = sample_mgen.gen(1)[0]
+    sample_mgen = get_generator('transparent', args.img_size)
+    fill_region = get_generator('full', args.img_size).gen(1)[0]
     data = next(test_data)
 
-    from blocks.helpers import broadcast_masks_np
-    data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
-
-    # sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
-    # data = np.rint(sample_x * 127.5 + 127.5)
+    # from blocks.helpers import broadcast_masks_np
+    # data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
 
     test_data.reset()
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
 
-    #sample_x = generate_samples(sess, data, fill_region=fill_region)
-    # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/generate_mouth_noise_unmask.png", layout=[8,8])
-
-    ## data = np.rint(sample_x * 127.5 + 127.5)
 
     img = []
     for i in [5,7,8]: #[5, 7, 8, 18, 27, 44, 74, 77]:
@@ -378,4 +371,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/eye_completion_b2e6_ce.png")
+    img.save("/data/ziz/jxu/gpu-results/full_completion_b2e6_ce.png")
