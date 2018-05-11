@@ -67,9 +67,17 @@ parser = argparse.ArgumentParser()
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":0.1, 'reg':'mmd-tc', "batch_size": 104, "sample_range":1.}
 # cfg = get_config(config=config, name=None, suffix="_test", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
+# # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
+# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
+
 # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
 config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
+
+
+
+
 
 # # large network, bn before nonlinearity, beta 1.5*1e6, nr_resnet 5
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":1.5*1e6, "nr_resnet":5, "batch_size": 104, "sample_range":1.}
@@ -426,7 +434,8 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
     # get test data
-    data = next(test_data)
+    #data = test_data.next(args.batch_size*args.nr_gpu)
+    data = test_data.next(100)
     test_data.reset()
     # mask generator
     sample_mgen = get_generator('nose', args.img_size)
@@ -456,7 +465,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/nose_completion_temp.png")
+    img.save("/data/ziz/jxu/gpu-results/nose_completion_pvae.png")
     quit()
 
 
