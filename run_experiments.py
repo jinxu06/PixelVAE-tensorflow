@@ -354,10 +354,10 @@ with tf.Session(config=config) as sess:
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
 
     # ordinary inpainting
-    sample_mgen = get_generator('eye', args.img_size)
+    sample_mgen = get_generator('center', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/eye_ord_completion.png", layout=(10,10))
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/center_ord_completion.png", layout=(10,10))
     quit()
 
 
