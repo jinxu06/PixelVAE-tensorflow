@@ -226,7 +226,7 @@ cfg_default = {
 
 
 # # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
-# config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.00005}
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001}
 # load_dir = "/data/ziz/jxu/save_dirs/checkpoints_celeba32_32_mmd_2000000.0_5_pvae_large"
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=load_dir, dataset='celeba', size=32, mode='train', phase='ce', use_mask_for="input output")
 
