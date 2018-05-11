@@ -327,7 +327,7 @@ def random_completion(sess, data, random_masks):
             feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
             x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
             for i in range(args.nr_gpu):
-                m = broadcast_masks_np([i][:, yi, xi], num_channels=3)
+                m = broadcast_masks_np(masks_np[i][:, yi, xi], num_channels=3)
                 x_gen[i][:, yi, xi, :] = (1-m) * x_hats[i][:, yi, xi, :] + m * x_gen[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
