@@ -67,9 +67,13 @@ parser = argparse.ArgumentParser()
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":0.1, 'reg':'mmd-tc', "batch_size": 104, "sample_range":1.}
 # cfg = get_config(config=config, name=None, suffix="_test", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
-# large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
-config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
+# # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
+# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
+
+# large network, bn before nonlinearity, beta 1.5*1e6, nr_resnet 5
+config = {"nonlinearity": "elu", "network_size":"large", "beta":1.5*1e6, "nr_resnet":5, , "batch_size": 104, "sample_range":1.}
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
@@ -350,7 +354,7 @@ with tf.Session(config=config) as sess:
     data = next(test_data)
     test_data.reset()
     # mask generator
-    sample_mgen = get_generator('hair', args.img_size)
+    sample_mgen = get_generator('mouth', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     # mask data
     from blocks.helpers import broadcast_masks_np
@@ -359,27 +363,12 @@ with tf.Session(config=config) as sess:
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
 
-    # ordinary inpainting
-    sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/hair_completion_1.png", layout=(10,10))
-    quit()
+    # # ordinary inpainting
+    # sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
+    # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/hair_completion_1.png", layout=(10,10))
+    # quit()
 
-
-
-    sample_mgen = get_generator('eye', args.img_size)
-    fill_region = sample_mgen.gen(1)[0]
-    # sample_mgen = get_generator('transparent', args.img_size)
-    # fill_region = get_generator('full', args.img_size).gen(1)[0]
-    data = next(test_data)
-
-    # from blocks.helpers import broadcast_masks_np
-    # data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
-
-    test_data.reset()
-    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
-    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
-
-
+    # latent traversal
     img = []
     for i in [5,7,8]: #[5, 7, 8, 18, 27, 44, 74, 77]:
         sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen)
@@ -389,4 +378,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/full_completion_b2e6_ce.png")
+    img.save("/data/ziz/jxu/gpu-results/mouth_completion_b1.5e6.png")
