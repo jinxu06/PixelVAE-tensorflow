@@ -67,13 +67,13 @@ parser = argparse.ArgumentParser()
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":0.1, 'reg':'mmd-tc', "batch_size": 104, "sample_range":1.}
 # cfg = get_config(config=config, name=None, suffix="_test", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
-# # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
-# config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
-# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
-
 # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
 config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
+
+# # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
+# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 
 
@@ -465,7 +465,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/eyebrow_completion_pvae.png")
+    img.save("/data/ziz/jxu/gpu-results/eyebrow_completion_ce.png")
     quit()
 
 
