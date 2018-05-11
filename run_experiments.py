@@ -5,7 +5,7 @@ import argparse
 import time
 import numpy as np
 import tensorflow as tf
-from blocks.helpers import Recorder, visualize_samples, get_nonlinearity, int_shape, get_trainable_variables
+from blocks.helpers import Recorder, visualize_samples, get_nonlinearity, int_shape, get_trainable_variables, broadcast_masks_np
 from blocks.optimizers import adam_updates
 import data.load_data as load_data
 from models.conv_pixel_vae import ConvPixelVAE
@@ -296,6 +296,41 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
+def random_completion(sess, data, random_masks):
+    data = np.cast[np.float32]((data - 127.5) / 127.5)
+    ds = np.split(data, args.nr_gpu)
+    feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
+    feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
+    feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
+    masks_np = np.split(random_masks, args.nr_gpu)
+    if "output" in args.use_mask_for:
+        if args.phase=='pvae':
+            feed_dict.update({masks[i]:np.zeros_like(masks_np[i]) for i in range(args.nr_gpu)})
+        elif args.phase=='ce':
+            feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
+    if "input" in args.use_mask_for:
+        feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)})
+    z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
+    z = np.random.normal(loc=z_mu, scale=z_sigma)
+    #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
+    z = np.split(z, args.nr_gpu)
+    feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
+
+    x_gen = [ds[i].copy() for i in range(args.nr_gpu)]
+    #x_gen = [x_gen[i]*np.stack([tm for t in range(3)], axis=-1) for i in range(args.nr_gpu)]
+
+    for yi in range(args.img_size):
+        for xi in range(args.img_size):
+            print(yi, xi)
+            feed_dict.update({x_bars[i]:x_gen[i] for i in range(args.nr_gpu)})
+            x_hats = sess.run([pvaes[i].x_hat for i in range(args.nr_gpu)], feed_dict=feed_dict)
+            for i in range(args.nr_gpu):
+                m = broadcast_masks_np([i][:, yi, xi], num_channels=3)
+                x_gen[i][:, yi, xi, :] = (1-m) * x_hats[i][:, yi, xi, :] + m * x_gen[i][:, yi, xi, :]
+    return np.concatenate(x_gen, axis=0)
+
 def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13, fill_region=None, mgen=None):
     image = np.cast[np.float32]((image - 127.5) / 127.5)
     num_instances = num_traversal_step * args.z_dim
@@ -356,17 +391,20 @@ with tf.Session(config=config) as sess:
     # mask generator
     sample_mgen = get_generator('mouth', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
+    # random masks
+    random_masks = get_generator('random rec', args.img_size).gen(args.batch_size*args.nr_gpu)
+    data = data.astype(np.float32) * broadcast_masks_np(random_masks, 3)
     # mask data
-    from blocks.helpers import broadcast_masks_np
-    data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
+    # data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
     # ground truth
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
 
-    # # ordinary inpainting
+    # ordinary inpainting
     # sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
-    # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/hair_completion_1.png", layout=(10,10))
-    # quit()
+    sample_x = random_completion(sess, data, random_masks=random_masks)
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/random_rec_completion.png", layout=(10,10))
+    quit()
 
     # latent traversal
     img = []
