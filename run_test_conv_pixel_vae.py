@@ -348,14 +348,14 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
 
-    # sample_mgen = get_generator('eye', args.img_size)
-    # fill_region = sample_mgen.gen(1)[0]
-    sample_mgen = get_generator('transparent', args.img_size)
-    fill_region = get_generator('full', args.img_size).gen(1)[0]
+    sample_mgen = get_generator('hair', args.img_size)
+    fill_region = sample_mgen.gen(1)[0]
+    # sample_mgen = get_generator('transparent', args.img_size)
+    # fill_region = get_generator('full', args.img_size).gen(1)[0]
     data = next(test_data)
 
-    # from blocks.helpers import broadcast_masks_np
-    # data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
+    from blocks.helpers import broadcast_masks_np
+    data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
 
     test_data.reset()
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
@@ -363,7 +363,7 @@ with tf.Session(config=config) as sess:
 
 
     img = []
-    for i in [5,7,8]: #[5, 7, 8, 18, 27, 44, 74, 77]:
+    for i in [76,77]:#[5,7,8]: #[5, 7, 8, 18, 27, 44, 74, 77]:
         sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
@@ -371,4 +371,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/full_completion_b2e6_pvae.png")
+    img.save("/data/ziz/jxu/gpu-results/hair_completion_b2e6_ce.png")
