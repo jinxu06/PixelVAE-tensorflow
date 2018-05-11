@@ -434,36 +434,37 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
     # get test data
-    #data = test_data.next(args.batch_size*args.nr_gpu)
     data = test_data.next(100)
     test_data.reset()
-    # GT
-    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
-    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[10, 10])
+    gt_data = np.cast[np.float32]((data - 127.5) / 127.5)
     # mask generator
     sample_mgen = get_generator('eye', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     # random masks
     # random_masks = get_generator('random rec', args.img_size).gen(args.batch_size*args.nr_gpu)
     # data = data.astype(np.float32) * broadcast_masks_np(random_masks, 3)
-    # mask data
     data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
-    # ground truth
-    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
-    s = int((args.batch_size * args.nr_gpu)**0.5)
-    s = 10
-    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_mask.png", layout=[s, s])
-    quit()
+    masked_data = np.cast[np.float32]((data - 127.5) / 127.5)
 
     # ordinary inpainting
-    # sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
-    # ## sample_x = random_completion(sess, data, random_masks=random_masks)
+    ord_samples = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
+    ## sample_x = random_completion(sess, data, random_masks=random_masks)
     # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/random_rec_completion.png", layout=(10,10))
 
     # CSI
+    img_ids = [5, 18, 44, 74, 77]
+    img_arr = []
+    for i in img_ids:
+        img_arr.apppend(gt_data[i])
+        img_arr.apppend(masked_data[i])
+        img_arr.append(ord_samples[i])
+    visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/temp.png", layout=(len(img_ids), 3))
+    quit()
+
+
     img = []
-    for i in [5, 7, 8, 18, 27, 44, 74, 77]:
-        sample_x = controllable_completion(sess, data[i], zid=21, traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen)
+    for i in img_ids: #[5, 7, 8, 18, 27, 44, 74, 77]:
+        sample_x = controllable_completion(sess, data[i], zid=21, traversal_range=[-6, 6], num_traversal_step=6, fill_region=fill_region, mgen=sample_mgen)
         view = visualize_samples(sample_x, None, layout=(1, sample_x.shape[0]))
         img.append(view.copy())
     img = np.concatenate(img, axis=0)
