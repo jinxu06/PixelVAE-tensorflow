@@ -398,7 +398,7 @@ with tf.Session(config=config) as sess:
     # data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
     # ground truth
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
-    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
+    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[10,10])
 
     # ordinary inpainting
     # sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
