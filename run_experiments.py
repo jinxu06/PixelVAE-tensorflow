@@ -455,8 +455,8 @@ with tf.Session(config=config) as sess:
     img_ids = [5, 18, 44, 74, 77]
     img_arr = []
     for i in img_ids:
-        img_arr.apppend(gt_data[i])
-        img_arr.apppend(masked_data[i])
+        img_arr.append(gt_data[i])
+        img_arr.append(masked_data[i])
         img_arr.append(ord_samples[i])
     visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/temp.png", layout=(len(img_ids), 3))
     quit()
