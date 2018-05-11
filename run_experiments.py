@@ -350,7 +350,7 @@ with tf.Session(config=config) as sess:
     data = next(test_data)
     test_data.reset()
     # mask generator
-    sample_mgen = get_generator('center', args.img_size)
+    sample_mgen = get_generator('mouth', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     # mask data
     from blocks.helpers import broadcast_masks_np
@@ -361,7 +361,7 @@ with tf.Session(config=config) as sess:
 
     # ordinary inpainting
     sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/center_ord_completion.png", layout=(10,10))
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/mouth_ord_completion.png", layout=(10,10))
     quit()
 
 
