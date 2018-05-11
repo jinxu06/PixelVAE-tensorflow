@@ -437,6 +437,9 @@ with tf.Session(config=config) as sess:
     #data = test_data.next(args.batch_size*args.nr_gpu)
     data = test_data.next(100)
     test_data.reset()
+    # GT
+    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
+    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[10, 10])
     # mask generator
     sample_mgen = get_generator('eye', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
@@ -448,7 +451,9 @@ with tf.Session(config=config) as sess:
     # ground truth
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     s = int((args.batch_size * args.nr_gpu)**0.5)
+    s = 10
     visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_mask.png", layout=[s, s])
+    quit()
 
     # ordinary inpainting
     # sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
