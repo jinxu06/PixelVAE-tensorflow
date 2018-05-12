@@ -458,9 +458,9 @@ with tf.Session(config=config) as sess:
     data = test_data.next(16)
     test_data.reset()
     gt_data = np.cast[np.float32]((data - 127.5) / 127.5)
-    sample_mgen = get_generator('transparent', args.img_size)
+    sample_mgen = get_generator('center', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
-    sample_x = generate_samples(sess, data, fill_region=np.zeros_like(fill_region), mgen=sample_mgen)
+    sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
     visualize_samples(gt_data, "/data/ziz/jxu/gpu-results/recon_gt_mmd_minputs.png", layout=(4,4))
     visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/recon_sample_mmd_minputs.png", layout=(4,4))
 quit()
