@@ -69,7 +69,7 @@ parser = argparse.ArgumentParser()
 
 # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
 config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
 
 # # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
@@ -447,20 +447,10 @@ with tf.Session(config=config) as sess:
     data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
     masked_data = np.cast[np.float32]((data - 127.5) / 127.5)
 
-
     # ordinary inpainting
-    ord_samples = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
+    # ord_samples = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
     ## sample_x = random_completion(sess, data, random_masks=random_masks)
     # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/random_rec_completion.png", layout=(10,10))
-
-    img_ids = [7, 18, 44, 74, 77]
-    img_arr = []
-    for i in img_ids:
-        img_arr.append(masked_data[i])
-    for i in img_ids:
-        img_arr.append(ord_samples[i])
-    visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/bdirectional_pvae.png", layout=(2,len(img_ids)))
-    quit()
 
     # CSI
     img_ids = [7, 18, 44, 74, 77]
@@ -468,7 +458,7 @@ with tf.Session(config=config) as sess:
     for i in img_ids:
         # img_arr.append(gt_data[i])
         img_arr.append(masked_data[i])
-        img_arr.append(ord_samples[i])
+        # img_arr.append(ord_samples[i])
     visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/eye_mask.png", layout=(len(img_ids), 1))
     quit()
 
