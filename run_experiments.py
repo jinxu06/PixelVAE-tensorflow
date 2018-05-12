@@ -451,7 +451,7 @@ with tf.Session(config=config) as sess:
     # ordinary inpainting
     ord_samples = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
     ## sample_x = random_completion(sess, data, random_masks=random_masks)
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/completion_temp.png", layout=(10,10))
+    visualize_samples(ord_samples, "/data/ziz/jxu/gpu-results/completion_temp.png", layout=(10,10))
     quit()
 
     # CSI
