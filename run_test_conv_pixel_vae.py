@@ -57,7 +57,7 @@ parser = argparse.ArgumentParser()
 
 # large network, bn before nonlinearity, beta 2e6, nr_resnet 5
 config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
 
 # # large network, bn before nonlinearity, beta 1e6, nr_resnet 3
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":1e6, "nr_resnet":3, "batch_size": 104, "sample_range":1.}
@@ -348,7 +348,7 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
 
-    sample_mgen = get_generator('hair', args.img_size)
+    sample_mgen = get_generator('mouth', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     # sample_mgen = get_generator('transparent', args.img_size)
     # fill_region = get_generator('full', args.img_size).gen(1)[0]
@@ -358,12 +358,12 @@ with tf.Session(config=config) as sess:
     data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
 
     test_data.reset()
-    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
-    visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
+    # vdata = np.cast[np.float32]((data - 127.5) / 127.5)
+    # visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
 
 
     img = []
-    for i in [76,77]:#[5,7,8]: #[5, 7, 8, 18, 27, 44, 74, 77]:
+    for i in [44,74]:#[5,7,8]: #[5, 7, 8, 18, 27, 44, 74, 77]:
         sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
@@ -371,4 +371,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/hair_completion_b2e6_ce.png")
+    img.save("/data/ziz/jxu/gpu-results/mouth_traversal_b2e6_ce.png")
