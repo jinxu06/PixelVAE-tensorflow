@@ -461,8 +461,8 @@ with tf.Session(config=config) as sess:
     sample_mgen = get_generator('center', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
-    visualize_samples(gt_data, "/data/ziz/jxu/gpu-results/recon_gt_mmd_moutputs.png", layout=(4,4))
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/recon_sample_mmd_moutputs.png", layout=(4,4))
+    visualize_samples(gt_data, "/data/ziz/jxu/gpu-results/recon_gt_together_moutputs.png", layout=(4,4))
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/recon_sample_together_moutputs.png", layout=(4,4))
 quit()
 
 
