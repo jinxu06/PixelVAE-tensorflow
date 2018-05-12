@@ -365,7 +365,10 @@ def controllable_completion(sess, image, zid, traversal_range=[-6, 6], num_trave
     z = z_mu.copy() # np.random.normal(loc=z_mu, scale=z_sigma)
     for i in range(z.shape[0]):
         z[i] = z[0].copy()
-    z[:num_traversal_step, zid] = np.linspace(start=traversal_range[0], stop=traversal_range[1], num=num_traversal_step)
+    z[:num_traversal_step, 30] = np.linspace(start=-6, stop=6, num=6)
+    z[:num_traversal_step, 25] = np.linspace(start=0, stop=6, num=6)
+    z[:num_traversal_step, 26] = np.linspace(start=0, stop=6, num=6)##
+    #z[:num_traversal_step, zid] = np.linspace(start=traversal_range[0], stop=traversal_range[1], num=num_traversal_step)
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
@@ -474,7 +477,7 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/smile_completion_ce.png")
+    img.save("/data/ziz/jxu/gpu-results/compound_completion_ce.png")
     quit()
 
 
