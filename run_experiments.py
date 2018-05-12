@@ -449,6 +449,8 @@ with tf.Session(config=config) as sess:
     data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
     masked_data = np.cast[np.float32]((data - 127.5) / 127.5)
 
+    visualize_samples(masked_data, "/data/ziz/jxu/gpu-results/img_mouth_masks.png", layout=(10,10))
+    quit()
     # ordinary inpainting
     ord_samples = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
     ## sample_x = random_completion(sess, data, random_masks=random_masks)
