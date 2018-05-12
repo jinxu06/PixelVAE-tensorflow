@@ -288,8 +288,8 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
     #z[:, 25] = 5. ##
-    #z[:, 26] = 5. ##
-    z[:, 30] = 5. ##
+    z[:, 26] = 5. ##
+    #z[:, 30] = 5. ##
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
@@ -452,7 +452,7 @@ with tf.Session(config=config) as sess:
     # ordinary inpainting
     ord_samples = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
     ## sample_x = random_completion(sess, data, random_masks=random_masks)
-    visualize_samples(ord_samples, "/data/ziz/jxu/gpu-results/completion_temp_smile.png", layout=(10,10))
+    visualize_samples(ord_samples, "/data/ziz/jxu/gpu-results/completion_temp_open_mouth.png", layout=(10,10))
     quit()
 
     # CSI
