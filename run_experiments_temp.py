@@ -295,9 +295,9 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
         if args.phase=='pvae':
             feed_dict.update({masks[i]:np.zeros_like(masks_np[i]) for i in range(args.nr_gpu)})
         elif args.phase=='ce':
-            feed_dict.update({masks[i]:np.zeros_like(masks_np[i]) for i in range(args.nr_gpu)})
+            feed_dict.update({masks[i]:np.masks_np[i] for i in range(args.nr_gpu)})
     if "input" in args.use_mask_for:
-        feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)}) ##
+        feed_dict.update({input_masks[i]:np.zeros_like(masks_np[i]) for i in range(args.nr_gpu)}) ##
     z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
@@ -461,8 +461,8 @@ with tf.Session(config=config) as sess:
     sample_mgen = get_generator('center', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
-    visualize_samples(gt_data, "/data/ziz/jxu/gpu-results/recon_gt_together_moutputs.png", layout=(4,4))
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/recon_sample_together_moutputs.png", layout=(4,4))
+    visualize_samples(gt_data, "/data/ziz/jxu/gpu-results/recon_gt_together_minputs.png", layout=(4,4))
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/recon_sample_together_minputs.png", layout=(4,4))
 quit()
 
 
