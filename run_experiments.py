@@ -438,7 +438,7 @@ with tf.Session(config=config) as sess:
     test_data.reset()
     gt_data = np.cast[np.float32]((data - 127.5) / 127.5)
     # mask generator
-    sample_mgen = get_generator('eye', args.img_size)
+    sample_mgen = get_generator('mouth', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     # random masks
     # random_masks = get_generator('random rec', args.img_size).gen(args.batch_size*args.nr_gpu)
@@ -459,7 +459,7 @@ with tf.Session(config=config) as sess:
         # img_arr.append(gt_data[i])
         img_arr.append(masked_data[i])
         # img_arr.append(ord_samples[i])
-    visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/eye_mask.png", layout=(len(img_ids), 1))
+    visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/mouth_mask.png", layout=(len(img_ids), 1))
     quit()
 
     img = []
