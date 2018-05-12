@@ -459,7 +459,7 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
     # get test data
-    data = test_data.next(100)
+    data = train_data.next(100)
     test_data.reset()
     gt_data = np.cast[np.float32]((data - 127.5) / 127.5)
     sample_mgen = get_generator('transparent', args.img_size)
