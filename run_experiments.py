@@ -301,6 +301,11 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
     z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
+    print(z_mu)
+    print(z_sigma)
+    print(z_mu.shape)
+    print(z_sigma.shape)
+    quit()
     z = np.random.normal(loc=z_mu, scale=z_sigma)
     #z[:, 25] = 5. ##
     #z[:, 26] = 5. ##
@@ -444,8 +449,6 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
 
-
-
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
@@ -456,10 +459,7 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
     # get test data
-    data = test_data.next(116)
-    data = data[-16:, :, :, :]
-    for i in range(16):
-        data[i] = data[-1].copy()
+    data = test_data.next(100)
     test_data.reset()
     gt_data = np.cast[np.float32]((data - 127.5) / 127.5)
     sample_mgen = get_generator('transparent', args.img_size)
@@ -467,9 +467,32 @@ with tf.Session(config=config) as sess:
     sample_x = generate_samples(sess, data, fill_region=np.zeros_like(fill_region), mgen=sample_mgen)
     visualize_samples(gt_data, "/data/ziz/jxu/gpu-results/recon_gt_info.png", layout=(4,4))
     visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/recon_sample_info.png", layout=(4,4))
-
-
 quit()
+
+
+
+# config = tf.ConfigProto()
+# config.gpu_options.allow_growth = True
+# with tf.Session(config=config) as sess:
+#
+#     sess.run(initializer)
+#     # restore the model
+#     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
+#     print('restoring parameters from', ckpt_file)
+#     saver.restore(sess, ckpt_file)
+#     # get test data
+#     data = test_data.next(116)
+#     data = data[-16:, :, :, :]
+#     for i in range(16):
+#         data[i] = data[-1].copy()
+#     test_data.reset()
+#     gt_data = np.cast[np.float32]((data - 127.5) / 127.5)
+#     sample_mgen = get_generator('transparent', args.img_size)
+#     fill_region = sample_mgen.gen(1)[0]
+#     sample_x = generate_samples(sess, data, fill_region=np.zeros_like(fill_region), mgen=sample_mgen)
+#     visualize_samples(gt_data, "/data/ziz/jxu/gpu-results/recon_gt_info.png", layout=(4,4))
+#     visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/recon_sample_info.png", layout=(4,4))
+# quit()
 
 
 config = tf.ConfigProto()
