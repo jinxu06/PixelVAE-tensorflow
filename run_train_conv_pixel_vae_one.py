@@ -199,8 +199,12 @@ cfg_default = {
 # cfg = get_config(config=config, name=None, suffix="_test", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
 
 
+# # all together
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":5e5}
+# cfg = get_config(config=config, name=None, suffix="_all_together", load_dir=None, dataset='celeba', size=32, mode='train', phase='ce', use_mask_for="input output")
+
 # all together
-config = {"nonlinearity": "elu", "network_size":"large", "beta":5e5}
+config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6}
 cfg = get_config(config=config, name=None, suffix="_all_together", load_dir=None, dataset='celeba', size=32, mode='train', phase='ce', use_mask_for="input output")
 
 
