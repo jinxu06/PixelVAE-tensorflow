@@ -220,9 +220,9 @@ cfg_default = {
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5}
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
 
-# large network, bn before nonlinearity, beta 1.5*1e6, nr_resnet 5
-config = {"nonlinearity": "elu", "network_size":"large", "beta":1.5*1e6, "nr_resnet":5}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
+# # large network, bn before nonlinearity, beta 1.5*1e6, nr_resnet 5
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":1.5*1e6, "nr_resnet":5}
+# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
 
 
 # # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
@@ -247,6 +247,10 @@ cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, datas
 # # info-tc, beta 5, large network, bn before nonlinearity nr_resnet 1
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":5.0, "nr_resnet":1, "reg":"info-tc"}
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
+
+# kld, large network, bn before nonlinearity nr_resnet 5
+config = {"nonlinearity": "elu", "network_size":"large", "beta":1.0, "nr_resnet":5, "reg":"kld"}
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
 
 
 parser.add_argument('-is', '--img_size', type=int, default=cfg['img_size'], help="size of input image")
