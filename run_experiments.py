@@ -85,13 +85,13 @@ parser = argparse.ArgumentParser()
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":1.0, "nr_resnet":1, "reg":"kld", "batch_size": 104, "sample_range":1.}
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
-# tc, beta 5, large network, bn before nonlinearity nr_resnet 1
-config = {"nonlinearity": "elu", "network_size":"large", "beta":5.0, "nr_resnet":1, "reg":"tc", "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
+# # tc, beta 5, large network, bn before nonlinearity nr_resnet 1
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":5.0, "nr_resnet":1, "reg":"tc", "batch_size": 104, "sample_range":1.}
+# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
-# # info-tc, beta 5, large network, bn before nonlinearity nr_resnet 1
-# config = {"nonlinearity": "elu", "network_size":"large", "beta":5.0, "nr_resnet":1, "reg":"info-tc"}
-# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='train', phase='pvae', use_mask_for="input output")
+# info-tc, beta 5, large network, bn before nonlinearity nr_resnet 1
+config = {"nonlinearity": "elu", "network_size":"large", "beta":5.0, "nr_resnet":1, "reg":"info-tc", "batch_size": 104, "sample_range":1.}
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 
 
@@ -215,6 +215,10 @@ if args.mode == 'train':
             record_dict['dwkld reg'] = tf.add_n([v.dwkld for v in pvaes]) / args.nr_gpu
         elif args.reg=='mmd':
             record_dict['mmd'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
+        if args.reg=='info-tc':
+            record_dict['mi reg'] = tf.add_n([v.mi for v in pvaes]) / args.nr_gpu
+            record_dict['tc reg'] = tf.add_n([v.tc for v in pvaes]) / args.nr_gpu
+            record_dict['dwkld reg'] = tf.add_n([v.dwkld for v in pvaes]) / args.nr_gpu
         elif args.reg=='kld':
             record_dict['kld'] = tf.add_n([v.kld for v in pvaes]) / args.nr_gpu
         elif args.reg=='tc-dwmmd':
@@ -459,8 +463,8 @@ with tf.Session(config=config) as sess:
     sample_mgen = get_generator('transparent', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     sample_x = generate_samples(sess, data, fill_region=np.zeros_like(fill_region), mgen=sample_mgen)
-    visualize_samples(gt_data, "/data/ziz/jxu/gpu-results/recon_gt_tc.png", layout=(4,4))
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/recon_sample_tc.png", layout=(4,4))
+    visualize_samples(gt_data, "/data/ziz/jxu/gpu-results/recon_gt_info.png", layout=(4,4))
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/recon_sample_info.png", layout=(4,4))
 
 
 quit()
