@@ -69,7 +69,7 @@ parser = argparse.ArgumentParser()
 
 # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
 config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 # # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
@@ -459,7 +459,7 @@ with tf.Session(config=config) as sess:
         img_arr.append(masked_data[i])
     for i in img_ids:
         img_arr.append(ord_samples[i])
-    visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/bdirectional.png", layout=(2,len(img_ids)))
+    visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/bdirectional_pvae.png", layout=(2,len(img_ids)))
     quit()
 
     # CSI
