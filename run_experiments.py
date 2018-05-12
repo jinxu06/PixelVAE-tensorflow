@@ -438,7 +438,7 @@ with tf.Session(config=config) as sess:
     test_data.reset()
     gt_data = np.cast[np.float32]((data - 127.5) / 127.5)
     # mask generator
-    sample_mgen = get_generator('center', args.img_size)
+    sample_mgen = get_generator('face', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     # random masks
     # random_masks = get_generator('random rec', args.img_size).gen(args.batch_size*args.nr_gpu)
