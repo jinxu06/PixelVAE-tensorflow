@@ -363,12 +363,12 @@ with tf.Session(config=config) as sess:
 
 
     img = []
-    for i in [44,74]:#[5,7,8]: #[5, 7, 8, 18, 27, 44, 74, 77]:
-        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen)
+    for i in [27,63,83]:#[5,7,8]: #[5, 7, 8, 18, 27, 44, 74, 77]:
+        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=4, fill_region=fill_region, mgen=sample_mgen)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/mouth_traversal_b2e6_ce.png")
+    img.save("/data/ziz/jxu/gpu-results/mouth_traversal_b2e6_ce_1.png")
