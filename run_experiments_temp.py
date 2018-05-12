@@ -297,7 +297,7 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
         elif args.phase=='ce':
             feed_dict.update({masks[i]:masks_np[i] for i in range(args.nr_gpu)})
     if "input" in args.use_mask_for:
-        feed_dict.update({input_masks[i]:np.zeros_like(masks_np[i]) for i in range(args.nr_gpu)}) ##
+        feed_dict.update({input_masks[i]:masks_np[i] for i in range(args.nr_gpu)}) ##
     z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
@@ -455,7 +455,8 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
     # get test data
-    data = test_data.next(16)
+    data = test_data.next(116)
+    data = data[-16:]
     test_data.reset()
     gt_data = np.cast[np.float32]((data - 127.5) / 127.5)
     sample_mgen = get_generator('hair', args.img_size)
