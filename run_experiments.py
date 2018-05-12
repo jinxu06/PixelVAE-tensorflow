@@ -69,14 +69,11 @@ parser = argparse.ArgumentParser()
 
 # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
 config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 # # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
-
-
-
 
 
 # # large network, bn before nonlinearity, beta 1.5*1e6, nr_resnet 5
@@ -428,6 +425,32 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
 
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
+
+
+
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+with tf.Session(config=config) as sess:
+
+    sess.run(initializer)
+    # restore the model
+    ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
+    print('restoring parameters from', ckpt_file)
+    saver.restore(sess, ckpt_file)
+    # get test data
+    data = test_data.next(100)
+    data = test_data.next(16)
+    test_data.reset()
+    gt_data = np.cast[np.float32]((data - 127.5) / 127.5)
+    sample_mgen = get_generator('transparent', args.img_size)
+    fill_region = sample_mgen.gen(1)[0]
+    sample_x = sample_from_model(sess, data, fill_region=None, mgen=sample_mgen)
+    visualize_samples(gt_data, "/data/ziz/jxu/gpu-results/recon_gt.png", layout=(4,4))
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/recon_sample.png", layout=(4,4))
+
+
+quit()
+
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
