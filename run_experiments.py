@@ -81,17 +81,17 @@ parser = argparse.ArgumentParser()
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 
-# # kld, large network, bn before nonlinearity nr_resnet 1
-# config = {"nonlinearity": "elu", "network_size":"large", "beta":1.0, "nr_resnet":1, "reg":"kld", "batch_size": 104, "sample_range":1.}
-# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
+# kld, large network, bn before nonlinearity nr_resnet 1
+config = {"nonlinearity": "elu", "network_size":"large", "beta":1.0, "nr_resnet":1, "reg":"kld", "batch_size": 104, "sample_range":1.}
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 # # tc, beta 5, large network, bn before nonlinearity nr_resnet 1
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":5.0, "nr_resnet":1, "reg":"tc", "batch_size": 104, "sample_range":1.}
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
-# info-tc, beta 5, large network, bn before nonlinearity nr_resnet 1
-config = {"nonlinearity": "elu", "network_size":"large", "beta":5.0, "nr_resnet":1, "reg":"info-tc", "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
+# # info-tc, beta 5, large network, bn before nonlinearity nr_resnet 1
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":5.0, "nr_resnet":1, "reg":"info-tc", "batch_size": 104, "sample_range":1.}
+# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 
 
@@ -459,7 +459,7 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
     # get test data
-    data = train_data.next(100)
+    data = test_data.next(100)
     test_data.reset()
     gt_data = np.cast[np.float32]((data - 127.5) / 127.5)
     sample_mgen = get_generator('transparent', args.img_size)
