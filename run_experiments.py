@@ -287,7 +287,7 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
-    z[:, 25] = 5. ##
+    #z[:, 25] = 5. ##
     #z[:, 26] = 5. ##
     #z[:, 30] = 5. ##
     z = np.split(z, args.nr_gpu)
@@ -449,34 +449,32 @@ with tf.Session(config=config) as sess:
     data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
     masked_data = np.cast[np.float32]((data - 127.5) / 127.5)
 
-    visualize_samples(masked_data, "/data/ziz/jxu/gpu-results/img_mouth_masks.png", layout=(10,10))
-    quit()
     # ordinary inpainting
-    ord_samples = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
+    #ord_samples = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
     ## sample_x = random_completion(sess, data, random_masks=random_masks)
-    visualize_samples(ord_samples, "/data/ziz/jxu/gpu-results/completion_temp_lip.png", layout=(10,10))
-    quit()
+    # visualize_samples(ord_samples, "/data/ziz/jxu/gpu-results/completion_temp_lip.png", layout=(10,10))
+    # quit()
 
     # CSI
     img_ids = [7, 18, 44, 74, 77]
-    img_arr = []
-    for i in img_ids:
-        # img_arr.append(gt_data[i])
-        img_arr.append(masked_data[i])
-        # img_arr.append(ord_samples[i])
-    visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/nose_mask.png", layout=(len(img_ids), 1))
-    quit()
+    # img_arr = []
+    # for i in img_ids:
+    #     # img_arr.append(gt_data[i])
+    #     img_arr.append(masked_data[i])
+    #     # img_arr.append(ord_samples[i])
+    # visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/nose_mask.png", layout=(len(img_ids), 1))
+    # quit()
 
     img = []
     for i in img_ids: #[5, 7, 8, 18, 27, 44, 74, 77]:
-        sample_x = controllable_completion(sess, data[i], zid=27, traversal_range=[-6, 6], num_traversal_step=6, fill_region=fill_region, mgen=sample_mgen)
+        sample_x = controllable_completion(sess, data[i], zid=30, traversal_range=[-6, 6], num_traversal_step=6, fill_region=fill_region, mgen=sample_mgen)
         view = visualize_samples(sample_x, None, layout=(1, sample_x.shape[0]))
         img.append(view.copy())
     img = np.concatenate(img, axis=0)
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/gender_completion_ce.png")
+    img.save("/data/ziz/jxu/gpu-results/smile_completion_ce.png")
     quit()
 
 
