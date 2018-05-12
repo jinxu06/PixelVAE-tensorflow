@@ -287,7 +287,7 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
     z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
     z = np.random.normal(loc=z_mu, scale=z_sigma)
-    #z[:, 1] = np.linspace(start=-5., stop=5., num=z.shape[0])
+    z[:, 21] = 5. ##
     z = np.split(z, args.nr_gpu)
     feed_dict.update({pvaes[i].z:z[i] for i in range(args.nr_gpu)})
 
@@ -438,30 +438,39 @@ with tf.Session(config=config) as sess:
     test_data.reset()
     gt_data = np.cast[np.float32]((data - 127.5) / 127.5)
     # mask generator
-    sample_mgen = get_generator('face', args.img_size)
+    sample_mgen = get_generator('eye', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     # random masks
     # random_masks = get_generator('random rec', args.img_size).gen(args.batch_size*args.nr_gpu)
     # data = data.astype(np.float32) * broadcast_masks_np(random_masks, 3)
-    masked_data = np.cast[np.float32]((data - 127.5) / 127.5)
-    masked_data = masked_data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
+
     data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
+    masked_data = np.cast[np.float32]((data - 127.5) / 127.5)
 
 
     # ordinary inpainting
-    # ord_samples = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
+    ord_samples = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
     ## sample_x = random_completion(sess, data, random_masks=random_masks)
     # visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/random_rec_completion.png", layout=(10,10))
 
+    img_ids = [7, 18, 44, 74, 77]
+    img_arr = []
+    for i in img_ids:
+        img_arr.append(masked_data[i])
+    for i in img_ids:
+        img_arr.append(ord_samples[i])
+    visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/bdirectional.png", layout=(2,len(img_ids)))
+    quit()
+
     # CSI
     img_ids = [7, 18, 44, 74, 77]
-    # img_arr = []
-    # for i in img_ids:
-    #     # img_arr.append(gt_data[i])
-    #     img_arr.append(masked_data[i])
-    #     # img_arr.append(ord_samples[i])
-    # visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/eye_mask.png", layout=(len(img_ids), 1))
-    # quit()
+    img_arr = []
+    for i in img_ids:
+        # img_arr.append(gt_data[i])
+        img_arr.append(masked_data[i])
+        img_arr.append(ord_samples[i])
+    visualize_samples(np.stack(img_arr, axis=0), "/data/ziz/jxu/gpu-results/eye_mask.png", layout=(len(img_ids), 1))
+    quit()
 
     img = []
     for i in img_ids: #[5, 7, 8, 18, 27, 44, 74, 77]:
