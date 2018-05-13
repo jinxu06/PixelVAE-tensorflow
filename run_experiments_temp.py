@@ -81,17 +81,17 @@ parser = argparse.ArgumentParser()
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 
-# # kld, large network, bn before nonlinearity nr_resnet 1
-# config = {"nonlinearity": "elu", "network_size":"large", "beta":1.0, "nr_resnet":1, "reg":"kld", "batch_size": 104, "sample_range":1.}
-# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
+# kld, large network, bn before nonlinearity nr_resnet 1
+config = {"nonlinearity": "elu", "network_size":"large", "beta":1.0, "nr_resnet":1, "reg":"kld", "batch_size": 104, "sample_range":1.}
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 # # tc, beta 5, large network, bn before nonlinearity nr_resnet 1
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":5.0, "nr_resnet":1, "reg":"tc", "batch_size": 104, "sample_range":1.}
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
-# info-tc, beta 5, large network, bn before nonlinearity nr_resnet 1
-config = {"nonlinearity": "elu", "network_size":"large", "beta":5.0, "nr_resnet":1, "reg":"info-tc", "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
+# # info-tc, beta 5, large network, bn before nonlinearity nr_resnet 1
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":5.0, "nr_resnet":1, "reg":"info-tc", "batch_size": 104, "sample_range":1.}
+# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 
 
@@ -480,7 +480,7 @@ with tf.Session(config=config) as sess:
     z_sigmas = np.concatenate(z_sigmas, axis=0)
     z_samples = np.concatenate(z_samples, axis=0)
 
-    np.savez("/data/ziz/jxu/info_posterior", mu=z_mus, sigma=z_sigmas, sample=z_samples)
+    np.savez("/data/ziz/jxu/kld_posterior", mu=z_mus, sigma=z_sigmas, sample=z_samples)
 
 quit()
 
