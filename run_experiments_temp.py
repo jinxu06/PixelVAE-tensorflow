@@ -98,8 +98,8 @@ parser = argparse.ArgumentParser()
 
 
 # all together
-config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6}
-cfg = get_config(config=config, name=None, suffix="_all_together", load_dir=None, dataset='celeba', size=32, mode='train', phase='ce', use_mask_for="input output")
+config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "batch_size": 104, "sample_range":1.}
+cfg = get_config(config=config, name=None, suffix="_all_together", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
 
 
 
