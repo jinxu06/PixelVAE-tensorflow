@@ -473,16 +473,15 @@ with tf.Session(config=config) as sess:
     z_mus, z_sigmas, z_samples = [], [], []
     for data in train_data:
         z_mu, z_sigma, z_sample = inspect_posterior(sess, data)
-        print(z_mu)
-        print(z_sigma)
+        print(z_sample.std())
         z_mus.append(z_mu)
         z_sigmas.append(z_sigma)
         z_samples.append(z_sample)
     z_mus = np.concatenate(z_mus, axis=0)
     z_sigmas = np.concatenate(z_sigmas, axis=0)
     z_samples = np.concatenate(z_samples, axis=0)
-    print(z_mus)
-    print(z_sigmas)
+    print(z_mus.std())
+    print(z_samples.std())
 
     #np.savez("/data/ziz/jxu/kld_posterior", mu=z_mus, sigma=z_sigmas, sample=z_samples)
 
