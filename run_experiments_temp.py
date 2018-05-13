@@ -42,9 +42,9 @@ parser = argparse.ArgumentParser()
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":5, 'reg':'mmd-tc', "batch_size": 104, "sample_range":1.}
 # cfg = get_config(config=config, name=None, suffix="_test", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
-# all together
-config = {"nonlinearity": "elu", "network_size":"large", "beta":5e5, "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="_all_together", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
+# # all together
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":5e5, "batch_size": 104, "sample_range":1.}
+# cfg = get_config(config=config, name=None, suffix="_all_together", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
 
 
 # # large network, bn before nonlinearity, beta 1e6
@@ -67,9 +67,9 @@ cfg = get_config(config=config, name=None, suffix="_all_together", load_dir=None
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":0.1, 'reg':'mmd-tc', "batch_size": 104, "sample_range":1.}
 # cfg = get_config(config=config, name=None, suffix="_test", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 #
-# # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase, ********
-# config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
-# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
+# large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase, ********
+config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
 
 # # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
@@ -141,7 +141,7 @@ if 'celeba' in args.data_set:
 elif 'svhn' in args.data_set:
     data_set = load_data.SVHN(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
 if args.debug:
-    train_data = data_set.train(shuffle=True, limit=batch_size*2) 
+    train_data = data_set.train(shuffle=True, limit=batch_size*2)
     eval_data = data_set.train(shuffle=True, limit=batch_size*2)
     test_data = data_set.test(shuffle=False, limit=-1)
 else:
@@ -505,8 +505,8 @@ with tf.Session(config=config) as sess:
     sample_mgen = get_generator('center', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
-    visualize_samples(gt_data, "/data/ziz/jxu/gpu-results/recon_gt_together_randomz.png", layout=(4,4))
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/recon_sample_together_randomz.png", layout=(4,4))
+    visualize_samples(gt_data, "/data/ziz/jxu/gpu-results/recon_gt_2stage_randomz.png", layout=(4,4))
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/recon_sample_2stage_randomz.png", layout=(4,4))
 
 quit()
 
