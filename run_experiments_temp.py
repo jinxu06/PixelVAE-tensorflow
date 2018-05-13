@@ -141,7 +141,7 @@ if 'celeba' in args.data_set:
 elif 'svhn' in args.data_set:
     data_set = load_data.SVHN(data_dir=args.data_dir, batch_size=batch_size, img_size=args.img_size)
 if args.debug:
-    train_data = data_set.train(shuffle=True, limit=-1)#limit=batch_size*2) ##
+    train_data = data_set.train(shuffle=True, limit=batch_size*2)#limit=batch_size*2) ##
     eval_data = data_set.train(shuffle=True, limit=batch_size*2)
     test_data = data_set.test(shuffle=False, limit=-1)
 else:
@@ -471,7 +471,7 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
     z_mus, z_sigmas, z_samples = [], [], []
-    for data in test_data:
+    for data in train_data:
         z_mu, z_sigma, z_sample = inspect_posterior(sess, data)
         print(z_mu)
         print(z_sigma)
