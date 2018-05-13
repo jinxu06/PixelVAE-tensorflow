@@ -322,6 +322,21 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
                     x_gen[i][:, yi, xi, :] = x_hats[i][:, yi, xi, :]
     return np.concatenate(x_gen, axis=0)
 
+def inspect_posterior(sess, data):
+    data = np.cast[np.float32]((data - 127.5) / 127.5)
+    ds = np.split(data, args.nr_gpu)
+    feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
+    feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
+    feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
+    masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
+    if "input" in args.use_mask_for:
+        feed_dict.update({input_masks[i]:np.ones((args.batch_size,args.img_size,args.img_size)) for i in range(args.nr_gpu)}) ##
+    z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_log_sigma_sq = np.concatenate(sess.run([pvaes[i].z_log_sigma_sq for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
+    z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
+    z = np.random.normal(loc=z_mu, scale=z_sigma)
+    return z_mu, z_sigma, z
+
 def random_completion(sess, data, random_masks):
     data = np.cast[np.float32]((data - 127.5) / 127.5)
     ds = np.split(data, args.nr_gpu)
@@ -444,6 +459,33 @@ def latent_traversal(sess, image, traversal_range=[-6, 6], num_traversal_step=13
 
 initializer = tf.global_variables_initializer()
 saver = tf.train.Saver()
+
+# inspect_posterior
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True
+with tf.Session(config=config) as sess:
+
+    sess.run(initializer)
+    # restore the model
+    ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
+    print('restoring parameters from', ckpt_file)
+    saver.restore(sess, ckpt_file)
+
+    z_mus, z_sigmas, z_samples = [], [], []
+    for data in train_data:
+        z_mu, z_sigma, z_sample = inspect_posterior(sess, data)
+        z_mus.append(z_mu)
+        z_sigmas.append(z_sigma)
+        z_samples.append(z_sample)
+    z_mus = np.concatenate(z_mus, axis=0)
+    z_sigmas = np.concatenate(z_sigmas, axis=0)
+    z_samples = np.concatenate(z_samples, axis=0)
+
+    print(z_mus.shape)
+    print(z_sigmas.shape)
+    print(z_samples.shape)
+
+quit()
 
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
