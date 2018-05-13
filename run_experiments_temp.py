@@ -328,7 +328,6 @@ def inspect_posterior(sess, data):
     feed_dict = {is_trainings[i]:False for i in range(args.nr_gpu)}
     feed_dict.update({dropout_ps[i]: 0. for i in range(args.nr_gpu)})
     feed_dict.update({xs[i]:ds[i] for i in range(args.nr_gpu)})
-    masks_np = [mgen.gen(args.batch_size) for i in range(args.nr_gpu)]
     if "input" in args.use_mask_for:
         feed_dict.update({input_masks[i]:np.ones((args.batch_size,args.img_size,args.img_size)) for i in range(args.nr_gpu)}) ##
     z_mu = np.concatenate(sess.run([pvaes[i].z_mu for i in range(args.nr_gpu)], feed_dict=feed_dict), axis=0)
