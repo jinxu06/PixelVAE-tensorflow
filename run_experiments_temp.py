@@ -503,14 +503,14 @@ with tf.Session(config=config) as sess:
     # get test data
     data = test_data.next(116)
     data = data[-16:]
-    # for i in range(16):
-    #     data[i] = data[-1].copy()
+    for i in range(16):
+        data[i] = data[-1].copy()
     test_data.reset()
     gt_data = np.cast[np.float32]((data - 127.5) / 127.5)
     sample_mgen = get_generator('mouth', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
-    visualize_samples(gt_data, "/data/ziz/jxu/gpu-results/gt.png", layout=(4,4))
+    visualize_samples(gt_data, "/data/ziz/jxu/gpu-results/recon_gt.png", layout=(4,4))
     visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/recon_sample_mouth_together.png", layout=(4,4))
 
 quit()
