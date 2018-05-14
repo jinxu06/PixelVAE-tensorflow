@@ -311,7 +311,7 @@ def generate_samples(sess, data, fill_region=None, mgen=None):
     z_sigma = np.sqrt(np.exp(z_log_sigma_sq))
 
     # z = np.random.normal(loc=z_mu, scale=z_sigma)
-    z = np.random.normal(loc=np.zeros_like(z_mu), scale=np.ones_like(z_sigma))
+    z = np.random.normal(loc=np.zeros_like(z_mu), scale=3*np.ones_like(z_sigma))
     #z[:, 25] = 5. ##
     #z[:, 26] = 5. ##
     #z[:, 30] = 5. ##
