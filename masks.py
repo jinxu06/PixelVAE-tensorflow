@@ -98,7 +98,7 @@ def get_generator(name, size):
     elif name=='eye':
         return RectangleMaskGenerator(size, size, rec=[9, 27, 21, 5])
     elif name=='mouth':
-        return RectangleMaskGenerator(size, size, rec=[22, 28, 31, 4])
+        return RectangleMaskGenerator(size, size, rec=[22, 28, 32, 4])
         # return RectangleMaskGenerator(size, size, rec=[22, 32, 32, 0])
     elif name=='nose':
         return RectangleMaskGenerator(size, size, rec=[18, 21, 27, 11])
