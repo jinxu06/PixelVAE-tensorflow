@@ -67,9 +67,9 @@ parser = argparse.ArgumentParser()
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":0.1, 'reg':'mmd-tc', "batch_size": 104, "sample_range":1.}
 # cfg = get_config(config=config, name=None, suffix="_test", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 #
-# large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase, ********
-config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
+# # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase, ********
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
+# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
 
 # # large network, bn before nonlinearity, beta 2e6, nr_resnet 5, ce phase
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "learning_rate":0.0001, "batch_size": 104, "sample_range":1.}
@@ -97,9 +97,9 @@ cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, datas
 
 
 
-# # all together
-# config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "batch_size": 104, "sample_range":1.}
-# cfg = get_config(config=config, name=None, suffix="_all_together", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
+# all together
+config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "batch_size": 104, "sample_range":1.}
+cfg = get_config(config=config, name=None, suffix="_all_together", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
 
 
 
@@ -510,11 +510,11 @@ with tf.Session(config=config) as sess:
         data[i] = data[-1].copy()
     test_data.reset()
     gt_data = np.cast[np.float32]((data - 127.5) / 127.5)
-    sample_mgen = get_generator('mouth', args.img_size)
+    sample_mgen = get_generator('hair', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     sample_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
-    visualize_samples(gt_data, "/data/ziz/jxu/gpu-results/recon_gt_mouth_mmd_2e6_randomz.png", layout=(4,4))
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/recon_sample_mouth_mmd_2e6_randomz.png", layout=(4,4))
+    visualize_samples(gt_data, "/data/ziz/jxu/gpu-results/recon_gt_hair_together_2e6_randomz.png", layout=(4,4))
+    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/recon_sample_hair_together_2e6_randomz.png", layout=(4,4))
 
 quit()
 
