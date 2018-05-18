@@ -109,7 +109,7 @@ def get_generator(name, size):
         return RectangleMaskGenerator(size, size, rec=[8, 24, 32, 8])
     elif name=='bottom half':
         return RectangleMaskGenerator(size, size, rec=[16, 32, 32, 0])
-    elif name=='bottom 1/4':
+    elif name=='bottom quarter':
         return RectangleMaskGenerator(size, size, rec=[24, 32, 32, 0])
     elif name=='random rec':
         return RandomRectangleMaskGenerator(size, size, min_ratio=1./8, max_ratio=(1.-1./8))
