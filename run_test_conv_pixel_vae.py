@@ -57,7 +57,7 @@ parser = argparse.ArgumentParser()
 
 # large network, bn before nonlinearity, beta 2e6, nr_resnet 5
 config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
 
 # # large network, bn before nonlinearity, beta 1e6, nr_resnet 3
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":1e6, "nr_resnet":3, "batch_size": 104, "sample_range":1.}
@@ -348,14 +348,14 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
 
-    # sample_mgen = get_generator('eye', args.img_size)
-    # fill_region = sample_mgen.gen(1)[0]
-    sample_mgen = get_generator('transparent', args.img_size)
-    fill_region = get_generator('full', args.img_size).gen(1)[0]
+    sample_mgen = get_generator('center', args.img_size)
+    fill_region = sample_mgen.gen(1)[0]
+    # sample_mgen = get_generator('transparent', args.img_size)
+    # fill_region = get_generator('full', args.img_size).gen(1)[0]
     data = next(test_data)
 
-    # from blocks.helpers import broadcast_masks_np
-    # data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
+    from blocks.helpers import broadcast_masks_np
+    data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
 
     test_data.reset()
     # vdata = np.cast[np.float32]((data - 127.5) / 127.5)
@@ -371,4 +371,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/full_traversal_b2e6_pvae.png")
+    img.save("/data/ziz/jxu/gpu-results/center_traversal_b2e6_ce.png")
