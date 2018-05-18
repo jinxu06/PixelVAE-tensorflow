@@ -33,10 +33,10 @@ parser = argparse.ArgumentParser()
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":5e5, "batch_size": 104, "sample_range":1.}
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
-config = {"nonlinearity": "elu", "network_size":"large", "beta":5e5, "batch_size": 96, "sample_range":1.}
-#load_dir = "/data/ziz/jxu/save_dirs/checkpoints_celeba32_32_mmd_500000.0_5_pvae_large"
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
-
+# config = {"nonlinearity": "elu", "network_size":"large", "beta":5e5, "batch_size": 96, "sample_range":1.}
+# #load_dir = "/data/ziz/jxu/save_dirs/checkpoints_celeba32_32_mmd_500000.0_5_pvae_large"
+# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
+#
 
 # # # large network, mmd-tc
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":5, 'reg':'mmd-tc', "batch_size": 104, "sample_range":1.}
@@ -55,9 +55,9 @@ cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, datas
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":5e6, "nr_resnet":5, "batch_size": 104, "sample_range":1.}
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
-# # large network, bn before nonlinearity, beta 2e6, nr_resnet 5
-# config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "batch_size": 104, "sample_range":1.}
-# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
+# large network, bn before nonlinearity, beta 2e6, nr_resnet 5
+config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "batch_size": 104, "sample_range":1.}
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 # # large network, bn before nonlinearity, beta 1e6, nr_resnet 3
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":1e6, "nr_resnet":3, "batch_size": 104, "sample_range":1.}
@@ -348,14 +348,14 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
 
-    sample_mgen = get_generator('eye', args.img_size)
-    fill_region = sample_mgen.gen(1)[0]
-    # sample_mgen = get_generator('transparent', args.img_size)
-    # fill_region = get_generator('full', args.img_size).gen(1)[0]
+    # sample_mgen = get_generator('eye', args.img_size)
+    # fill_region = sample_mgen.gen(1)[0]
+    sample_mgen = get_generator('transparent', args.img_size)
+    fill_region = get_generator('full', args.img_size).gen(1)[0]
     data = next(test_data)
 
-    from blocks.helpers import broadcast_masks_np
-    data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
+    # from blocks.helpers import broadcast_masks_np
+    # data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
 
     test_data.reset()
     # vdata = np.cast[np.float32]((data - 127.5) / 127.5)
@@ -363,12 +363,12 @@ with tf.Session(config=config) as sess:
 
 
     img = []
-    for i in [7, 18, 44, 74, 77]: #[5,7,8]: #[5, 7, 8, 18, 27, 44, 74, 77]:
-        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=6, fill_region=fill_region, mgen=sample_mgen)
+    for i in [7]: #[5,7,8]: #[5, 7, 8, 18, 27, 44, 74, 77]:
+        sample_x = latent_traversal(sess, data[i], traversal_range=[-6, 6], num_traversal_step=13, fill_region=fill_region, mgen=sample_mgen)
         view = visualize_samples(sample_x, None, layout=(args.z_dim, sample_x.shape[0]//args.z_dim))
         img.append(view.copy())
     img = np.concatenate(img, axis=1)
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/eye_traversal_b5e5_ce.png")
+    img.save("/data/ziz/jxu/gpu-results/full_traversal_b2e6_pvae.png")
