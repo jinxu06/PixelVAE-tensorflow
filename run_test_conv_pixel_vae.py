@@ -348,7 +348,7 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
 
-    sample_mgen = get_generator('face', args.img_size)
+    sample_mgen = get_generator('bottom half', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     # sample_mgen = get_generator('transparent', args.img_size)
     # fill_region = get_generator('full', args.img_size).gen(1)[0]
@@ -371,4 +371,4 @@ with tf.Session(config=config) as sess:
     from PIL import Image
     img = img.astype(np.uint8)
     img = Image.fromarray(img, 'RGB')
-    img.save("/data/ziz/jxu/gpu-results/face_traversal_b2e6_ce.png")
+    img.save("/data/ziz/jxu/gpu-results/bottom_half_traversal_b2e6_ce.png")

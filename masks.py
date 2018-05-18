@@ -107,6 +107,8 @@ def get_generator(name, size):
         # return MultiRectangleMaskGenerator(size, size, recs=[[0,32,10,0], [0,9,32,0], [0,23,32,32]])
     elif name=='face':
         return RectangleMaskGenerator(size, size, rec=[8, 24, 32, 8])
+    elif name=='bottom half':
+        return RectangleMaskGenerator(size, size, rec=[16, 32, 32, 0])
     elif name=='random rec':
         return RandomRectangleMaskGenerator(size, size, min_ratio=1./8, max_ratio=(1.-1./8))
 
