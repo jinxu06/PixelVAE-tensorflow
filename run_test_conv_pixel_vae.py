@@ -357,10 +357,16 @@ with tf.Session(config=config) as sess:
     from blocks.helpers import broadcast_masks_np
     data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
 
+    vdata = np.cast[np.float32]((data - 127.5) / 127.5)
+    visualize_samples(vdata, "results/original.png", layout=[8,8])
+
     test_data.reset()
 
     samples_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
     visualize_samples(samples_x, "results/test.png", layout=[8,8])
+
+    diff = samples_x - vdata 
+    visualize_samples(diff, "results/diff.png", layout=[8,8])
 
 
     # vdata = np.cast[np.float32]((data - 127.5) / 127.5)
