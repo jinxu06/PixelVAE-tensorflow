@@ -360,7 +360,7 @@ with tf.Session(config=config) as sess:
     test_data.reset()
 
     samples_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
-    visualize_samples(sample_x, "results/test.png", layout=[8,8])
+    visualize_samples(samples_x, "results/test.png", layout=[8,8])
 
 
     # vdata = np.cast[np.float32]((data - 127.5) / 127.5)
