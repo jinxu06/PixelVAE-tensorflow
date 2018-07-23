@@ -57,7 +57,7 @@ parser = argparse.ArgumentParser()
 
 # large network, bn before nonlinearity, beta 2e6, nr_resnet 5
 config = {"nonlinearity": "elu", "network_size":"large", "beta":2e6, "nr_resnet":5, "batch_size": 104, "sample_range":1.}
-cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='ce', use_mask_for="input output")
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 # # large network, bn before nonlinearity, beta 1e6, nr_resnet 3
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":1e6, "nr_resnet":3, "batch_size": 104, "sample_range":1.}
@@ -365,7 +365,7 @@ with tf.Session(config=config) as sess:
     visualize_samples(samples_x, "results/test.png", layout=[8,8])
 
     diff = np.abs(samples_x - vdata) / 2.
-    visualize_samples(diff, "results/diff.png", layout=[8,8])
+    visualize_samples(diff, "results/diff-pvae.png", layout=[8,8])
 
 
     # vdata = np.cast[np.float32]((data - 127.5) / 127.5)
