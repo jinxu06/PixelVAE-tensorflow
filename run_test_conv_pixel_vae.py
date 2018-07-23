@@ -348,7 +348,7 @@ with tf.Session(config=config) as sess:
     saver.restore(sess, ckpt_file)
 
 
-    sample_mgen = get_generator('bottom quarter', args.img_size)
+    sample_mgen = get_generator('center', args.img_size)
     fill_region = sample_mgen.gen(1)[0]
     # sample_mgen = get_generator('transparent', args.img_size)
     # fill_region = get_generator('full', args.img_size).gen(1)[0]
@@ -358,9 +358,15 @@ with tf.Session(config=config) as sess:
     data = data.astype(np.float32) * broadcast_masks_np(fill_region, 3)
 
     test_data.reset()
+
+    samples_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
+    visualize_samples(sample_x, "results/test.png", layout=[8,8])
+
+
     # vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     # visualize_samples(vdata, "/data/ziz/jxu/gpu-results/show_original.png", layout=[8,8])
 
+    quit()
 
     img = []
     for i in [7]: #[5,7,8]: #[5, 7, 8, 18, 27, 44, 74, 77]:
