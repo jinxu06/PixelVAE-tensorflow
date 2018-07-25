@@ -341,6 +341,15 @@ config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
 
+    p = np.load('diff-pvae.npz')['d']
+    n = np.load('diff-ce.npz')['d']
+    d = p - n
+    d = (d - d.min()) / d.max()
+    d = d * 2. - 1.
+    diff = np.array([np.stack([d for c in range(3)], axis=-1)])
+    visualize_samples(diff, "results/diff.png", layout=[1,1])
+    quit()
+
     sess.run(initializer)
 
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
