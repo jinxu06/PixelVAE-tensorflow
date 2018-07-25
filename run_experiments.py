@@ -81,9 +81,9 @@ cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, datas
 # cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 
-# # kld, large network, bn before nonlinearity nr_resnet 1
-# config = {"nonlinearity": "elu", "network_size":"large", "beta":1.0, "nr_resnet":1, "reg":"kld", "batch_size": 104, "sample_range":1.}
-# cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
+# kld, large network, bn before nonlinearity nr_resnet 1
+config = {"nonlinearity": "elu", "network_size":"large", "beta":1.0, "nr_resnet":1, "reg":"kld", "batch_size": 104, "sample_range":1.}
+cfg = get_config(config=config, name=None, suffix="_large", load_dir=None, dataset='celeba', size=32, mode='test', phase='pvae', use_mask_for="input output")
 
 # # tc, beta 5, large network, bn before nonlinearity nr_resnet 1
 # config = {"nonlinearity": "elu", "network_size":"large", "beta":5.0, "nr_resnet":1, "reg":"tc", "batch_size": 104, "sample_range":1.}
@@ -458,15 +458,16 @@ with tf.Session(config=config) as sess:
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
-    # get test data
-    data = test_data.next(100)
-    test_data.reset()
-    gt_data = np.cast[np.float32]((data - 127.5) / 127.5)
-    sample_mgen = get_generator('transparent', args.img_size)
-    fill_region = sample_mgen.gen(1)[0]
-    sample_x = generate_samples(sess, data, fill_region=np.zeros_like(fill_region), mgen=sample_mgen)
-    visualize_samples(gt_data, "/data/ziz/jxu/gpu-results/recon_gt_info.png", layout=(4,4))
-    visualize_samples(sample_x, "/data/ziz/jxu/gpu-results/recon_sample_info.png", layout=(4,4))
+
+    mgen = get_generator('transparent', args.img_size)
+    #
+    for data in train_data:
+        feed_dict = make_feed_dict(data, is_training=False, dropout_p=0.0, mgen=mgen)
+        r = np.mean(sess.run([p.mi for p in pvaes], feed_dict=feed_dict))
+        print(r)
+
+    quit()
+    
 quit()
 
 
@@ -504,6 +505,10 @@ with tf.Session(config=config) as sess:
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
+
+
+
+
     # get test data
     data = test_data.next(100)
     test_data.reset()
