@@ -114,7 +114,7 @@ class ConvPixelVAE(object):
             self.mmdtc = estimate_mmdtc(self.z, self.random_indices)
             self.loss_reg =  (self.mmd + self.beta * self.mmdtc) * 1e5
 
-        self.mi = estimate_mi(z, z_mu, z_log_sigma_sq, N=200000)
+        self.mi = estimate_mi(self.z, self.z_mu, self.z_log_sigma_sq, N=200000)
 
         print("reg:{0}, beta:{1}, lam:{2}".format(self.reg, self.beta, self.lam))
         self.loss = self.loss_ae + self.loss_reg
