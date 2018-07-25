@@ -215,7 +215,7 @@ if args.mode == 'train':
             record_dict['dwkld reg'] = tf.add_n([v.dwkld for v in pvaes]) / args.nr_gpu
         elif args.reg=='mmd':
             record_dict['mmd'] = tf.add_n([v.mmd for v in pvaes]) / args.nr_gpu
-        if args.reg=='info-tc':
+        elif args.reg=='info-tc':
             record_dict['mi reg'] = tf.add_n([v.mi for v in pvaes]) / args.nr_gpu
             record_dict['tc reg'] = tf.add_n([v.tc for v in pvaes]) / args.nr_gpu
             record_dict['dwkld reg'] = tf.add_n([v.dwkld for v in pvaes]) / args.nr_gpu
