@@ -352,7 +352,7 @@ with tf.Session(config=config) as sess:
     fill_region = sample_mgen.gen(1)[0]
     # sample_mgen = get_generator('transparent', args.img_size)
     # fill_region = get_generator('full', args.img_size).gen(1)[0]
-    data = next(test_data, n=100)
+    data = next(test_data, 100)
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     visualize_samples(vdata, "results/original.png", layout=[8,8])
 
