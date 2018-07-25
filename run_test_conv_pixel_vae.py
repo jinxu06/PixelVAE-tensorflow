@@ -352,7 +352,7 @@ with tf.Session(config=config) as sess:
     fill_region = sample_mgen.gen(1)[0]
     # sample_mgen = get_generator('transparent', args.img_size)
     # fill_region = get_generator('full', args.img_size).gen(1)[0]
-    data = next(test_data)
+    data = next(test_data, n=100)
     vdata = np.cast[np.float32]((data - 127.5) / 127.5)
     visualize_samples(vdata, "results/original.png", layout=[8,8])
 
@@ -364,7 +364,7 @@ with tf.Session(config=config) as sess:
     samples_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
     visualize_samples(samples_x, "results/test.png", layout=[8,8])
 
-    diff = np.mean(np.mean(np.abs(samples_x - vdata), axis=-1), 0)
+    diff = np.mean(np.mean(np.power(samples_x - vdata, 2), axis=-1), 0) / 2. - 1.
     diff = np.array([np.stack([diff for c in range(3)], axis=-1)])
     visualize_samples(diff, "results/diff-pvae.png", layout=[1,1])
 
