@@ -365,6 +365,7 @@ with tf.Session(config=config) as sess:
     visualize_samples(samples_x, "results/test.png", layout=[8,8])
 
     diff = np.mean(np.mean(np.power(samples_x - vdata, 2), axis=-1), 0)
+    np.set_printoptions(threshold=np.inf)
     print(diff)
     print(diff / 2. - 1.)
     diff = np.array([np.stack([diff for c in range(3)], axis=-1)])
