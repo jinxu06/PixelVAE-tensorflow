@@ -341,20 +341,28 @@ config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 with tf.Session(config=config) as sess:
 
-    p = np.load('diff-pvae.npz')['d']
-    n = np.load('diff-ce.npz')['d']
-    d = p - n
-    d = (d - d.min()) / d.max()
-    d = d * 2. - 1.
-    diff = np.array([np.stack([d for c in range(3)], axis=-1)])
-    visualize_samples(diff, "results/diff.png", layout=[1,1])
-    quit()
+    # p = np.load('diff-pvae.npz')['d']
+    # n = np.load('diff-ce.npz')['d']
+    # d = p - n
+    # d = (d - d.min()) / d.max()
+    # d = d * 2. - 1.
+    # diff = np.array([np.stack([d for c in range(3)], axis=-1)])
+    # visualize_samples(diff, "results/diff.png", layout=[1,1])
+    # quit()
 
     sess.run(initializer)
 
     ckpt_file = args.save_dir + '/params_' + args.data_set + '.ckpt'
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
+
+    #
+    for data in train_data:
+        feed_dict = make_feed_dict(data, is_training=False, dropout_p=0.0)
+        r = np.mean(sess.run([p.mi for p in pvaes], feed_dict=feed_dict))
+        print(r)
+
+    quit()
 
 
     sample_mgen = get_generator('eye', args.img_size)
