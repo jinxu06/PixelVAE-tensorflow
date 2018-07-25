@@ -364,7 +364,9 @@ with tf.Session(config=config) as sess:
     samples_x = generate_samples(sess, data, fill_region=fill_region, mgen=sample_mgen)
     visualize_samples(samples_x, "results/test.png", layout=[8,8])
 
-    diff = np.mean(np.mean(np.power(samples_x - vdata, 2), axis=-1), 0) / 2. - 1.
+    diff = np.mean(np.mean(np.power(samples_x - vdata, 2), axis=-1), 0)
+    print(diff)
+    print(diff / 2. - 1.)
     diff = np.array([np.stack([diff for c in range(3)], axis=-1)])
     visualize_samples(diff, "results/diff-pvae.png", layout=[1,1])
 
