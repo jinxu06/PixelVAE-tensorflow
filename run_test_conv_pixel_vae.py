@@ -356,9 +356,10 @@ with tf.Session(config=config) as sess:
     print('restoring parameters from', ckpt_file)
     saver.restore(sess, ckpt_file)
 
+    mgen = get_generator('transparent', args.img_size)
     #
     for data in train_data:
-        feed_dict = make_feed_dict(data, is_training=False, dropout_p=0.0)
+        feed_dict = make_feed_dict(data, is_training=False, dropout_p=0.0, mgen=mgen)
         r = np.mean(sess.run([p.mi for p in pvaes], feed_dict=feed_dict))
         print(r)
 
